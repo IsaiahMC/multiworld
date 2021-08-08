@@ -2,8 +2,7 @@
  * Isaiah's Configuration File Format
  * Tiny two file YAML-like configuration parser
  * 
- * Copyright (c) 2021. All Rights Reserved.
- * 
+ * Unlicense
  */
 package me.isaiah.multiworld.config;
 
