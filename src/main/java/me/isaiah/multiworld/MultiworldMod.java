@@ -13,7 +13,6 @@ import java.util.Random;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import me.isaiah.extra.Extra;
 import me.isaiah.multiworld.config.FileConfiguration;
 import me.isaiah.multiworld.perm.Perm;
 import net.fabricmc.api.ModInitializer;
@@ -60,12 +59,6 @@ public class MultiworldMod implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(mc -> {
             MultiworldMod.mc = mc;
         });
-        try {
-            Extra.download();
-        } catch (Exception e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
             dispatcher.register(literal(CMD)
