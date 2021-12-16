@@ -23,7 +23,6 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ') + 1);
 
         String input = builder.getInput();
-        int spaces = input.length() - input.replaceAll(" ", "").length();
         String[] cmds = input.split(" ");
 
         ServerCommandSource plr = context.getSource();
