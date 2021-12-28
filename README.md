@@ -1,6 +1,6 @@
 <img src="https://cdn.modrinth.com/data/fgvoNDL1/icon.gif" align="right" height="128">
 
-# Multiworld ![](http://cf.way2muchnoise.eu/multiworld-fabric.svg) ![](http://cf.way2muchnoise.eu/versions/multiworld-fabric.svg)
+# Multiworld ![](http://cf.way2muchnoise.eu/multiworld-mod.svg) ![](http://cf.way2muchnoise.eu/versions/multiworld-mod.svg)
 The Multiworld Mod - Adds support for creating & teleporting to multiple worlds. 
 
  
