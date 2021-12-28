@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "multiworld",
+  "version": "${version}",
+  "name": "Multiworld",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "Insert License Here",
+  "icon": "assets/MultiworldMod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.isaiah.multiworld.fabric.MultiworldModFabric"
+    ]
+  },
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.18"
+  },
+  "mixins": [
+    "dim.mixins.json"
+  ],
+  "suggests": {
+    "flamingo": "*"
+  }
+}
