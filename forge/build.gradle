@@ -39,8 +39,8 @@ dependencies {
     //common(project(path: ":fantasy-forge", configuration: "namedElements")) { transitive false }
     //shadowCommon(project(path: ":fantasy-forge", configuration: "transformProductionForge")) { transitive = false }
     
-    common( project(path: ":fantasy-forge") )
-    shadowCommon( project(path: ":fantasy-forge") )
+    // common( project(path: ":fantasy-forge") )
+    // shadowCommon( project(path: ":fantasy-forge") )
 }
 
 processResources {
