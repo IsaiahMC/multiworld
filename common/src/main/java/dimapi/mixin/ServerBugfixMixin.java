@@ -52,7 +52,10 @@ import net.minecraft.world.level.storage.LevelStorage;
  */
 @Mixin(value = Main.class)
 public class ServerBugfixMixin {
-	@Unique
+    
+    // TODO: 1.18.2
+    
+	/*@Unique
 	private static LevelStorage.Session fabric_session;
 
 	@Unique
@@ -88,5 +91,5 @@ public class ServerBugfixMixin {
 
 		// And reload it again, and replace the actual level properties with it
 		return (LevelProperties) fabric_session.readLevelProperties(fabric_registryOps, dataPackSettings);
-	}
+	}*/
 }
