@@ -1,7 +1,5 @@
 package me.isaiah.multiworld.perm;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -26,7 +24,7 @@ public class Perm {
     public static boolean has(ServerCommandSource s, String perm) {
         try {
             return has(s.getPlayer(), perm);
-        } catch (CommandSyntaxException e) {
+        } catch (Exception e) {
             return s.hasPermissionLevel(2);
         }
     }

@@ -29,7 +29,8 @@ dependencies {
     
     // Fantasy API
     // include(modImplementation('xyz.nucleoid:fantasy:0.4.3+1.18-pre6'))
-    include(modImplementation('xyz.nucleoid:fantasy:0.4.4+1.18.2'))
+    // include(modImplementation('xyz.nucleoid:fantasy:0.4.4+1.18.2'))
+    include(modImplementation(fileTree(dir: 'libs', include: "fantasy-1.19.jar")))
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }

@@ -7,11 +7,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
+import static me.isaiah.multiworld.MultiworldMod.text;
 
 public class TpCommand {
 
@@ -28,15 +28,21 @@ public class TpCommand {
         if (worlds.containsKey(arg1)) {
             ServerWorld w = worlds.get(arg1);
             BlockPos sp = w.getSpawnPos();
-            if (!w.getDimension().isBedWorking() && !w.getDimension().hasCeiling()) {
+            /*if (!w.getDimension().isBedWorking() && !w.getDimension().hasCeiling()) {
                 ServerWorld.createEndSpawnPlatform(w);
                 sp = ServerWorld.END_SPAWN_POS;
-            }
+            }*/
+			
+			if (w.getDimensionKey() == Util.THE_END_REGISTRY_KEY) {
+				ServerWorld.createEndSpawnPlatform(w);
+                sp = ServerWorld.END_SPAWN_POS;
+			}
+			
             if (null == sp) {
-                plr.sendMessage(new LiteralText("Error: null getSpawnPos").formatted(Formatting.RED), false);
+                plr.sendMessage(text("Error: null getSpawnPos", Formatting.RED), false);
                 sp = new BlockPos(1, 40, 1);
             }
-            plr.sendMessage(new LiteralText("Telelporting...").formatted(Formatting.GOLD), false);
+            plr.sendMessage(text("Telelporting...", Formatting.GOLD), false);
 
             sp = findSafePos(w, sp);
 

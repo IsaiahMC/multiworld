@@ -32,7 +32,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -59,8 +58,8 @@ public class MultiworldMod {
         world_creator = ic;
     }
 
-    public static ServerWorld create_world(String id, RegistryKey<DimensionType> dim, ChunkGenerator gen, Difficulty dif) {
-        return world_creator.create_world(id, dim,gen,dif);
+    public static ServerWorld create_world(String id, RegistryKey<DimensionType> dim, ChunkGenerator gen, Difficulty dif, long seed) {
+        return world_creator.create_world(id, dim,gen,dif, seed);
     }
 
     // On mod init
@@ -80,7 +79,7 @@ public class MultiworldMod {
                         try {
                             return Perm.has(source.getPlayer(), "multiworld.cmd") ||
                                     Perm.has(source.getPlayer(), "multiworld.admin");
-                        } catch (CommandSyntaxException e) {
+                        } catch (Exception e) {
                             return source.hasPermissionLevel(1);
                         }
                     }) 
@@ -102,7 +101,7 @@ public class MultiworldMod {
         final ServerPlayerEntity plr = source.getPlayer();
 
         if (null == message) {
-            plr.sendMessage(new LiteralText("Usage:").formatted(Formatting.AQUA), false);
+            plr.sendMessage(text("Usage:", Formatting.AQUA), false);
             return 1;
         }
 
@@ -129,7 +128,7 @@ public class MultiworldMod {
             try {
                 p.save();
             } catch (IOException e) {
-                plr.sendMessage(new LiteralText("Failed saving portal data. Check console for details.").formatted(Formatting.RED), false);
+                plr.sendMessage(text("Failed saving portal data. Check console for details.", Formatting.RED), false);
                 e.printStackTrace();
             }
         }*/
@@ -148,7 +147,7 @@ public class MultiworldMod {
                 return 1;
             }
             if (args.length == 1) {
-                plr.sendMessage(new LiteralText("Usage: /" + CMD + " tp <world>"), false);
+                plr.sendMessage(text_plain("Usage: /" + CMD + " tp <world>"), false);
                 return 0;
             }
             return TpCommand.run(mc, plr, args);
@@ -159,17 +158,17 @@ public class MultiworldMod {
                 plr.sendMessage(Text.of("No permission! Missing permission: multiworld.cmd"), false);
                 return 1;
             }
-            plr.sendMessage(new LiteralText("All Worlds:").formatted(Formatting.AQUA), false);
+            plr.sendMessage(text("All Worlds:", Formatting.AQUA), false);
             mc.getWorlds().forEach(world -> {
                 String name = world.getRegistryKey().getValue().toString();
                 if (name.startsWith("multiworld:")) name = name.replace("multiworld:", "");
 
-                plr.sendMessage(new LiteralText("- " + name), false);
+                plr.sendMessage(text_plain("- " + name), false);
             });
         }
 
         if (args[0].equalsIgnoreCase("version") && (ALL || Perm.has(plr, "multiworld.cmd")) ) {
-            plr.sendMessage(new LiteralText("Mutliworld Mod (Fabric) version 1.2"), false);
+            plr.sendMessage(text_plain("Mutliworld Mod (Fabric) version 1.2"), false);
             return 1;
         }
 
@@ -185,4 +184,13 @@ public class MultiworldMod {
     }
     
     
+	// TODO: this could be better
+	public static Text text(String txt, Formatting color) {
+		return Text.of(txt).copy().formatted(color);
+	}
+	
+	public static Text text_plain(String txt) {
+		return Text.of(txt);
+	}
+	
 }

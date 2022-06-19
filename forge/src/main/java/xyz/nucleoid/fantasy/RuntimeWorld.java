@@ -8,6 +8,8 @@ import net.minecraft.util.Util;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.dimension.DimensionOptions;
+
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
 import xyz.nucleoid.fantasy.util.VoidWorldProgressListener;
@@ -16,18 +18,15 @@ class RuntimeWorld extends ServerWorld {
     final Style style;
 
     RuntimeWorld(MinecraftServer server, RegistryKey<World> registryKey, RuntimeWorldConfig config, Style style) {
-        super(
-                server, Util.getMainWorkerExecutor(), ((MinecraftServerAccess) server).getSession(),
+        super(server, Util.getMainWorkerExecutor(), ((MinecraftServerAccess) server).getSession(),
                 new RuntimeWorldProperties(server.getSaveProperties(), config),
                 registryKey,
-                config.createDimensionOptions(server).getDimensionTypeSupplier(),
+                config.createDimensionOptions(server),
                 VoidWorldProgressListener.INSTANCE,
-                config.getGenerator(),
                 false,
                 BiomeAccess.hashSeed(config.getSeed()),
                 ImmutableList.of(),
-                false
-        );
+                false);
         this.style = style;
     }
 

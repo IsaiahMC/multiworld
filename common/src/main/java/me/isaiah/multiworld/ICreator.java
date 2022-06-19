@@ -10,6 +10,6 @@ import net.minecraft.server.world.ServerWorld;
 
 public interface ICreator {
     
-    public ServerWorld create_world(String id, RegistryKey<DimensionType> dim, ChunkGenerator gen, Difficulty dif);
+    public ServerWorld create_world(String id, RegistryKey<DimensionType> dim, ChunkGenerator gen, Difficulty dif, long seed);
 
 }

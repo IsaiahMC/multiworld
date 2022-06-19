@@ -22,11 +22,12 @@ public class ForgeWorldCreator implements ICreator {
         MultiworldMod.setICreator(new ForgeWorldCreator());
     }
     
-    public ServerWorld create_world(String id, RegistryKey<DimensionType> dim, ChunkGenerator gen, Difficulty dif) {
+    public ServerWorld create_world(String id, RegistryKey<DimensionType> dim, ChunkGenerator gen, Difficulty dif, long seed) {
         RuntimeWorldConfig config = new RuntimeWorldConfig()
                 .setDimensionType(dim)
                 .setGenerator(gen)
                 .setDifficulty(Difficulty.NORMAL)
+				.setSeed(seed)
                 ;
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);

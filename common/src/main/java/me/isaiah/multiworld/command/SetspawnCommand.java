@@ -7,11 +7,13 @@ import me.isaiah.multiworld.config.FileConfiguration;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import static me.isaiah.multiworld.MultiworldMod.text;
+import static me.isaiah.multiworld.MultiworldMod.text_plain;
 
 public class SetspawnCommand {
 
@@ -20,10 +22,12 @@ public class SetspawnCommand {
         BlockPos pos = plr.getBlockPos();
         try {
             setSpawn(w, pos);
-            plr.sendMessage(new LiteralText("Spawn for world \"" + w.getRegistryKey().getValue() + "\" changed to " 
-                    + pos.toShortString()).formatted(Formatting.GOLD), false);
+			
+			String txt = "Spawn for world \"" + w.getRegistryKey().getValue() + "\" changed to " + pos.toShortString();
+			
+            plr.sendMessage(text(txt, Formatting.GOLD), false);
         } catch (IOException e) {
-            plr.sendMessage(new LiteralText("Error: " + e.getMessage()), false);
+            plr.sendMessage(text_plain("Error: " + e.getMessage()), false);
             e.printStackTrace();
         }
         return 1;
