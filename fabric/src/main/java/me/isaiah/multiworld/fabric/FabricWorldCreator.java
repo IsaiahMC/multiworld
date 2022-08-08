@@ -15,6 +15,9 @@ import xyz.nucleoid.fantasy.RuntimeWorldHandle;
 
 import net.minecraft.util.Identifier;
 import me.isaiah.multiworld.MultiworldMod;
+import net.minecraft.util.Formatting;
+import net.minecraft.text.*;
+
 
 public class FabricWorldCreator implements ICreator {
     
@@ -40,5 +43,16 @@ public class FabricWorldCreator implements ICreator {
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new Identifier(id), null);
         worldHandle.delete();
     }
+	
+	@Override
+	public Text colored_literal(String txt, Formatting color) {
+		try {
+			return Text.of(txt).copy().formatted(color);
+		} catch (Exception | IncompatibleClassChangeError e) {
+			// Stupid Mojang changed color chat.
+			// Fallback for 1.18.2:
+			return Fabric18Text.colored_literal(txt, color);
+		}
+	}
 
 }

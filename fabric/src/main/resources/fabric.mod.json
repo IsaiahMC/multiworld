@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "multiworld",
-  "version": "${version}",
+  "version": "1.5",
   "name": "Multiworld",
   "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [

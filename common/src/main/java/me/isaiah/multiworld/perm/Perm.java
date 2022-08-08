@@ -23,7 +23,7 @@ public class Perm {
 
     public static boolean has(ServerCommandSource s, String perm) {
         try {
-            return has(s.getPlayer(), perm);
+            return has(s.getPlayerOrThrow(), perm);
         } catch (Exception e) {
             return s.hasPermissionLevel(2);
         }

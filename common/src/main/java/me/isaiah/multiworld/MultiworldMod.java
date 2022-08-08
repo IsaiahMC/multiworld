@@ -6,6 +6,7 @@ package me.isaiah.multiworld;
 
 import java.util.function.Supplier;
 import com.mojang.brigadier.CommandDispatcher;
+import java.io.File;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
@@ -43,6 +44,9 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.Difficulty;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.registry.SimpleRegistry;
+import net.minecraft.text.LiteralTextContent;
+
+//import me.isaiah.lib.IText;
 
 /**
  * Multiworld version 1.3
@@ -53,6 +57,9 @@ public class MultiworldMod {
     public static MinecraftServer mc;
     public static String CMD = "mw";
     public static ICreator world_creator;
+
+	// Mod Version
+	public static final String VERSION = "1.6";
     
     public static void setICreator(ICreator ic) {
         world_creator = ic;
@@ -70,6 +77,24 @@ public class MultiworldMod {
     // On server start
     public static void on_server_started(MinecraftServer mc) {
         MultiworldMod.mc = mc;
+		
+		File cfg_folder = new File("config");
+		if (cfg_folder.exists()) {
+			File folder = new File(cfg_folder, "multiworld");
+			File worlds = new File(folder, "worlds");
+			if (worlds.exists()) {
+				for (File f : worlds.listFiles()) {
+					if (f.getName().equals("minecraft")) {
+						continue;
+					}
+					for (File fi : f.listFiles()) {
+						String id = f.getName() + ":" + fi.getName().replace(".yml", "");
+						System.out.println("Found saved world " + id);
+						CreateCommand.reinit_world_from_config(mc, id);
+					}
+				}
+			}
+		}
     }
     
     // On command register
@@ -77,8 +102,8 @@ public class MultiworldMod {
         dispatcher.register(literal(CMD)
                     .requires(source -> {
                         try {
-                            return Perm.has(source.getPlayer(), "multiworld.cmd") ||
-                                    Perm.has(source.getPlayer(), "multiworld.admin");
+                            return Perm.has(source.getPlayerOrThrow(), "multiworld.cmd") ||
+                                    Perm.has(source.getPlayerOrThrow(), "multiworld.admin");
                         } catch (Exception e) {
                             return source.hasPermissionLevel(1);
                         }
@@ -98,7 +123,7 @@ public class MultiworldMod {
     }
     
     public static int broadcast(ServerCommandSource source, Formatting formatting, String message) throws CommandSyntaxException {
-        final ServerPlayerEntity plr = source.getPlayer();
+        final ServerPlayerEntity plr = source.getPlayerOrThrow();
 
         if (null == message) {
             plr.sendMessage(text("Usage:", Formatting.AQUA), false);
@@ -168,7 +193,7 @@ public class MultiworldMod {
         }
 
         if (args[0].equalsIgnoreCase("version") && (ALL || Perm.has(plr, "multiworld.cmd")) ) {
-            plr.sendMessage(text_plain("Mutliworld Mod (Fabric) version 1.2"), false);
+            plr.sendMessage(text_plain("Mutliworld Mod version " + VERSION), false);
             return 1;
         }
 
@@ -186,7 +211,7 @@ public class MultiworldMod {
     
 	// TODO: this could be better
 	public static Text text(String txt, Formatting color) {
-		return Text.of(txt).copy().formatted(color);
+		return world_creator.colored_literal(txt, color);
 	}
 	
 	public static Text text_plain(String txt) {

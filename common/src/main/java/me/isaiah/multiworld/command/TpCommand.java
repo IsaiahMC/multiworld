@@ -12,6 +12,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import static me.isaiah.multiworld.MultiworldMod.text;
+import net.minecraft.world.WorldProperties;
+import net.minecraft.world.Heightmap;
+import java.io.File;
+import me.isaiah.multiworld.config.*;
 
 public class TpCommand {
 
@@ -27,15 +31,34 @@ public class TpCommand {
 
         if (worlds.containsKey(arg1)) {
             ServerWorld w = worlds.get(arg1);
-            BlockPos sp = w.getSpawnPos();
+            BlockPos sp = multiworld_method_43126(w);
             /*if (!w.getDimension().isBedWorking() && !w.getDimension().hasCeiling()) {
                 ServerWorld.createEndSpawnPlatform(w);
                 sp = ServerWorld.END_SPAWN_POS;
             }*/
 			
-			if (w.getDimensionKey() == Util.THE_END_REGISTRY_KEY) {
+			
+			boolean isEnd = false;
+			
+			try {
+				// 1.19
+				if (w.getDimensionKey() == Util.THE_END_REGISTRY_KEY) {
+					isEnd = true;
+				}
+			} catch (NoSuchMethodError | Exception e) {
+				// 1.18
+			}
+			
+			String env = read_env_from_config(arg1);
+			if (null != env) {
+				if (env.equalsIgnoreCase("END")) {
+					isEnd = true;
+				}
+			}
+
+			if (isEnd) {
 				ServerWorld.createEndSpawnPlatform(w);
-                sp = ServerWorld.END_SPAWN_POS;
+				sp = ServerWorld.END_SPAWN_POS;
 			}
 			
             if (null == sp) {
@@ -59,6 +82,46 @@ public class TpCommand {
             pos = pos.add(0, 1, 0);
         }
         return pos;
+    }
+	
+	// getSpawnPos
+	public static BlockPos multiworld_method_43126(ServerWorld world) {
+		WorldProperties prop = world.getLevelProperties();
+        BlockPos pos = new BlockPos(prop.getSpawnX(), prop.getSpawnY(), prop.getSpawnZ());
+        if (!world.getWorldBorder().contains(pos)) {
+            pos = world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, new BlockPos(world.getWorldBorder().getCenterX(), 0.0, world.getWorldBorder().getCenterZ()));
+        }
+        return pos;
+    }
+	
+	public static String read_env_from_config(String id) {
+        File config_dir = new File("config");
+        config_dir.mkdirs();
+		
+		String[] spl = id.split(":");
+        
+        File cf = new File(config_dir, "multiworld"); 
+        cf.mkdirs();
+
+        File worlds = new File(cf, "worlds");
+        worlds.mkdirs();
+
+        File namespace = new File(worlds, spl[0]);
+        namespace.mkdirs();
+
+        File wc = new File(namespace, spl[1] + ".yml");
+        FileConfiguration config;
+        try {
+			if (!wc.exists()) {
+				wc.createNewFile();
+			}
+            config = new FileConfiguration(wc);
+			String env = config.getString("environment");
+			return env;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+		return "NORMAL";
     }
 
 }

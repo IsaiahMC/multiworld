@@ -13,6 +13,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
+import net.minecraft.world.WorldProperties;
+import net.minecraft.world.Heightmap;
 
 @SuppressWarnings("deprecation") // Fabric dimension API
 public class SpawnCommand {
@@ -41,7 +43,7 @@ public class SpawnCommand {
 
         File wc = new File(namespace, id.getPath() + ".yml");
         if (!wc.exists()) {
-            return w.getSpawnPos();
+            return multiworld_method_43126(w);
         }
         FileConfiguration config;
         try {
@@ -49,8 +51,18 @@ public class SpawnCommand {
             return BlockPos.fromLong(config.getLong("spawnpos"));
         } catch (IOException e) {
             e.printStackTrace();
-            return w.getSpawnPos();
+            return multiworld_method_43126(w);
         }
+    }
+	
+	// getSpawnPos
+	public static BlockPos multiworld_method_43126(ServerWorld world) {
+		WorldProperties prop = world.getLevelProperties();
+        BlockPos pos = new BlockPos(prop.getSpawnX(), prop.getSpawnY(), prop.getSpawnZ());
+        if (!world.getWorldBorder().contains(pos)) {
+            pos = world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, new BlockPos(world.getWorldBorder().getCenterX(), 0.0, world.getWorldBorder().getCenterZ()));
+        }
+        return pos;
     }
 
 }
