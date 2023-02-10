@@ -31,7 +31,7 @@ import me.isaiah.multiworld.config.*;
 public class CreateCommand {
 
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
-        if (args.length == 1 && args.length == 2) {
+        if (args.length == 1 || args.length == 2) {
             plr.sendMessage(text_plain("Usage: /mv create <id> <env>"), false);
             return 0;
         }
