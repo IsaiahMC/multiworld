@@ -37,9 +37,10 @@ public final class GameRuleStore {
 
         Reference2IntMaps.fastForEach(this.intRules, entry -> {
             GameRules.IntRule rule = rules.get(entry.getKey());
-            
-            System.out.println("TODO: Set rule to value");
-            //rule.value = entry.getIntValue();
+            // rule.value = entry.getIntValue();
+            // TODO: check if this equals.
+            rule.set(entry.getIntValue(), server);
+            // rule.setValue(entry, server);
         });
     }
 }

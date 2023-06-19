@@ -1,12 +1,11 @@
 package me.isaiah.multiworld.fabric;
 
 import me.isaiah.multiworld.ICreator;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.Difficulty;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.SimpleRegistry;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 
 import xyz.nucleoid.fantasy.Fantasy;

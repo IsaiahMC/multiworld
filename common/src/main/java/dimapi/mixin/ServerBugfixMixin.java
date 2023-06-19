@@ -23,15 +23,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import net.minecraft.server.Main;
+/*
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.resource.DataPackSettings;
-import net.minecraft.server.Main;
 import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
+*/
 
 /**
  * This Mixin aims to solve a Minecraft Vanilla bug where datapacks are ignored during creation of the

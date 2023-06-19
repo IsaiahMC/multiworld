@@ -1,10 +1,10 @@
 package xyz.nucleoid.fantasy;
 
 import com.google.common.base.Preconditions;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.dimension.DimensionOptions;
@@ -12,7 +12,6 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.fantasy.util.GameRuleStore;
-import net.minecraft.util.registry.RegistryEntry;
 
 /**
  * A configuration describing how a runtime world should be constructed. This includes properties such as the dimension
@@ -25,6 +24,7 @@ public final class RuntimeWorldConfig {
     private RegistryKey<DimensionType> dimensionTypeKey = Fantasy.DEFAULT_DIM_TYPE;
     private RegistryEntry<DimensionType> dimensionType;
     private ChunkGenerator generator = null;
+    private boolean shouldTickTime = false;
     private long timeOfDay = 6000;
     private Difficulty difficulty = Difficulty.NORMAL;
     private final GameRuleStore gameRules = new GameRuleStore();
@@ -40,6 +40,13 @@ public final class RuntimeWorldConfig {
         return this;
     }
 
+    public RuntimeWorldConfig setDimensionType(RegistryEntry<DimensionType> dimensionType) {
+        this.dimensionType = dimensionType;
+        this.dimensionTypeKey = null;
+        return this;
+    }
+
+    @Deprecated
     public RuntimeWorldConfig setDimensionType(DimensionType dimensionType) {
         this.dimensionType = RegistryEntry.of(dimensionType);
         this.dimensionTypeKey = null;
@@ -54,6 +61,11 @@ public final class RuntimeWorldConfig {
 
     public RuntimeWorldConfig setGenerator(ChunkGenerator generator) {
         this.generator = generator;
+        return this;
+    }
+	
+    public RuntimeWorldConfig setShouldTickTime(boolean shouldTickTime) {
+        this.shouldTickTime = shouldTickTime;
         return this;
     }
 
@@ -118,7 +130,7 @@ public final class RuntimeWorldConfig {
     private RegistryEntry<DimensionType> resolveDimensionType(MinecraftServer server) {
         var dimensionType = this.dimensionType;
         if (dimensionType == null) {
-            dimensionType = server.getRegistryManager().get(Registry.DIMENSION_TYPE_KEY).getEntry(this.dimensionTypeKey).orElse(null);
+            dimensionType = server.getRegistryManager().get(RegistryKeys.DIMENSION_TYPE).getEntry(this.dimensionTypeKey).orElse(null);
             Preconditions.checkNotNull(dimensionType, "invalid dimension type " + this.dimensionTypeKey);
         }
         return dimensionType;
@@ -127,6 +139,10 @@ public final class RuntimeWorldConfig {
     @Nullable
     public ChunkGenerator getGenerator() {
         return this.generator;
+    }
+	
+    public boolean shouldTickTime() {
+        return this.shouldTickTime;
     }
 
     public long getTimeOfDay() {

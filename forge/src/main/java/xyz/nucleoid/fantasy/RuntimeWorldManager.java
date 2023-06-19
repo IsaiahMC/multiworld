@@ -1,15 +1,15 @@
 package xyz.nucleoid.fantasy;
 
 import com.mojang.serialization.Lifecycle;
-//import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+// import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.commons.io.FileUtils;
 import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
@@ -29,13 +29,20 @@ final class RuntimeWorldManager {
     RuntimeWorld add(RegistryKey<World> worldKey, RuntimeWorldConfig config, RuntimeWorld.Style style) {
         DimensionOptions options = config.createDimensionOptions(this.server);
 
+        if (style == RuntimeWorld.Style.TEMPORARY) {
+            ((FantasyDimensionOptions) (Object) options).fantasy$setSave(false);
+        }
+
         SimpleRegistry<DimensionOptions> dimensionsRegistry = getDimensionsRegistry(this.server);
-        dimensionsRegistry.add(RegistryKey.of(Registry.DIMENSION_KEY, worldKey.getValue()), options, Lifecycle.stable());
+        boolean isFrozen = ((RemoveFromRegistry<?>) dimensionsRegistry).fantasy$isFrozen();
+        ((RemoveFromRegistry<?>) dimensionsRegistry).fantasy$setFrozen(false);
+        dimensionsRegistry.add(RegistryKey.of(RegistryKeys.DIMENSION, worldKey.getValue()), options, Lifecycle.stable());
+        ((RemoveFromRegistry<?>) dimensionsRegistry).fantasy$setFrozen(isFrozen);
 
         RuntimeWorld world = new RuntimeWorld(this.server, worldKey, config, style);
 
         this.serverAccess.getWorlds().put(world.getRegistryKey(), world);
-        // TODO ServerWorldEvents.LOAD.invoker().onWorldLoad(this.server, world);
+        // ServerWorldEvents.LOAD.invoker().onWorldLoad(this.server, world);
 
         // tick the world to ensure it is ready for use right away
         world.tick(() -> true);
@@ -47,7 +54,7 @@ final class RuntimeWorldManager {
         RegistryKey<World> dimensionKey = world.getRegistryKey();
 
         if (this.serverAccess.getWorlds().remove(dimensionKey, world)) {
-            // TODO ServerWorldEvents.UNLOAD.invoker().onWorldUnload(this.server, world);
+            // ServerWorldEvents.UNLOAD.invoker().onWorldUnload(this.server, world);
 
             SimpleRegistry<DimensionOptions> dimensionsRegistry = getDimensionsRegistry(this.server);
             RemoveFromRegistry.remove(dimensionsRegistry, dimensionKey.getValue());
@@ -69,7 +76,7 @@ final class RuntimeWorldManager {
     }
 
     private static SimpleRegistry<DimensionOptions> getDimensionsRegistry(MinecraftServer server) {
-        GeneratorOptions generatorOptions = server.getSaveProperties().getGeneratorOptions();
-        return (SimpleRegistry<DimensionOptions>) generatorOptions.getDimensions();
+        DynamicRegistryManager registryManager = server.getCombinedDynamicRegistries().getCombinedRegistryManager();
+        return (SimpleRegistry<DimensionOptions>) registryManager.get(RegistryKeys.DIMENSION);
     }
 }

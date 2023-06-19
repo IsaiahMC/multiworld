@@ -1,15 +1,13 @@
 package xyz.nucleoid.fantasy;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.Util;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.dimension.DimensionOptions;
-
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
 import xyz.nucleoid.fantasy.util.VoidWorldProgressListener;
@@ -18,7 +16,8 @@ class RuntimeWorld extends ServerWorld {
     final Style style;
 
     RuntimeWorld(MinecraftServer server, RegistryKey<World> registryKey, RuntimeWorldConfig config, Style style) {
-        super(server, Util.getMainWorkerExecutor(), ((MinecraftServerAccess) server).getSession(),
+        super(
+                server, Util.getMainWorkerExecutor(), ((MinecraftServerAccess) server).getSession(),
                 new RuntimeWorldProperties(server.getSaveProperties(), config),
                 registryKey,
                 config.createDimensionOptions(server),
@@ -26,8 +25,14 @@ class RuntimeWorld extends ServerWorld {
                 false,
                 BiomeAccess.hashSeed(config.getSeed()),
                 ImmutableList.of(),
-                false);
+                config.shouldTickTime()
+        );
         this.style = style;
+    }
+
+    @Override
+    public long getSeed() {
+        return ((RuntimeWorldProperties) this.properties).config.getSeed();
     }
 
     @Override
