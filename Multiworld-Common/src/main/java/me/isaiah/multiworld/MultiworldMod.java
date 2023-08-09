@@ -207,9 +207,8 @@ public class MultiworldMod {
 
         return Command.SINGLE_SUCCESS; // Success
     }
-    
-    
-	// TODO: this could be better
+
+    @Deprecated
 	public static Text text(String txt, Formatting color) {
 		return world_creator.colored_literal(txt, color);
 	}

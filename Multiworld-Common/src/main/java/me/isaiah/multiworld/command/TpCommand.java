@@ -33,26 +33,17 @@ public class TpCommand {
 
         if (worlds.containsKey(arg1)) {
             ServerWorld w = worlds.get(arg1);
-            BlockPos sp = multiworld_method_43126(w);
-            /*if (!w.getDimension().isBedWorking() && !w.getDimension().hasCeiling()) {
-                ServerWorld.createEndSpawnPlatform(w);
-                sp = ServerWorld.END_SPAWN_POS;
-            }*/
-			
+            // BlockPos sp = multiworld_method_43126(w);
+            BlockPos sp = SpawnCommand.getSpawn(w);
 			
 			boolean isEnd = false;
 			
 			try {
-				// 1.19
-				//if (w.getDimensionKey() == Util.THE_END_REGISTRY_KEY) {
-				//	isEnd = true;
-				//}
 				boolean is_the_end = MultiworldMod.get_world_creator().is_the_end(w);
 				if (is_the_end) {
 					isEnd = true;
 				}
 			} catch (NoSuchMethodError | Exception e) {
-				// 1.18
 			}
 			
 			String env = read_env_from_config(arg1);
