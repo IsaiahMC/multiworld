@@ -1,15 +1,20 @@
 pluginManagement {
     repositories {
-        maven { url "https://maven.fabricmc.net/" }
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
         maven { url "https://maven.architectury.dev/" }
-        maven { url "https://maven.minecraftforge.net/" }
+        maven { url "https://files.minecraftforge.net/maven/" }
         gradlePluginPortal()
     }
 }
 
-include("common")
-include("fabric")
-// include("fantasy-forge")
-include("forge")
+rootProject.name = 'Multiworld'
+include 'Multiworld-Common'
 
-rootProject.name = "multiworld"
+include 'Multiworld-Fabric-1.18.2'
+include 'Multiworld-Fabric-1.19.2'
+include 'Multiworld-Fabric-1.19.4'
+include 'Multiworld-Fabric-1.20'
+// include 'Multiworld-Fabric-bundle'
