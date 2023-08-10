@@ -19,7 +19,6 @@ public class ServerChunkManagerMixin {
     @Inject(method = "executeQueuedTasks", at = @At("HEAD"), cancellable = true)
     private void executeQueuedTasks(CallbackInfoReturnable<Boolean> ci) {
         if (!((FantasyWorldAccess) this.world).fantasy$shouldTick()) {
-        	System.out.println("NOT TICKING! " + world.getRegistryKey().getValue());
             ci.setReturnValue(false);
         }
     }

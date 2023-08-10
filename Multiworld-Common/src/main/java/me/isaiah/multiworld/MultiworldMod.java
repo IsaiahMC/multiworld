@@ -32,6 +32,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.Difficulty;
 //import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
 
 //import me.isaiah.lib.IText;
 
@@ -156,6 +157,14 @@ public class MultiworldMod {
                 e.printStackTrace();
             }
         }*/
+        
+        if (args[0].equalsIgnoreCase("debugtick")) {
+        	ServerWorld w = (ServerWorld) plr.getWorld();
+        	Identifier id = w.getRegistryKey().getValue();
+        	message(plr, "World ID: " + id.toString());
+        	message(plr, "Players : " + w.getPlayers().size());
+        	w.tick(() -> true);
+        }
 
         if (args[0].equalsIgnoreCase("setspawn") && (ALL || Perm.has(plr, "multiworld.setspawn") )) {
             return SetspawnCommand.run(mc, plr, args);

@@ -46,7 +46,7 @@ public final class Fantasy {
     private final MinecraftServer server;
     private final MinecraftServerAccess serverAccess;
 
-    private final RuntimeWorldManager worldManager;
+    public final RuntimeWorldManager worldManager;
 
     private final Set<ServerWorld> deletionQueue = new ReferenceOpenHashSet<>();
 

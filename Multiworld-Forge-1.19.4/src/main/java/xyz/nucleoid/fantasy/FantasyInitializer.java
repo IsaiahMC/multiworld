@@ -12,6 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.event.server.*;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraft.server.MinecraftServer;
@@ -20,6 +21,8 @@ import net.minecraft.server.world.ServerWorld;
 //@Mod("fantasy")
 public final class FantasyInitializer {
    
+	public static boolean after_tick_start = false;
+	
     public MinecraftServer mc;
     public FantasyInitializer() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -51,13 +54,20 @@ public final class FantasyInitializer {
     }
     
     @SubscribeEvent
+    public void handle_started(ServerStartedEvent event) {
+    	after_tick_start = true;
+    }
+    
+    @SubscribeEvent
     public void handleTickEvent(TickEvent.ServerTickEvent event) {
-       /* if (event.phase == TickEvent.Phase.START) {
+       if (event.phase == TickEvent.Phase.START) {
             //MinecraftServer server = event.getServer();
             Fantasy fantasy = Fantasy.get(mc);
             fantasy.tick();
-            System.out.println("TICK EVENT!");
-        }*/
+            for (ServerWorld w : fantasy.worldManager.worldss.values()) {
+            	w.tick(() -> true);
+            }
+        }
     }
     
     @SubscribeEvent

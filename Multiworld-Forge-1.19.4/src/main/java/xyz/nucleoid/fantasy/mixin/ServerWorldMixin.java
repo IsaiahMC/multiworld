@@ -40,12 +40,7 @@ public abstract class ServerWorldMixin implements FantasyWorldAccess {
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         boolean shouldTick = this.fantasy$tickWhenEmpty || !this.isWorldEmpty();
-        
-        //ServerWorld sv = (ServerWorld) (Object) this;
 
-        
-        
-        //System.out.println(sv.getRegistryKey().getValue().toString() + getPlayers().size() + " - " + shouldTick);
         if (shouldTick) {
             this.fantasy$tickTimeout = TICK_TIMEOUT;
         } else if (this.fantasy$tickTimeout-- <= 0) {

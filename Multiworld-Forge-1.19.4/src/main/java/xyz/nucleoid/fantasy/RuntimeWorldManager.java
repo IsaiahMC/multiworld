@@ -16,13 +16,18 @@ import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 final class RuntimeWorldManager {
     private final MinecraftServer server;
     private final MinecraftServerAccess serverAccess;
 
+    public Map<RegistryKey<World>, ServerWorld> worldss;
+    
     RuntimeWorldManager(MinecraftServer server) {
         this.server = server;
+        this.worldss = new HashMap<>();
         this.serverAccess = (MinecraftServerAccess) server;
     }
 
@@ -41,7 +46,14 @@ final class RuntimeWorldManager {
 
         RuntimeWorld world = new RuntimeWorld(this.server, worldKey, config, style);
 
-        this.serverAccess.getWorlds().put(world.getRegistryKey(), world);
+        IMC imc = (IMC) this.server;
+        imc.add_world(world.getRegistryKey(), world);
+
+        if (FantasyInitializer.after_tick_start) {
+        	worldss.put(world.getRegistryKey(), world);
+        }
+
+        // this.serverAccess.getWorlds().put(world.getRegistryKey(), world);
         // ServerWorldEvents.LOAD.invoker().onWorldLoad(this.server, world);
         
         // tick the world to ensure it is ready for use right away
