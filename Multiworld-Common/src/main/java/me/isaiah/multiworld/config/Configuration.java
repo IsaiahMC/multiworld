@@ -69,6 +69,12 @@ public class Configuration {
     public long getLong(String key) {
         return (Long) contentMap.get(key);
     }
+    
+    /**
+     */
+    public boolean is_set(String key) {
+    	return contentMap.containsKey(key);
+    } 
 
     /**
      * @param key - key with which the specified value is to be associated

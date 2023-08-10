@@ -6,7 +6,6 @@ pluginManagement {
         }
         maven { url "https://maven.architectury.dev/" }
         maven { url "https://files.minecraftforge.net/maven/" }
-        maven { url "https://isaiahpatton.github.io/maven-repo/" }
         gradlePluginPortal()
     }
 }
@@ -18,4 +17,5 @@ include 'Multiworld-Fabric-1.18.2'
 include 'Multiworld-Fabric-1.19.2'
 include 'Multiworld-Fabric-1.19.4'
 include 'Multiworld-Fabric-1.20'
-// include 'Multiworld-Fabric-bundle'
+include 'Multiworld-Fabric-bundle'
+include 'Multiworld-Forge-1.19.4'

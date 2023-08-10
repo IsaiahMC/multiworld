@@ -12,8 +12,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import static me.isaiah.multiworld.MultiworldMod.text;
-import net.minecraft.world.WorldProperties;
-import net.minecraft.world.Heightmap;
 import java.io.File;
 
 import me.isaiah.multiworld.MultiworldMod;

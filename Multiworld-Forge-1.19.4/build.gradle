@@ -1,0 +1,122 @@
+plugins {
+	id "java-library"
+	id "maven-publish"
+    id "com.github.johnrengelman.shadow" version "7.1.1"
+    id "architectury-plugin" version "3.4-SNAPSHOT"
+    id "dev.architectury.loom" version "1.3-SNAPSHOT"
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+// archivesBaseName = rootProject.archives_base_name
+
+base {
+    archivesBaseName = "Multiworld-Forge"
+    version = "1.19.4"
+    group = "me.isaiah.mods"
+}
+
+loom {
+    forge {
+        getMixinConfigs().empty()
+        mixinConfig "dim.mixins.json"
+        mixinConfig "fantasy.mixins.json"
+    }
+}
+
+configurations {
+    extraLibs
+    common
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:1.19.4"
+    forge "net.minecraftforge:forge:${rootProject.forge_version}"
+	mappings "net.fabricmc:yarn:1.19.4+build.2:v2"
+
+    // Note:
+    //  Forge port of CyberPermissions currently not on maven.
+    //
+    common fileTree(dir: 'lib', include: 'permissions-forge-dev.jar')
+
+    common(project(path: ":Multiworld-Common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":Multiworld-Common", configuration: "transformProductionForge")) { transitive = false }
+    
+    // fantasy api
+    //common(project(path: ":fantasy-forge", configuration: "namedElements")) { transitive false }
+    //shadowCommon(project(path: ":fantasy-forge", configuration: "transformProductionForge")) { transitive = false }
+    
+    // common( project(path: ":fantasy-forge") )
+    // shadowCommon( project(path: ":fantasy-forge") )
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+}
+
+shadowJar {
+    exclude "fabric.mod.json"
+
+    configurations = [project.configurations.shadowCommon]
+    // classifier "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    //lassifier null
+}
+
+tasks.named("build") { finalizedBy("copyReport2") }
+tasks.named("build") { finalizedBy("copyReport2") }
+
+tasks.register('copyReport2', Copy) {
+    from remapJar
+    into "${project.rootDir}/output"
+}
+
+
+
+jar {
+    // classifier "dev"
+}
+
+
+/*
+sourcesJar {
+    // def commonSources = project(":Multiworld-Common").sourcesJar
+    // dependsOn commonSources
+    // from commonSources.archiveFile.map { zipTree(it) }
+}
+*/
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}
+
+publishing {
+    publications {
+        mavenForge(MavenPublication) {
+            artifactId = rootProject.archives_base_name + "-" + project.name
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+    }
+}

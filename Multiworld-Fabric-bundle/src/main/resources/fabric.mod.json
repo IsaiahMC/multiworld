@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "icommon-bundle",
+  "id": "multiworld-bundle",
   "version": "bundle",
 
-  "name": "iCommonLib-bundle",
-  "description": "Common API for multi-version functions. ",
+  "name": "Multiworld-bundle",
+  "description": "Multiworld-bundle contains nested 1.18/1.19/1.20 versions of Multiworld. Loader should choose the right one",
   "authors": [
-    "Me!"
+    "isaiah"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
@@ -14,7 +14,7 @@
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/multiworld/icon.png",
 
   "environment": "*",
   "entrypoints": {

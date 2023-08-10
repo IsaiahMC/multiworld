@@ -1,6 +1,6 @@
 /**
  * Multiworld Mod
- * Copyright (c) 2021-2022 by Isaiah.
+ * Copyright (c) 2021-2023 by Isaiah.
  */
 package me.isaiah.multiworld;
 
@@ -47,7 +47,7 @@ public class MultiworldMod {
 
 	// Mod Version
 	public static final String VERSION = "1.7";
-    
+
     public static void setICreator(ICreator ic) {
         world_creator = ic;
     }
@@ -56,7 +56,6 @@ public class MultiworldMod {
     	return world_creator;
     }
 
-    // public static ServerWorld create_world(String id, RegistryKey<DimensionType> dim, ChunkGenerator gen, Difficulty dif, long seed) {
     public static ServerWorld create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed) {
     	return world_creator.create_world(id, dim, gen, dif, seed);
     }

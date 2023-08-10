@@ -31,6 +31,7 @@ public class FabricWorldCreator implements ICreator {
                 .setGenerator(gen)
                 .setDifficulty(Difficulty.NORMAL)
 				.setSeed(seed)
+				.setShouldTickTime(true)
                 ;
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);

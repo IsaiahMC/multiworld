@@ -19,7 +19,6 @@ import me.isaiah.multiworld.MultiworldMod;
 import net.minecraft.util.Formatting;
 import net.minecraft.text.*;
 
-
 public class FabricWorldCreator implements ICreator {
     
     public static void init() {
@@ -32,6 +31,7 @@ public class FabricWorldCreator implements ICreator {
                 .setGenerator(gen)
                 .setDifficulty(Difficulty.NORMAL)
 				.setSeed(seed)
+				.setShouldTickTime(true)
                 ;
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
@@ -54,21 +54,18 @@ public class FabricWorldCreator implements ICreator {
 		try {
 			return Text.of(txt).copy().formatted(color);
 		} catch (Exception | IncompatibleClassChangeError e) {
-			// Stupid Mojang changed color chat.
 			// Fallback for 1.18.2:
-			return Fabric18Text.colored_literal(txt, color);
+			return Text.of(txt);
 		}
 	}
 
 	@Override
 	public boolean is_the_end(ServerWorld world) {
-		// TODO Auto-generated method stub
 		return world.getDimensionKey() == DimensionTypes.THE_END;
 	}
 
 	@Override
 	public BlockPos get_pos(double x, double y, double z) {
-		// TODO Auto-generated method stub
 		return new BlockPos(x, y, z);
 	}
 

@@ -23,8 +23,13 @@ public class SpawnCommand {
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         ServerWorld w = (ServerWorld) plr.getWorld();
         BlockPos sp = getSpawn(w);
-        TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(1, 1, 1), 0f, 0f);
-        ServerPlayerEntity teleported = FabricDimensionInternals.changeDimension(plr, w, target);
+
+        // Don't use FabricDimensionInternals here as
+        // we are teleporting to the same world.
+        plr.teleport(sp.getX(), sp.getY(), sp.getZ());
+
+        // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(1, 1, 1), 0f, 0f);
+        // ServerPlayerEntity teleported = FabricDimensionInternals.changeDimension(plr, w, target);
         return 1;
     }
 
@@ -49,7 +54,11 @@ public class SpawnCommand {
         FileConfiguration config;
         try {
             config = new FileConfiguration(wc);
-            return BlockPos.fromLong(config.getLong("spawnpos"));
+            if (config.is_set("spawnpos")) {
+            	return BlockPos.fromLong(config.getLong("spawnpos"));
+            } else {
+            	return multiworld_method_43126(w);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return multiworld_method_43126(w);

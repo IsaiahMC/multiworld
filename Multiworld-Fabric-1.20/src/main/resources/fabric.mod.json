@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "multiworld",
-  "version": "1.6",
+  "version": "1.7",
   "name": "Multiworld",
   "description": "Travel between and manage multiple worlds.",
   "authors": [
@@ -20,7 +20,8 @@
     ]
   },
   "depends": {
-    "fabric": "*"
+    "fabric": "*",
+    "minecraft": ">=1.20"
   },
   "mixins": [
     "dim.mixins.json"

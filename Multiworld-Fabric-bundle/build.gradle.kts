@@ -78,6 +78,13 @@ tasks.getByName<ProcessResources>("processResources") {
 
 val remapJar = tasks.getByName<RemapJarTask>("remapJar")
 
+tasks.named("build") { finalizedBy("copyReport2") }
+
+tasks.register<Copy>("copyReport2") {
+    from(remapJar)
+    into("${project.rootDir}/output")
+}
+
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {

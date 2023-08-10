@@ -37,7 +37,7 @@ public class CreateCommand {
 
         ChunkGenerator gen = null;
         if (args[2].contains("NORMAL")) {
-            gen = mc.getWorld(World.OVERWORLD).getChunkManager().getChunkGenerator(); // .withSeed(seed);
+            gen = mc.getWorld(World.OVERWORLD).getChunkManager().getChunkGenerator();
             dim = Util.OVERWORLD_ID;
         }
 
@@ -47,7 +47,7 @@ public class CreateCommand {
         }
         
         if (args[2].contains("END")) {
-            gen = mc.getWorld(World.END).getChunkManager().getChunkGenerator(); // .withSeed(seed);
+            gen = mc.getWorld(World.END).getChunkManager().getChunkGenerator();
             dim = Util.THE_END_ID;
         }
         

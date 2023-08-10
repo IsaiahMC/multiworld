@@ -1,9 +1,15 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id ("fabric-loom") version "1.3-SNAPSHOT"
+
     id ("java-library")
     id ("maven-publish")
+	id ("dev.architectury.loom") version "1.3-SNAPSHOT"
+	id ("architectury-plugin") version "3.4-SNAPSHOT"
+}
+
+architectury {
+    common("fabric", "forge")
 }
 
 java {

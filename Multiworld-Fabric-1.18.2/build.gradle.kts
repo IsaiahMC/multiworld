@@ -28,8 +28,8 @@ dependencies {
 
     annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.1")
 	
-	include("xyz.nucleoid:fantasy:0.4.5+1.18.2")
-	modImplementation("xyz.nucleoid:fantasy:0.4.5+1.18.2")
+	include("xyz.nucleoid:fantasy:0.4.7+1.18.2")
+	modImplementation("xyz.nucleoid:fantasy:0.4.7+1.18.2")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
 	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
 	modImplementation("net.fabricmc.fabric-api:fabric-api:0.76.0+1.18.2")
