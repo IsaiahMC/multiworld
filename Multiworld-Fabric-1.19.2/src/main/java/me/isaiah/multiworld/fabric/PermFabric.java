@@ -1,8 +1,5 @@
 package me.isaiah.multiworld.fabric;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import me.isaiah.multiworld.perm.Perm;
 import net.fabricmc.loader.api.FabricLoader;

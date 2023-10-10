@@ -6,8 +6,7 @@ import cyber.permissions.v1.PermissionDefaults;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
- * CyberPermissions was released before
- * any other Permission API was.
+ * CyberPermissions API
  */
 public class CyberHandler {
     

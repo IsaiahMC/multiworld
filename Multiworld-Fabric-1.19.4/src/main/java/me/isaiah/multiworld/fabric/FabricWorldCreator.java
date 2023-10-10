@@ -59,13 +59,11 @@ public class FabricWorldCreator implements ICreator {
 
 	@Override
 	public boolean is_the_end(ServerWorld world) {
-		// TODO Auto-generated method stub
 		return world.getDimensionKey() == DimensionTypes.THE_END;
 	}
 
 	@Override
 	public BlockPos get_pos(double x, double y, double z) {
-		// TODO Auto-generated method stub
 		return BlockPos.ofFloored(x, y, z);
 	}
 

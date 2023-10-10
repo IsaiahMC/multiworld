@@ -54,15 +54,13 @@ public class FabricWorldCreator implements ICreator {
 		try {
 			return Text.of(txt).copy().formatted(color);
 		} catch (Exception | IncompatibleClassChangeError e) {
-			// Stupid Mojang changed color chat.
-			// Fallback for 1.18.2:
-			return Fabric18Text.colored_literal(txt, color);
+			// Fallback
+			return Text.of(txt);
 		}
 	}
 
 	@Override
 	public boolean is_the_end(ServerWorld world) {
-		// TODO Auto-generated method stub
 		if (!world.getDimension().isBedWorking() && !world.getDimension().hasCeiling()) {
 	        return true;
 		}
@@ -72,7 +70,6 @@ public class FabricWorldCreator implements ICreator {
 
 	@Override
 	public BlockPos get_pos(double x, double y, double z) {
-		// TODO Auto-generated method stub
 		return new BlockPos(x, y, z);
 	}
 

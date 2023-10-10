@@ -54,7 +54,7 @@ public class FabricWorldCreator implements ICreator {
 		try {
 			return Text.of(txt).copy().formatted(color);
 		} catch (Exception | IncompatibleClassChangeError e) {
-			// Fallback for 1.18.2:
+			// Fallback
 			return Text.of(txt);
 		}
 	}
