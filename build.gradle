@@ -1,5 +1,5 @@
 	plugins {
-		id "dev.architectury.loom" version "1.3-SNAPSHOT" apply false
+		id "dev.architectury.loom" version "1.4-SNAPSHOT" apply false
 	}
 
 subprojects {
@@ -7,7 +7,7 @@ subprojects {
 	  maven { url = 'https://maven.nucleoid.xyz/' }
 	  maven { url = 'https://cursemaven.com/' }
 	  maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-	  maven { url = "https://isaiahpatton.github.io/maven-repo/" }
+	  maven { url = "https://pisaiah.github.io/maven-repo/" }
 	}
     plugins.withId('java-library', { _ ->
         sourceSets {

@@ -51,6 +51,11 @@ public class CreateCommand {
             dim = Util.THE_END_ID;
         }
         
+        if (null == dim) {
+        	System.out.println("Null dimenstion ");
+        	dim = Util.OVERWORLD_ID;
+        }
+        
         String arg1 = args[1];
         if (arg1.indexOf(':') == -1) arg1 = "multiworld:" + arg1;
         
