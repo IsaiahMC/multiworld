@@ -10,6 +10,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -67,6 +68,12 @@ public class ForgeWorldCreator implements ICreator {
 	public BlockPos get_pos(double x, double y, double z) {
 		// TODO Auto-generated method stub
 		return BlockPos.ofFloored(x, y, z);
+	}
+	
+	@Override
+	public BlockPos get_spawn(ServerWorld world) {
+		WorldProperties prop = world.getLevelProperties();
+		return new BlockPos(prop.getSpawnX(), prop.getSpawnY(), prop.getSpawnZ());
 	}
 
 }

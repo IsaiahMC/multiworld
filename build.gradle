@@ -1,5 +1,5 @@
 	plugins {
-		id "dev.architectury.loom" version "1.4-SNAPSHOT" apply false
+		id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
 	}
 
 subprojects {
@@ -9,6 +9,7 @@ subprojects {
 	  maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 	  maven { url = "https://pisaiah.github.io/maven-repo/" }
 	}
+
     plugins.withId('java-library', { _ ->
         sourceSets {
             main {

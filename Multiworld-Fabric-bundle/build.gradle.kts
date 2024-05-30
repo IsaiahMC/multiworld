@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id ("fabric-loom") version "1.3-SNAPSHOT"
+    id ("fabric-loom") version "1.6-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -20,16 +20,17 @@ base {
 dependencies {
 
 	// 1.20
-    minecraft("com.mojang:minecraft:1.20") 
-    mappings("net.fabricmc:yarn:1.20+build.1:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.14.21")
+    minecraft("com.mojang:minecraft:1.20.1") 
+    mappings("net.fabricmc:yarn:1.20.1+build.10")
+    modImplementation("net.fabricmc:fabric-loader:0.15.11")
 	
 	// bundle jars
 	include(project(":Multiworld-Fabric-1.18.2"))
 	include(project(":Multiworld-Fabric-1.19.2"))
 	include(project(":Multiworld-Fabric-1.19.4"))
-	include(project(":Multiworld-Fabric-1.20"))
+	include(project(":Multiworld-Fabric-1.20.1"))
 	include(project(":Multiworld-Fabric-1.20.4"))
+	include(project(":Multiworld-Fabric-1.20.6"))
 }
 
 

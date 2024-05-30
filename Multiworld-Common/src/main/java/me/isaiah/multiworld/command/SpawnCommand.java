@@ -68,7 +68,10 @@ public class SpawnCommand {
 	// getSpawnPos
 	public static BlockPos multiworld_method_43126(ServerWorld world) {
 		WorldProperties prop = world.getLevelProperties();
-        BlockPos pos = new BlockPos(prop.getSpawnX(), prop.getSpawnY(), prop.getSpawnZ());
+		
+		BlockPos pos = MultiworldMod.get_world_creator().get_spawn(world);
+        // BlockPos pos = new BlockPos(prop.getSpawnX(), prop.getSpawnY(), prop.getSpawnZ());
+		
         if (!world.getWorldBorder().contains(pos)) {
         	BlockPos pp = MultiworldMod.get_world_creator().get_pos(world.getWorldBorder().getCenterX(), 0.0, world.getWorldBorder().getCenterZ());
             pos = world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, new BlockPos(pp));

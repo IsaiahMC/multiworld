@@ -4,6 +4,7 @@ import me.isaiah.multiworld.ICreator;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.server.world.ServerWorld;
 
 import xyz.nucleoid.fantasy.Fantasy;
@@ -71,6 +72,12 @@ public class FabricWorldCreator implements ICreator {
 	@Override
 	public BlockPos get_pos(double x, double y, double z) {
 		return new BlockPos(x, y, z);
+	}
+
+	@Override
+	public BlockPos get_spawn(ServerWorld world) {
+		WorldProperties prop = world.getLevelProperties();
+		return new BlockPos(prop.getSpawnX(), prop.getSpawnY(), prop.getSpawnZ());
 	}
 
 }

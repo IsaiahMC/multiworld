@@ -7,49 +7,42 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 base {
     archivesBaseName = "Multiworld-Fabric"
-    version = "1.18.2"
+    version = "1.20.6"
     group = "me.isaiah.mods"
 }
 
-
 dependencies {
 
-	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
-    compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
+		annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
+		compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 
-    //annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.1")
+	// 1.20.4
+    minecraft("com.mojang:minecraft:1.20.6") 
+    mappings("net.fabricmc:yarn:1.20.6+build.3:v2")
+    modImplementation("net.fabricmc:fabric-loader:0.15.11")
 
-    // 1.18.2
-    minecraft("com.mojang:minecraft:1.18.2") 
-    mappings("net.fabricmc:yarn:1.18.2+build.2:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.13.3")
-
-    //annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.1")
-	
-	include("xyz.nucleoid:fantasy:0.4.7+1.18.2")
-	modImplementation("xyz.nucleoid:fantasy:0.4.7+1.18.2")
+	include("xyz.nucleoid:fantasy:0.6.0+1.20.6")
+	modImplementation("xyz.nucleoid:fantasy:0.6.0+1.20.6")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
 	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
-	modImplementation("net.fabricmc.fabric-api:fabric-api:0.76.0+1.18.2")
-	// modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.76.0+1.18.2")
-}
-
-// Jabel
-tasks.withType<JavaCompile>().configureEach {
-    sourceCompatibility = JavaVersion.VERSION_17.toString() // for the IDE support
-    options.release.set(8)
-
-    javaCompiler.set(
-        javaToolchains.compilerFor {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
-    )
+	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.99.0+1.20.6")
+	
+	
+	setOf(
+		"fabric-api-base",
+		//"fabric-command-api-v1",
+		"fabric-lifecycle-events-v1",
+		"fabric-networking-api-v1"
+	).forEach {
+		// Add each module as a dependency
+		modImplementation(fabricApi.module(it, "0.99.0+1.20.6"))
+	}
 }
 
 
@@ -68,6 +61,18 @@ sourceSets {
             srcDir("${rootProject.projectDir}/Multiworld-Common/src/main/resources")
         }
     }
+}
+
+// Jabel
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = JavaVersion.VERSION_21.toString() // for the IDE support
+    options.release.set(8)
+
+    javaCompiler.set(
+        javaToolchains.compilerFor {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
+    )
 }
 
 /*configure([tasks.compileJava]) {
@@ -106,7 +111,6 @@ tasks.register<Copy>("copyReport2") {
     from(remapJar)
     into("${project.rootDir}/output")
 }
-
 
 
 publishing {

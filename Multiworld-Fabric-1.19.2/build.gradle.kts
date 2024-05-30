@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id ("fabric-loom") version "1.3-SNAPSHOT"
+    id ("fabric-loom") version "1.6-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -19,6 +19,9 @@ base {
 
 
 dependencies {
+
+	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
+	compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 
     // 1.19.2
     minecraft("com.mojang:minecraft:1.19.2") 
@@ -58,6 +61,18 @@ sourceSets {
             srcDir("${rootProject.projectDir}/Multiworld-Common/src/main/resources")
         }
     }
+}
+
+// Jabel
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = JavaVersion.VERSION_17.toString() // for the IDE support
+    options.release.set(8)
+
+    javaCompiler.set(
+        javaToolchains.compilerFor {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    )
 }
 
 /*configure([tasks.compileJava]) {

@@ -26,4 +26,6 @@ public interface ICreator {
 		}
 	}
 
+	public BlockPos get_spawn(ServerWorld world);
+
 }
