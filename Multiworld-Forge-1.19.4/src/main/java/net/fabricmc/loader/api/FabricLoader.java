@@ -25,4 +25,8 @@ public class FabricLoader {
 		return dir.toPath();
 	}
 	
+	public java.util.Optional<ModContainer> getModContainer(String id) {
+		return java.util.Optional.empty();
+	}
+	
 }

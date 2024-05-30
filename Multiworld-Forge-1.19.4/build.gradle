@@ -45,6 +45,9 @@ dependencies {
     //  Forge port of CyberPermissions currently not on maven.
     //
     common fileTree(dir: 'lib', include: 'permissions-forge-dev.jar')
+	
+	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
+	modImplementation("net.fabricmc:fabric-loader:0.14.18")
 
     common(project(path: ":Multiworld-Common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":Multiworld-Common", configuration: "transformProductionForge")) { transitive = false }
@@ -57,16 +60,45 @@ dependencies {
     // shadowCommon( project(path: ":fantasy-forge") )
 }
 
+jar {
+   sourceSets {
+        main {
+            java {
+                exclude '**/fabric/*.java'
+                exclude '**/fabric/*.class'
+            }
+			resources {
+				exclude '**/fabric/*.java'
+                exclude '**/fabric/*.class'
+			}
+        }
+    }
+}
+
 processResources {
     inputs.property "version", project.version
 
     filesMatching("META-INF/mods.toml") {
         expand "version": project.version
     }
+	
+	exclude '**/fabric/*.class'
+	exclude '**/fabric/*.java'
 }
 
 shadowJar {
+    sourceSets {
+        main {
+            java {
+                exclude '**/fabric/*.java'
+                exclude '**/fabric/*.class'
+            }
+        }
+    }
+
     exclude "fabric.mod.json"
+	exclude '**/fabric/*.java'
+	exclude '**/fabric/*.class'
 
     configurations = [project.configurations.shadowCommon]
     // classifier "dev-shadow"
@@ -75,6 +107,15 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
+	
+	sourceSets {
+        main {
+            java {
+                exclude '**/fabric/*.java'
+                exclude '**/fabric/*.class'
+            }
+        }
+    }
     //lassifier null
 }
 
@@ -85,13 +126,6 @@ tasks.register('copyReport2', Copy) {
     from remapJar
     into "${project.rootDir}/output"
 }
-
-
-
-jar {
-    // classifier "dev"
-}
-
 
 /*
 sourcesJar {
