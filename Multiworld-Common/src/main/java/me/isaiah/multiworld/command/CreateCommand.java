@@ -6,13 +6,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-// import net.minecraft.util.registry.Registry;
-// import net.minecraft.registry.RegistryKey;
-// import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
-// import net.minecraft.world.biome.Biome;
-// import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import me.isaiah.multiworld.MultiworldMod;
 
@@ -116,8 +111,33 @@ public class CreateCommand {
 				dim = Util.THE_END_ID;
 			}
 			
-			MultiworldMod.create_world(id, dim, gen, Difficulty.NORMAL, seed);
+			ServerWorld world = MultiworldMod.create_world(id, dim, gen, Difficulty.NORMAL, seed);
 			
+			
+			if (GameruleCommand.keys.size() == 0) {
+            	GameruleCommand.setup();
+            }
+			
+			for (String name : GameruleCommand.keys.keySet()) {
+				String key = "gamerule_" + name;
+				
+				if (config.is_set(key)) {
+					
+					Object o = config.getObject(key);
+					
+					// BoleanRule
+					if (o instanceof Boolean) {
+						o = ((Boolean) o) ? "true" : "false";
+					}
+					
+					// IntRule
+					if (o instanceof Integer) {
+						o = String.valueOf((Integer) o);
+					}
+					
+					GameruleCommand.set_gamerule_from_cfg(world, key, (String) o);
+				}
+			}
         } catch (Exception e) {
             e.printStackTrace();
         }

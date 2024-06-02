@@ -35,6 +35,7 @@ public class FabricWorldCreator implements ICreator {
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new Identifier(id), config);
+        
         return worldHandle.asWorld();
     }
     

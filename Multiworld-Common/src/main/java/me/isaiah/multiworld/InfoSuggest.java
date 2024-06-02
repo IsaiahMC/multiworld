@@ -10,6 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import me.isaiah.multiworld.command.GameruleCommand;
 import me.isaiah.multiworld.perm.Perm;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -29,9 +30,10 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
         boolean ALL = Perm.has(plr, "multiworld.admin");
 
         if (cmds.length <= 1 || (cmds.length <= 2 && !input.endsWith(" "))) {
-            String[] subcommands = {"tp", "list", "version", "create", "spawn", "setspawn"};
-            for (String s : subcommands)
+            String[] subcommands = {"tp", "list", "version", "create", "spawn", "setspawn", "gamerule"};
+            for (String s : subcommands) {
                 builder.suggest(s);
+            }
             return builder.buildFuture();
         }
         
@@ -59,6 +61,29 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                 builder.suggest("myid:myvalue");
                 return builder.buildFuture();
             }
+            
+            if (cmds[1].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
+                if (GameruleCommand.keys.size() == 0) {
+                	GameruleCommand.setup();
+                }
+                
+                System.out.println("INPUT: " + input);
+                
+                String last = input.substring(input.lastIndexOf(' ')).trim();
+
+                for (String name : GameruleCommand.keys.keySet()) {
+                	if (name.startsWith(last) || last.contains("gamerule") || name.toLowerCase().contains(last)) {
+                		builder.suggest(name);
+                	}
+                }
+                
+            	//for (String name : GameruleCommand.keys.keySet()) {
+            		// builder.suggest(name);
+                //}
+            	
+            	//builder.suggest("myid:myvalue");
+                return builder.buildFuture();
+            }
         }
 
         if (cmds.length <= 3 || (cmds.length <= 4 && !input.endsWith(" "))) {
@@ -67,7 +92,15 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                 builder.suggest("NETHER");
                 builder.suggest("END");
             }
+            
+            if (cmds[1].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule")) ) {
+                // TODO: IntRules
+            	builder.suggest("true");
+                builder.suggest("false");
+            }
         }
+        
+        
 
         return builder.buildFuture();
     }

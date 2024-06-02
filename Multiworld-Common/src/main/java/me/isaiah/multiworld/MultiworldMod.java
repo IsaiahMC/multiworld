@@ -16,6 +16,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import me.isaiah.multiworld.command.CreateCommand;
+import me.isaiah.multiworld.command.GameruleCommand;
 import me.isaiah.multiworld.command.SetspawnCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.command.TpCommand;
@@ -172,6 +173,10 @@ public class MultiworldMod {
 
         if (args[0].equalsIgnoreCase("spawn") && (ALL || Perm.has(plr, "multiworld.spawn")) ) {
             return SpawnCommand.run(mc, plr, args);
+        }
+        
+        if (args[0].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
+        	return GameruleCommand.run(mc, plr, args);
         }
 
         if (args[0].equalsIgnoreCase("tp") ) {

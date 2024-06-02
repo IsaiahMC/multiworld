@@ -6,7 +6,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class LuckHandler {
 
     public static boolean hasPermission(ServerPlayerEntity plr, String perm) {
-        return Permissions.check(plr, perm);
+        return Permissions.check(plr, perm) || plr.isCreativeLevelTwoOp();
     }
 
 }
