@@ -19,6 +19,8 @@ import net.minecraft.world.level.ServerWorldProperties;
 
 public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
 
+	public static String[] diff_names = {"PEACEFUL", "EASY", "NORMAL", "HARD"};
+	
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ') + 1);
@@ -30,7 +32,7 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
         boolean ALL = Perm.has(plr, "multiworld.admin");
 
         if (cmds.length <= 1 || (cmds.length <= 2 && !input.endsWith(" "))) {
-            String[] subcommands = {"tp", "list", "version", "create", "spawn", "setspawn", "gamerule"};
+            String[] subcommands = {"tp", "list", "version", "create", "spawn", "setspawn", "gamerule", "help", "difficulty"};
             for (String s : subcommands) {
                 builder.suggest(s);
             }
@@ -67,8 +69,6 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                 	GameruleCommand.setup();
                 }
                 
-                System.out.println("INPUT: " + input);
-                
                 String last = input.substring(input.lastIndexOf(' ')).trim();
 
                 for (String name : GameruleCommand.keys.keySet()) {
@@ -76,12 +76,16 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                 		builder.suggest(name);
                 	}
                 }
-                
-            	//for (String name : GameruleCommand.keys.keySet()) {
-            		// builder.suggest(name);
-                //}
-            	
-            	//builder.suggest("myid:myvalue");
+                return builder.buildFuture();
+            }
+            
+            if (cmds[1].equalsIgnoreCase("difficulty") && (ALL || Perm.has(plr, "multiworld.difficulty"))) {
+            	String last = input.substring(input.lastIndexOf(' ')).trim();
+            	for (String name : diff_names) {
+                 	if (name.startsWith(last) || last.contains("difficulty") || name.toLowerCase().contains(last)) {
+                 		builder.suggest(name);
+                 	}
+                }
                 return builder.buildFuture();
             }
         }
@@ -97,6 +101,20 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                 // TODO: IntRules
             	builder.suggest("true");
                 builder.suggest("false");
+            }
+            
+            if (cmds[1].equalsIgnoreCase("difficulty") && (ALL || Perm.has(plr, "multiworld.difficulty")) ) {
+                // TODO: IntRules
+            	ArrayList<String> names = new ArrayList<>();
+            	MultiworldMod.mc.getWorldRegistryKeys().forEach(r -> {
+                    String val = r.getValue().toString();
+                    if (val.startsWith("multiworld:")) {
+                        val = val.replace("multiworld:", "");
+                    }
+                    names.add(val);
+                    //builder.suggest(val);
+                 });
+                for (String s : names) builder.suggest(s);
             }
         }
         

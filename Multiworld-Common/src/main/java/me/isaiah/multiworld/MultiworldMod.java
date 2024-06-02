@@ -1,6 +1,6 @@
 /**
  * Multiworld Mod
- * Copyright (c) 2021-2023 by Isaiah.
+ * Copyright (c) 2021-2024 by Isaiah.
  */
 package me.isaiah.multiworld;
 
@@ -16,6 +16,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import me.isaiah.multiworld.command.CreateCommand;
+import me.isaiah.multiworld.command.DifficultyCommand;
 import me.isaiah.multiworld.command.GameruleCommand;
 import me.isaiah.multiworld.command.SetspawnCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
@@ -48,7 +49,7 @@ public class MultiworldMod {
     public static ICreator world_creator;
 
 	// Mod Version
-	public static final String VERSION = "1.7";
+	public static final String VERSION = "1.8";
 
     public static void setICreator(ICreator ic) {
         world_creator = ic;
@@ -65,6 +66,19 @@ public class MultiworldMod {
     // On mod init
     public static void init() {
         System.out.println(" Multiworld init");
+    }
+    
+    public static Identifier new_id(String id) {
+    	/*if (id.indexOf(':') != -1) {
+    		String[] spl = id.split(Pattern.quote(":"));
+    		return Identifier.of(spl[0], spl[1]);
+    	}
+    	return Identifier.of("minecraft", id);*/
+    	
+    	// tryParse works from 1.18 to 1.21
+    	return Identifier.tryParse(id);
+    	
+    	// return new Identifier(id);
     }
 
     // On server start
@@ -93,6 +107,9 @@ public class MultiworldMod {
     public static ServerPlayerEntity get_player(ServerCommandSource s) throws CommandSyntaxException {
     	ServerPlayerEntity plr = s.getPlayer();
     	if (null == plr) {
+    		// s.sendMessage(text_plain("Multiworld Mod for Minecraft " + mc.getVersion()));
+    		// s.sendMessage(text_plain("These commands currently require a Player."));
+    		
     		throw ServerCommandSource.REQUIRES_PLAYER_EXCEPTION.create();
     	}
     	return plr;
@@ -103,7 +120,7 @@ public class MultiworldMod {
         dispatcher.register(literal(CMD)
                     .requires(source -> {
                         try {
-                            return Perm.has(get_player(source), "multiworld.cmd") ||
+                            return source.hasPermissionLevel(1) || Perm.has(get_player(source), "multiworld.cmd") ||
                                     Perm.has(get_player(source), "multiworld.admin");
                         } catch (Exception e) {
                             return source.hasPermissionLevel(1);
@@ -127,7 +144,13 @@ public class MultiworldMod {
         final ServerPlayerEntity plr = get_player(source); // source.getPlayerOrThrow();
 
         if (null == message) {
-            plr.sendMessage(text("Usage:", Formatting.AQUA), false);
+            plr.sendMessage(text("Multiworld Mod for Minecraft " + mc.getVersion(), Formatting.AQUA), false);
+            
+            World world = plr.getWorld();
+            Identifier id = world.getRegistryKey().getValue();
+            
+            message(plr, "Currently in: " + id.toString());
+            
             return 1;
         }
 
@@ -159,6 +182,24 @@ public class MultiworldMod {
             }
         }*/
         
+        if (args[0].equalsIgnoreCase("help")) {
+            String[] lines = {
+            		"&4Multiworld Mod Commands:&r",
+            		"&a/mw spawn&r - Teleport to current world spawn",
+            		"&a/mw setspawn&r - Sets the current world spawn",
+            		"&a/mw tp <id>&r - Teleport to a world",
+            		"&a/mw list&r - List all worlds",
+            		"&a/mw gamerule <rule> <value>&r - Change a worlds Gamerules",
+            		"&a/mw create <id> <env>&r - create a new world",
+            		"&a/mw difficulty <value> [world id] - Sets the difficulty of a world"
+            };
+            
+            for (String s : lines) {
+            	message(plr, s);
+            }
+            
+        }
+        
         if (args[0].equalsIgnoreCase("debugtick")) {
         	ServerWorld w = (ServerWorld) plr.getWorld();
         	Identifier id = w.getRegistryKey().getValue();
@@ -177,6 +218,10 @@ public class MultiworldMod {
         
         if (args[0].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
         	return GameruleCommand.run(mc, plr, args);
+        }
+        
+        if (args[0].equalsIgnoreCase("difficulty") && (ALL || Perm.has(plr, "multiworld.difficulty"))) {
+        	return DifficultyCommand.run(mc, plr, args);
         }
 
         if (args[0].equalsIgnoreCase("tp") ) {
@@ -206,7 +251,7 @@ public class MultiworldMod {
         }
 
         if (args[0].equalsIgnoreCase("version") && (ALL || Perm.has(plr, "multiworld.cmd")) ) {
-            message(plr, "Mutliworld Mod version " + VERSION);
+            message(plr, "Multiworld Mod version " + VERSION);
             return 1;
         }
 

@@ -5,19 +5,14 @@ import java.io.IOException;
 
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.FileConfiguration;
-import dimapi.FabricDimensionInternals;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.Heightmap;
 
-@SuppressWarnings("deprecation") // Fabric dimension API
 public class SpawnCommand {
 
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
@@ -26,7 +21,7 @@ public class SpawnCommand {
 
         // Don't use FabricDimensionInternals here as
         // we are teleporting to the same world.
-        plr.teleport(sp.getX(), sp.getY(), sp.getZ());
+        plr.teleport(sp.getX(), sp.getY(), sp.getZ(), true);
 
         // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(1, 1, 1), 0f, 0f);
         // ServerPlayerEntity teleported = FabricDimensionInternals.changeDimension(plr, w, target);

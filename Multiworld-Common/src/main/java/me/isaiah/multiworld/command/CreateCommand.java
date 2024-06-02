@@ -1,7 +1,9 @@
 package me.isaiah.multiworld.command;
 
+import java.util.ArrayList;
 import java.util.Random;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Formatting;
@@ -16,6 +18,8 @@ import static me.isaiah.multiworld.MultiworldMod.text_plain;
 import net.minecraft.server.world.ServerWorld;
 
 import java.io.File;
+import java.io.IOException;
+
 import me.isaiah.multiworld.config.*;
 
 public class CreateCommand {
@@ -111,13 +115,27 @@ public class CreateCommand {
 				dim = Util.THE_END_ID;
 			}
 			
-			ServerWorld world = MultiworldMod.create_world(id, dim, gen, Difficulty.NORMAL, seed);
+			Difficulty d = Difficulty.NORMAL;
+			
+			// Set saved Difficulty
+			if (config.is_set("difficulty")) {
+				String di = config.getString("difficulty");
+
+				// String to Difficulty
+				if (di.equalsIgnoreCase("EASY"))     { d = Difficulty.EASY; }
+				if (di.equalsIgnoreCase("HARD"))     { d = Difficulty.HARD; }
+				if (di.equalsIgnoreCase("NORMAL"))   { d = Difficulty.NORMAL; }
+				if (di.equalsIgnoreCase("PEACEFUL")) { d = Difficulty.PEACEFUL; }
+			}
+			
+			ServerWorld world = MultiworldMod.create_world(id, dim, gen, d, seed);
 			
 			
 			if (GameruleCommand.keys.size() == 0) {
             	GameruleCommand.setup();
             }
 			
+			// Set Gamerules
 			for (String name : GameruleCommand.keys.keySet()) {
 				String key = "gamerule_" + name;
 				
@@ -138,6 +156,7 @@ public class CreateCommand {
 					GameruleCommand.set_gamerule_from_cfg(world, key, (String) o);
 				}
 			}
+			
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -172,6 +191,26 @@ public class CreateCommand {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+	
+    /**
+     * 
+     */
+    public static FileConfiguration get_config(World w) throws IOException {
+        File cf = new File(FabricLoader.getInstance().getConfigDir().toFile(), "multiworld"); 
+        cf.mkdirs();
+
+        File worlds = new File(cf, "worlds");
+        worlds.mkdirs();
+
+        Identifier id = w.getRegistryKey().getValue();
+        File namespace = new File(worlds, id.getNamespace());
+        namespace.mkdirs();
+
+        File wc = new File(namespace, id.getPath() + ".yml");
+        wc.createNewFile();
+        FileConfiguration config = new FileConfiguration(wc);
+        return config;
     }
 
 }

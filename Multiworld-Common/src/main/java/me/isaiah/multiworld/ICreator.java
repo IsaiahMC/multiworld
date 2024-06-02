@@ -2,6 +2,7 @@ package me.isaiah.multiworld;
 
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.Difficulty;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -27,5 +28,9 @@ public interface ICreator {
 	}
 
 	public BlockPos get_spawn(ServerWorld world);
+
+	void teleleport(ServerPlayerEntity player, ServerWorld world, double x, double y, double z);
+
+	void set_difficulty(String id, Difficulty dif);
 
 }

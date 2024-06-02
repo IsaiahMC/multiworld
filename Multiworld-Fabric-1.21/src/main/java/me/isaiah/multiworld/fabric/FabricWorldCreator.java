@@ -2,7 +2,6 @@ package me.isaiah.multiworld.fabric;
 
 import java.util.HashMap;
 
-import dimapi.FabricDimensionInternals;
 import me.isaiah.multiworld.ICreator;
 import me.isaiah.multiworld.MultiworldMod;
 import net.minecraft.registry.RegistryKey;
@@ -16,7 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.TeleportTarget;
-import net.minecraft.world.WorldProperties;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -25,7 +23,11 @@ import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.fantasy.RuntimeWorldHandle;
 
 public class FabricWorldCreator implements ICreator {
-    
+
+    public Identifier new_id(String id) {
+    	return Identifier.of(id);
+    }
+
 	public HashMap<String, RuntimeWorldConfig> worldConfigs;
 	
 	public FabricWorldCreator() {
@@ -46,7 +48,7 @@ public class FabricWorldCreator implements ICreator {
                 ;
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
-        RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new Identifier(id), config);
+        RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new_id(id), config);
         this.worldConfigs.put(id, config);
         return worldHandle.asWorld();
     }
@@ -62,7 +64,7 @@ public class FabricWorldCreator implements ICreator {
     
     public void delete_world(String id) {
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
-        RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new Identifier(id), null);
+        RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new_id(id), null);
         worldHandle.delete();
     }
 	
@@ -78,7 +80,7 @@ public class FabricWorldCreator implements ICreator {
 
 	@Override
 	public boolean is_the_end(ServerWorld world) {
-		return world.getDimensionKey() == DimensionTypes.THE_END;
+		return world.getDimensionEntry() == DimensionTypes.THE_END;
 	}
 
 	@Override
@@ -88,14 +90,18 @@ public class FabricWorldCreator implements ICreator {
 	
 	@Override
 	public BlockPos get_spawn(ServerWorld world) {
-		WorldProperties prop = world.getLevelProperties();
-		return new BlockPos(prop.getSpawnX(), prop.getSpawnY(), prop.getSpawnZ());
+		return world.getLevelProperties().getSpawnPos();
 	}
 	
 	@Override
 	public void teleleport(ServerPlayerEntity player, ServerWorld world, double x, double y, double z) {
-        TeleportTarget target = new TeleportTarget(new Vec3d(x, y, z), new Vec3d(1, 1, 1), 0f, 0f);
-        FabricDimensionInternals.changeDimension(player, world, target);
+        TeleportTarget target = new TeleportTarget(world, new Vec3d(x, y, z), new Vec3d(1, 1, 1), 0f, 0f, TeleportTarget.NO_OP);
+        
+        // FabricDimensionInternals.changeDimension(player, world, target);
+        
+        // Per https://fabricmc.net/2024/05/31/121.html
+        // for 1.21, FabricDimension API is replaced by teleportTo
+        player.teleportTo(target);
 	}
 
 }

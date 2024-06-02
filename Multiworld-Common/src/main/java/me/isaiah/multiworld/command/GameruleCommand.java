@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.GameRules.BooleanRule;
@@ -40,6 +41,35 @@ public class GameruleCommand {
 		
         String a1 = args[1];
         String a2 = args[2];
+        
+        /*if (a1.equalsIgnoreCase("difficulty")) {
+        	// Test
+        	
+			Difficulty d = Difficulty.NORMAL;
+
+			// String to Difficulty
+			if (a2.equalsIgnoreCase("EASY"))     { d = Difficulty.EASY; }
+			else if (a2.equalsIgnoreCase("HARD"))     { d = Difficulty.HARD; }
+			else if (a2.equalsIgnoreCase("NORMAL"))   { d = Difficulty.NORMAL; }
+			else if (a2.equalsIgnoreCase("PEACEFUL")) { d = Difficulty.PEACEFUL; }
+			else {
+				MultiworldMod.message(plr, "Invalid difficulty: " + a2);
+				return 1;
+			}
+        	
+        	MultiworldMod.get_world_creator().set_difficulty(w.getRegistryKey().getValue().toString(), d);
+        	
+        	try {
+				FileConfiguration config = CreateCommand.get_config(w);
+				config.set("difficulty", a2);
+				config.save();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+        	return 1;
+        }*/
         
         boolean is_bol = false;
         
