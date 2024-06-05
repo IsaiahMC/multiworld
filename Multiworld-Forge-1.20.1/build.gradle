@@ -1,0 +1,168 @@
+plugins {
+	id "java-library"
+	id "maven-publish"
+    id "com.github.johnrengelman.shadow" version "7.1.1"
+    id "architectury-plugin" version "3.4-SNAPSHOT"
+    id "dev.architectury.loom" version "1.6-SNAPSHOT"
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+// archivesBaseName = rootProject.archives_base_name
+
+base {
+    archivesBaseName = "Multiworld-Forge"
+    version = "1.20.1"
+    group = "me.isaiah.mods"
+}
+
+loom {
+    forge {
+        getMixinConfigs().empty()
+        mixinConfig "dim.mixins.json"
+        mixinConfig "fantasy.mixins.json"
+    }
+}
+
+configurations {
+    extraLibs
+    common
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:1.20.1"
+    forge "net.minecraftforge:forge:${rootProject.forge_version_1_20_1}"
+	mappings "net.fabricmc:yarn:1.20.1+build.10:v2"
+	
+	annotationProcessor 'com.pkware.jabel:jabel-javac-plugin:1.0.1-1'
+    compileOnly 'com.pkware.jabel:jabel-javac-plugin:1.0.1-1'
+
+    // Note:
+    //  Forge port of CyberPermissions currently not on maven.
+    //
+    common fileTree(dir: 'lib', include: 'permissions-forge-dev.jar')
+	
+	// modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
+	// modImplementation("net.fabricmc:fabric-loader:0.14.18")
+
+    common(project(path: ":Multiworld-Common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":Multiworld-Common", configuration: "transformProductionForge")) { transitive = false }
+    
+    // fantasy api
+    //common(project(path: ":fantasy-forge", configuration: "namedElements")) { transitive false }
+    //shadowCommon(project(path: ":fantasy-forge", configuration: "transformProductionForge")) { transitive = false }
+    
+    // common( project(path: ":fantasy-forge") )
+    // shadowCommon( project(path: ":fantasy-forge") )
+}
+
+configure([tasks.compileJava]) {
+    sourceCompatibility = 21 // for the IDE support
+    options.release = 16
+
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+jar {
+   sourceSets {
+        main {
+            java {
+                exclude '**/fabric/*.java'
+                exclude '**/fabric/*.class'
+            }
+			resources {
+				exclude '**/fabric/*.java'
+                exclude '**/fabric/*.class'
+			}
+        }
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+	
+	exclude '**/fabric/*.class'
+	exclude '**/fabric/*.java'
+}
+
+shadowJar {
+    sourceSets {
+        main {
+            java {
+                exclude '**/fabric/*.java'
+                exclude '**/fabric/*.class'
+            }
+        }
+    }
+
+    exclude "fabric.mod.json"
+	exclude '**/fabric/*.java'
+	exclude '**/fabric/*.class'
+
+    configurations = [project.configurations.shadowCommon]
+    // classifier "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+	
+	sourceSets {
+        main {
+            java {
+                exclude '**/fabric/*.java'
+                exclude '**/fabric/*.class'
+            }
+        }
+    }
+    //lassifier null
+}
+
+tasks.named("build") { finalizedBy("copyReport2") }
+tasks.named("build") { finalizedBy("copyReport2") }
+
+tasks.register('copyReport2', Copy) {
+    from remapJar
+    into "${project.rootDir}/output"
+}
+
+/*
+sourcesJar {
+    // def commonSources = project(":Multiworld-Common").sourcesJar
+    // dependsOn commonSources
+    // from commonSources.archiveFile.map { zipTree(it) }
+}
+*/
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}
+
+publishing {
+    publications {
+        mavenForge(MavenPublication) {
+            artifactId = rootProject.archives_base_name + "-" + project.name
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+    }
+}

@@ -11,15 +11,20 @@ pluginManagement {
 }
 
 rootProject.name = 'Multiworld'
+mod_version = '1.8.1'
+
 include 'Multiworld-Common'
 
+// Fabric
 include 'Multiworld-Fabric-1.18.2'
 include 'Multiworld-Fabric-1.19.2'
 include 'Multiworld-Fabric-1.19.4'
 include 'Multiworld-Fabric-1.20.1'
 include 'Multiworld-Fabric-1.20.4'
 include 'Multiworld-Fabric-1.20.6'
-// TODO: Needs Fantasy update for 1.21
-// include 'Multiworld-Fabric-1.21'
+include 'Multiworld-Fabric-1.21'
 include 'Multiworld-Fabric-bundle'
+
+// Forge
 include 'Multiworld-Forge-1.19.4'
+include 'Multiworld-Forge-1.20.1'

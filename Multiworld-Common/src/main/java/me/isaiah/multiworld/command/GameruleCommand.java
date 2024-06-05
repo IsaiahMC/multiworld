@@ -6,12 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.FileConfiguration;
-import net.fabricmc.loader.api.FabricLoader;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.GameRules.BooleanRule;
@@ -121,7 +120,7 @@ public class GameruleCommand {
      * @param b - The value for the Gamerule (ex: "true", or "100")
      */
     public static void set_rule_cfg(World w, String a, String b) throws IOException {
-        File cf = new File(FabricLoader.getInstance().getConfigDir().toFile(), "multiworld"); 
+        File cf = new File(Util.get_platform_config_dir(), "multiworld"); 
         cf.mkdirs();
 
         File worlds = new File(cf, "worlds");

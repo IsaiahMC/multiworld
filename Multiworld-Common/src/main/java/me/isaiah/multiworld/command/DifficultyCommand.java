@@ -54,7 +54,7 @@ public class DifficultyCommand {
         MultiworldMod.get_world_creator().set_difficulty(w.getRegistryKey().getValue().toString(), d);
 
         try {
-			FileConfiguration config = CreateCommand.get_config(w);
+			FileConfiguration config = Util.get_config(w);
 			config.set("difficulty", a1);
 			config.save();
 		} catch (IOException e) {

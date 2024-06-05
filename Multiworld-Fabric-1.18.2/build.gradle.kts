@@ -87,17 +87,6 @@ sourceSets {
 
 tasks.withType<Jar> { duplicatesStrategy = DuplicatesStrategy.INHERIT }
 
-tasks.getByName<ProcessResources>("processResources") {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    filesMatching("fabric.mod.json") {
-        expand(
-            mutableMapOf(
-                "version" to "1.1"
-            )
-        )
-    }
-}
-
 val remapJar = tasks.getByName<RemapJarTask>("remapJar")
 
 tasks.named("build") { finalizedBy("copyReport2") }

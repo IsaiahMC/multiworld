@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[38,)"
+#issueTrackerURL = ""
+license = "gpl"
+
+[[mods]]
+modId = "multiworld"
+version = "${version}"
+displayName = "Multiworld"
+authors = "isaiah"
+description = '''
+This is an example description! Tell everyone what your mod is about!
+'''
+#logoFile = ""
+
+[[dependencies.multiworld]]
+modId = "forge"
+mandatory = true
+versionRange = "[38,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.multiworld]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20,)"
+ordering = "NONE"
+side = "BOTH"

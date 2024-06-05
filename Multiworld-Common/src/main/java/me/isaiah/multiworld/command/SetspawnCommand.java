@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import me.isaiah.multiworld.config.FileConfiguration;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Formatting;
@@ -34,7 +33,7 @@ public class SetspawnCommand {
     }
 
     public static void setSpawn(World w, BlockPos spawn) throws IOException {
-        File cf = new File(FabricLoader.getInstance().getConfigDir().toFile(), "multiworld"); 
+        File cf = new File(Util.get_platform_config_dir(), "multiworld"); 
         cf.mkdirs();
 
         File worlds = new File(cf, "worlds");

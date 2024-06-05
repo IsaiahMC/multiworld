@@ -3,6 +3,23 @@
 	}
 
 subprojects {
+
+	ext {
+		mod_version = project.mod_version
+		set("mod_version", project.mod_version)
+	}
+	
+	project.afterEvaluate {
+		processResources {
+			duplicatesStrategy = DuplicatesStrategy.INCLUDE
+			filesMatching("fabric.mod.json") {
+				expand "version": project.mod_version
+			}
+		}
+		
+	}
+
+
 	repositories {
 	  maven { url = 'https://maven.nucleoid.xyz/' }
 	  maven { url = 'https://cursemaven.com/' }

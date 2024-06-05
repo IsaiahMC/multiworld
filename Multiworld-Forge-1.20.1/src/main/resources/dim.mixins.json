@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "dimapi.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "EntityMixin",
+    "ServerBugfixMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

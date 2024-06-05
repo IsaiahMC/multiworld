@@ -60,14 +60,3 @@ dependencies {
 		modImplementation(fabricApi.module(it, "0.86.1+1.19.4"))
 	}
 }
-
-tasks.getByName<ProcessResources>("processResources") {
-duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    filesMatching("fabric.mod.json") {
-        expand(
-            mutableMapOf(
-                "version" to "1.1"
-            )
-        )
-    }
-}

@@ -30,13 +30,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-//import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.Difficulty;
-//import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
-
-//import me.isaiah.lib.IText;
 
 /**
  * Multiworld Mod

@@ -19,6 +19,9 @@ base {
 
 dependencies {
 
+	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
+	compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
+
 	// 1.20
     minecraft("com.mojang:minecraft:1.20.1") 
     mappings("net.fabricmc:yarn:1.20.1+build.10")
@@ -31,6 +34,7 @@ dependencies {
 	include(project(":Multiworld-Fabric-1.20.1"))
 	include(project(":Multiworld-Fabric-1.20.4"))
 	include(project(":Multiworld-Fabric-1.20.6"))
+	include(project(":Multiworld-Fabric-1.21"))
 }
 
 
@@ -50,32 +54,30 @@ sourceSets {
     }
 }
 
-/*configure([tasks.compileJava]) {
-    sourceCompatibility = 16 // for the IDE support
-    options.release = 8
+// Jabel
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = JavaVersion.VERSION_21.toString() // for the IDE support
+    options.release.set(8)
 
-    javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(16)
-    }
-}*/
-
-//tasks.getByName("compileJava") {
-    //sourceCompatibility = 16
-    //options.release = 8
-//}
+    javaCompiler.set(
+        javaToolchains.compilerFor {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
+    )
+}
 
 
 tasks.withType<Jar> { duplicatesStrategy = DuplicatesStrategy.INHERIT }
 
 tasks.getByName<ProcessResources>("processResources") {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    filesMatching("fabric.mod.json") {
+    /*filesMatching("fabric.mod.json") {
         expand(
             mutableMapOf(
-                "version" to "1.1"
+                "version" to ext.get("mod_version")
             )
         )
-    }
+    }*/
 }
 
 val remapJar = tasks.getByName<RemapJarTask>("remapJar")

@@ -17,6 +17,11 @@ base {
     group = "me.isaiah.mods"
 }
 
+repositories {
+	// Fantasy 1.21
+	mavenLocal()
+}
+
 dependencies {
 
 	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
@@ -27,8 +32,8 @@ dependencies {
     mappings("net.fabricmc:yarn:1.21-pre2+build.2:v2")
     modImplementation("net.fabricmc:fabric-loader:0.15.11")
 
-	include("xyz.nucleoid:fantasy:0.6.0+1.20.6")
-	modImplementation("xyz.nucleoid:fantasy:0.6.0+1.20.6")
+	include("xyz.nucleoid:fantasy:0.6.0+1.21-pre2")
+	modImplementation("xyz.nucleoid:fantasy:0.6.0+1.21-pre2")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
 	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
 	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.99.4+1.21")
@@ -94,17 +99,6 @@ tasks.withType<JavaCompile>().configureEach {
 
 
 tasks.withType<Jar> { duplicatesStrategy = DuplicatesStrategy.INHERIT }
-
-tasks.getByName<ProcessResources>("processResources") {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    filesMatching("fabric.mod.json") {
-        expand(
-            mutableMapOf(
-                "version" to "1.1"
-            )
-        )
-    }
-}
 
 val remapJar = tasks.getByName<RemapJarTask>("remapJar")
 
