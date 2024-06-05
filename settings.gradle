@@ -26,5 +26,6 @@ include 'Multiworld-Fabric-1.21'
 include 'Multiworld-Fabric-bundle'
 
 // Forge
+include 'Multiworld-Forge-1.18.2'
 include 'Multiworld-Forge-1.19.4'
 include 'Multiworld-Forge-1.20.1'
