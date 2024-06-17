@@ -21,7 +21,7 @@
   },
   "depends": {
     "fabric": "*",
-    "minecraft": ">=1.20.5"
+    "minecraft": ">=1.20.5- <1.21-"
   },
   "mixins": [
     "dim.mixins.json"
