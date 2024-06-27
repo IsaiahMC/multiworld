@@ -58,7 +58,7 @@ public class TpCommand {
                 plr.sendMessage(text("Error: null getSpawnPos", Formatting.RED), false);
                 sp = new BlockPos(1, 40, 1);
             }
-            plr.sendMessage(text("Telelporting...", Formatting.GOLD), false);
+            plr.sendMessage(text("Teleporting...", Formatting.GOLD), false);
 
             sp = findSafePos(w, sp);
 
