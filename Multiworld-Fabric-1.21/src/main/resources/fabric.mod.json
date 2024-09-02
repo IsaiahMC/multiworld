@@ -8,7 +8,7 @@
     "Isaiah"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
+    "homepage": "https://curseforge.com/minecraft/mc-mods/multiworld-mod",
     "sources": "https://github.com/IsaiahMC/multiworld"
   },
   "license": "LGPL version 3.0",
@@ -21,7 +21,7 @@
   },
   "depends": {
     "fabric": "*",
-    "minecraft": ">=1.21- <1.21.1-"
+    "minecraft": ">=1.21- <1.21.3-"
   },
   "suggests": {
     "flamingo": "*"

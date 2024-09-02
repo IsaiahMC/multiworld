@@ -27,10 +27,15 @@ dependencies {
 	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 
-	// 1.20.4
-    minecraft("com.mojang:minecraft:1.21") 
-    mappings("net.fabricmc:yarn:1.21+build.2:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.15.11")
+	// 1.21
+    // minecraft("com.mojang:minecraft:1.21") 
+    // mappings("net.fabricmc:yarn:1.21+build.2:v2")
+    // modImplementation("net.fabricmc:fabric-loader:0.15.11")
+	
+	// 1.21.1
+    minecraft("com.mojang:minecraft:1.21.1") 
+    mappings("net.fabricmc:yarn:1.21.1+build.3:v2")
+    modImplementation("net.fabricmc:fabric-loader:0.16.3")
 
 	include("xyz.nucleoid:fantasy:0.6.3+1.21")
 	modImplementation("xyz.nucleoid:fantasy:0.6.3+1.21")
@@ -46,7 +51,8 @@ dependencies {
 		"fabric-networking-api-v1"
 	).forEach {
 		// Add each module as a dependency
-		modImplementation(fabricApi.module(it, "0.100.1+1.21"))
+		// modImplementation(fabricApi.module(it, "0.100.1+1.21"))
+		modImplementation(fabricApi.module(it, "0.103.0+1.21.1"))
 	}
 }
 
