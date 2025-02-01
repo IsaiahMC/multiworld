@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id ("fabric-loom") version "1.6-SNAPSHOT"
+    id ("fabric-loom") version "1.9-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -13,7 +13,7 @@ java {
 
 base {
     archivesBaseName = "Multiworld-Fabric"
-    version = "1.21"
+    version = "1.21.4"
     group = "me.isaiah.mods"
 }
 
@@ -32,16 +32,16 @@ dependencies {
     // mappings("net.fabricmc:yarn:1.21+build.2:v2")
     // modImplementation("net.fabricmc:fabric-loader:0.15.11")
 	
-	// 1.21.1
-    minecraft("com.mojang:minecraft:1.21.1") 
-    mappings("net.fabricmc:yarn:1.21.1+build.3:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.16.3")
+	// 1.21.4
+    minecraft("com.mojang:minecraft:1.21.4") 
+    mappings("net.fabricmc:yarn:1.21.4+build.7:v2")
+    modImplementation("net.fabricmc:fabric-loader:0.16.9")
 
-	include("xyz.nucleoid:fantasy:0.6.3+1.21")
-	modImplementation("xyz.nucleoid:fantasy:0.6.3+1.21")
+	include("xyz.nucleoid:fantasy:0.6.5+1.21.2")
+	modImplementation("xyz.nucleoid:fantasy:0.6.5+1.21.2")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
-	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
-	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.100.1+1.21")
+	modImplementation("me.lucko:fabric-permissions-api:0.3.3")
+	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.107.0+1.21.4")
 	
 	
 	setOf(
@@ -52,7 +52,7 @@ dependencies {
 	).forEach {
 		// Add each module as a dependency
 		// modImplementation(fabricApi.module(it, "0.100.1+1.21"))
-		modImplementation(fabricApi.module(it, "0.103.0+1.21.1"))
+		modImplementation(fabricApi.module(it, "0.107.0+1.21.4"))
 	}
 }
 
@@ -120,11 +120,11 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = project.group.toString()
-            artifactId = project.name.toLowerCase()
+            artifactId = project.name.lowercase()
             version = project.version.toString()
             
             pom {
-                name.set(project.name.toLowerCase())
+                name.set(project.name.lowercase())
                 description.set("A concise description of my library")
                 url.set("http://www.example.com/")
             }
