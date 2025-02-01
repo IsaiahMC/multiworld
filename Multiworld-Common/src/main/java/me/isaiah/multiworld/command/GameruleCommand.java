@@ -27,7 +27,7 @@ public class GameruleCommand {
         ServerWorld w = (ServerWorld) plr.getWorld();
         
 		if (keys.isEmpty()) {
-			setup();
+			setup(w);
 		}
 
         // GameRules rules = new GameRules();
@@ -97,17 +97,33 @@ public class GameruleCommand {
         
         return 1;
     }
-    
+
     /**
-     * Read the Gamerule names
+     * Read the Gamerule names – fetches gamerules from server
      */
-    public static void setup() {
+    public static void setupServer(MinecraftServer server) {
         keys.clear();
-    	GameRules.accept(new GameRules.Visitor(){
+        // Create a temporary GameRules instance to access the accept method
+        server.getGameRules().accept(new GameRules.Visitor() {
             @Override
             public <T extends GameRules.Rule<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
                 String name = key.getName();
-            	keys.put(name, key);
+                keys.put(name, key);
+            }
+        });
+    }
+    
+    /**
+     * Read the Gamerule names – fetches gamerules from world
+     */
+    public static void setup(ServerWorld world) {
+        keys.clear();
+        // Create a temporary GameRules instance to access the accept method
+        world.getGameRules().accept(new GameRules.Visitor() {
+            @Override
+            public <T extends GameRules.Rule<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
+                String name = key.getName();
+                keys.put(name, key);
             }
         });
     }
@@ -154,7 +170,7 @@ public class GameruleCommand {
 	@SuppressWarnings("unchecked")
 	public static void set_gamerule_from_cfg(ServerWorld world, String key, String val) {
 		if (keys.isEmpty()) {
-			setup();
+			setup(world);
 		}
 
         String name = key.replace("gamerule_", "").trim();

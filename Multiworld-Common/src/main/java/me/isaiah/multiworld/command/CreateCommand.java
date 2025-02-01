@@ -128,8 +128,8 @@ public class CreateCommand {
 			
 			
 			if (GameruleCommand.keys.size() == 0) {
-            	GameruleCommand.setup();
-            }
+				GameruleCommand.setupServer(MultiworldMod.mc);
+			}
 			
 			// Set Gamerules
 			for (String name : GameruleCommand.keys.keySet()) {

@@ -66,7 +66,7 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
             
             if (cmds[1].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
                 if (GameruleCommand.keys.size() == 0) {
-                	GameruleCommand.setup();
+                	GameruleCommand.setupServer(MultiworldMod.mc);
                 }
                 
                 String last = input.substring(input.lastIndexOf(' ')).trim();
