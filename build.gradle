@@ -1,5 +1,5 @@
 	plugins {
-		id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
+		id "dev.architectury.loom" version "1.9-SNAPSHOT" apply false
 	}
 
 subprojects {
