@@ -35,6 +35,7 @@ dependencies {
 	include(project(":Multiworld-Fabric-1.20.4"))
 	include(project(":Multiworld-Fabric-1.20.6"))
 	include(project(":Multiworld-Fabric-1.21"))
+	include(project(":Multiworld-Fabric-1.21.4"))
 }
 
 
