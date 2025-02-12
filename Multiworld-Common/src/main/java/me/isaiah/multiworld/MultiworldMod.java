@@ -50,7 +50,10 @@ public class MultiworldMod {
     public static void setICreator(ICreator ic) {
         world_creator = ic;
     }
-    
+
+    /**
+     * Gets the Multiversion ICreator instance
+     */
     public static ICreator get_world_creator() {
     	return world_creator;
     }
@@ -59,22 +62,18 @@ public class MultiworldMod {
     	return world_creator.create_world(id, dim, gen, dif, seed);
     }
 
-    // On mod init
+    /**
+     * ModInitializer onInitialize
+     * 
+     * @see {@link me.isaiah.multiworld.fabric.MultiworldModFabric}
+     */
     public static void init() {
-        System.out.println(" Multiworld init");
+        System.out.println("Multiworld init");
     }
-    
+
     public static Identifier new_id(String id) {
-    	/*if (id.indexOf(':') != -1) {
-    		String[] spl = id.split(Pattern.quote(":"));
-    		return Identifier.of(spl[0], spl[1]);
-    	}
-    	return Identifier.of("minecraft", id);*/
-    	
     	// tryParse works from 1.18 to 1.21
     	return Identifier.tryParse(id);
-    	
-    	// return new Identifier(id);
     }
 
     // On server start
@@ -99,7 +98,7 @@ public class MultiworldMod {
 			}
 		}
     }
-    
+
     public static ServerPlayerEntity get_player(ServerCommandSource s) throws CommandSyntaxException {
     	ServerPlayerEntity plr = s.getPlayer();
     	if (null == plr) {
@@ -135,7 +134,7 @@ public class MultiworldMod {
                                     }
                                  }))); 
     }
-    
+   
     public static int broadcast(ServerCommandSource source, Formatting formatting, String message) throws CommandSyntaxException {
         final ServerPlayerEntity plr = get_player(source); // source.getPlayerOrThrow();
 
@@ -178,6 +177,7 @@ public class MultiworldMod {
             }
         }*/
         
+        // Help Command
         if (args[0].equalsIgnoreCase("help")) {
             String[] lines = {
             		"&4Multiworld Mod Commands:&r",
@@ -196,6 +196,7 @@ public class MultiworldMod {
             
         }
         
+        // Debug
         if (args[0].equalsIgnoreCase("debugtick")) {
         	ServerWorld w = (ServerWorld) plr.getWorld();
         	Identifier id = w.getRegistryKey().getValue();
@@ -204,22 +205,27 @@ public class MultiworldMod {
         	w.tick(() -> true);
         }
 
+        // SetSpawn Command
         if (args[0].equalsIgnoreCase("setspawn") && (ALL || Perm.has(plr, "multiworld.setspawn") )) {
             return SetspawnCommand.run(mc, plr, args);
         }
 
+        // Spawn Command
         if (args[0].equalsIgnoreCase("spawn") && (ALL || Perm.has(plr, "multiworld.spawn")) ) {
             return SpawnCommand.run(mc, plr, args);
         }
         
+        // Gamerule Command
         if (args[0].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
         	return GameruleCommand.run(mc, plr, args);
         }
         
+        // Difficulty Command
         if (args[0].equalsIgnoreCase("difficulty") && (ALL || Perm.has(plr, "multiworld.difficulty"))) {
         	return DifficultyCommand.run(mc, plr, args);
         }
 
+        // TP Command
         if (args[0].equalsIgnoreCase("tp") ) {
             if (!(ALL || Perm.has(plr, "multiworld.tp"))) {
                 plr.sendMessage(Text.of("No permission! Missing permission: multiworld.tp"), false);
@@ -232,6 +238,7 @@ public class MultiworldMod {
             return TpCommand.run(mc, plr, args);
         }
 
+        // List Command
         if (args[0].equalsIgnoreCase("list") ) {
             if (!(ALL || Perm.has(plr, "multiworld.cmd"))) {
                 plr.sendMessage(Text.of("No permission! Missing permission: multiworld.cmd"), false);
@@ -246,11 +253,13 @@ public class MultiworldMod {
             });
         }
 
+        // Version Command
         if (args[0].equalsIgnoreCase("version") && (ALL || Perm.has(plr, "multiworld.cmd")) ) {
             message(plr, "Multiworld Mod version " + VERSION);
             return 1;
         }
 
+        // Create Command
         if (args[0].equalsIgnoreCase("create") ) {
             if (!(ALL || Perm.has(plr, "multiworld.create"))) {
                 message(plr, "No permission! Missing permission: multiworld.create");
@@ -287,9 +296,8 @@ public class MultiworldMod {
         return new String(b);
     }
 
-	
 	public static Text text_plain(String txt) {
 		return Text.of(txt);
 	}
-	
+
 }

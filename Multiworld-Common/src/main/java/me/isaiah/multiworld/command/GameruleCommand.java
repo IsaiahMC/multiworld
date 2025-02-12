@@ -19,6 +19,11 @@ import net.minecraft.world.GameRules.Rule;
 
 public class GameruleCommand {
 
+	// TODO
+	public static GameRules getGameRules(ServerWorld world) {
+		return world.getGameRules();
+	}
+	
 	@SuppressWarnings("rawtypes")
 	public static HashMap<String, GameRules.Key> keys = new HashMap<>();
 	
@@ -33,7 +38,7 @@ public class GameruleCommand {
         // GameRules rules = new GameRules();
 
 		if (args.length < 3) {
-			Rule<?> rule = w.getGameRules().get(keys.get(args[1]));
+			Rule<?> rule = getGameRules(w).get(keys.get(args[1]));
 			MultiworldMod.message(plr, "[&4Multiworld&r] Value of " + args[1] + " is: " + rule);
 			return 1;
 		}
@@ -78,11 +83,11 @@ public class GameruleCommand {
 
         if (is_bol) {
         	// Boolean Rule
-        	BooleanRule rule = (BooleanRule) w.getGameRules().get(keys.get(a1));
+        	BooleanRule rule = (BooleanRule) getGameRules(w).get(keys.get(a1));
         	rule.set(Boolean.valueOf(a2), mc);
         } else {
         	// Int Rule
-        	IntRule rule = (IntRule) w.getGameRules().get(keys.get(a1));
+        	IntRule rule = (IntRule) getGameRules(w).get(keys.get(a1));
         	rule.set(Integer.valueOf(a2), mc);
         }
 
@@ -184,11 +189,11 @@ public class GameruleCommand {
 		
         if (is_bol) {
         	// Boolean Rule
-        	BooleanRule rule = (BooleanRule) world.getGameRules().get(keys.get(name));
+        	BooleanRule rule = (BooleanRule) getGameRules(world).get(keys.get(name));
         	rule.set(Boolean.valueOf(a1), MultiworldMod.mc);
         } else {
         	// Int Rule
-        	IntRule rule = (IntRule) world.getGameRules().get(keys.get(name));
+        	IntRule rule = (IntRule) getGameRules(world).get(keys.get(name));
         	rule.set(Integer.valueOf(a1), MultiworldMod.mc);
         }
 		

@@ -67,7 +67,7 @@ public class FabricWorldCreator implements ICreator {
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new_id(id), null);
         worldHandle.delete();
     }
-	
+
 	@Override
 	public Text colored_literal(String txt, Formatting color) {
 		try {
@@ -92,7 +92,7 @@ public class FabricWorldCreator implements ICreator {
 	public BlockPos get_spawn(ServerWorld world) {
 		return world.getLevelProperties().getSpawnPos();
 	}
-	
+
 	@Override
 	public void teleleport(ServerPlayerEntity player, ServerWorld world, double x, double y, double z) {
         TeleportTarget target = new TeleportTarget(world, new Vec3d(x, y, z), new Vec3d(1, 1, 1), 0f, 0f, TeleportTarget.NO_OP);

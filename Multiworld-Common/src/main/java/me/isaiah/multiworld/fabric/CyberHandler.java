@@ -7,7 +7,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
  * CyberPermissions API
+ * 
+ * @deprecated Been superseded by fabric-permissions-api
  */
+@Deprecated
 public class CyberHandler {
     
     public static boolean hasPermission(ServerPlayerEntity plr, String perm) {

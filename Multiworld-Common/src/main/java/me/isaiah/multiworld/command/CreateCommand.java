@@ -1,5 +1,6 @@
 package me.isaiah.multiworld.command;
 
+import java.util.HashMap;
 import java.util.Random;
 
 import net.minecraft.server.MinecraftServer;
@@ -19,32 +20,27 @@ import java.io.File;
 import me.isaiah.multiworld.config.*;
 
 public class CreateCommand {
+	
+	public static HashMap<String, ChunkGenerator> customs;
+	
+	// TODO: expose API
+	public static void registerCustomGenerator(Identifier id, ChunkGenerator gen) {
+		customs.put(id.toString(), gen);
+	}
 
+	// Run Command
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         if (args.length == 1 || args.length == 2) {
             plr.sendMessage(text_plain("Usage: /mv create <id> <env>"), false);
             return 0;
         }
 
-        Identifier dim = null;
         Random r = new Random();
         long seed = r.nextInt();
-
-        ChunkGenerator gen = null;
-        if (args[2].contains("NORMAL")) {
-            gen = mc.getWorld(World.OVERWORLD).getChunkManager().getChunkGenerator();
-            dim = Util.OVERWORLD_ID;
-        }
-
-        if (args[2].contains("NETHER")) {
-            gen = mc.getWorld(World.NETHER).getChunkManager().getChunkGenerator();
-            dim = Util.THE_NETHER_ID;
-        }
         
-        if (args[2].contains("END")) {
-            gen = mc.getWorld(World.END).getChunkManager().getChunkGenerator();
-            dim = Util.THE_END_ID;
-        }
+        String env = args[2];
+        ChunkGenerator gen = get_chunk_gen(mc, env);
+        Identifier dim = get_dim_id(env);
         
         if (null == dim) {
         	System.out.println("Null dimenstion ");
@@ -52,7 +48,9 @@ public class CreateCommand {
         }
         
         String arg1 = args[1];
-        if (arg1.indexOf(':') == -1) arg1 = "multiworld:" + arg1;
+        if (arg1.indexOf(':') == -1) {
+        	arg1 = "multiworld:" + arg1;
+        }
         
         ServerWorld world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.NORMAL, seed);
 		make_config(world, args[2], seed);
@@ -61,6 +59,43 @@ public class CreateCommand {
         
         return 1;
     }
+
+    /**
+     * Return a {@link Identifier} representing the given vanilla environment,
+     * or NULL if the passed argument is not NORMAL / NETHER / END.
+     */
+    public static Identifier get_dim_id(String env) {
+    	if (env.contains("NORMAL")) {
+			return Util.OVERWORLD_ID;
+		}
+
+		if (env.contains("NETHER")) {
+			return Util.THE_NETHER_ID;
+		}
+
+		if (env.contains("END")) {
+			return Util.THE_END_ID;
+		}
+		
+		if (customs.containsKey(env)) {
+			return MultiworldMod.new_id( env );
+		}
+		
+		return null;
+    }
+
+    /**
+     * Return a {@link ChunkGenerator} for the given vanilla environment,
+     * or NULL if the passed argument is not NORMAL / NETHER / END.
+     */
+    public static ChunkGenerator get_chunk_gen(MinecraftServer mc, String env) {
+		ChunkGenerator gen = MultiworldMod.get_world_creator().get_chunk_gen(mc, env);
+
+		if (customs.containsKey(env)) {
+			return customs.get(env);
+		}
+		return gen;
+    } 
 	
 	public static void reinit_world_from_config(MinecraftServer mc, String id) {
 		File config_dir = new File("config");
@@ -92,24 +127,13 @@ public class CreateCommand {
 			} catch (Exception e) {
 				seed = config.getInt("seed");
 			}
-			
-			Identifier dim = null;
 
-			ChunkGenerator gen = null;
-			if (env.contains("NORMAL")) {
-				gen = mc.getWorld(World.OVERWORLD).getChunkManager().getChunkGenerator(); // .withSeed(seed);
-				dim = Util.OVERWORLD_ID;
-			}
-
-			if (env.contains("NETHER")) {
-				gen = mc.getWorld(World.NETHER).getChunkManager().getChunkGenerator();
-				dim = Util.THE_NETHER_ID;
-			}
-			
-			if (env.contains("END")) {
-				gen = mc.getWorld(World.END).getChunkManager().getChunkGenerator(); // .withSeed(seed);
-				dim = Util.THE_END_ID;
-			}
+			ChunkGenerator gen = get_chunk_gen(mc, env);
+		    Identifier dim = get_dim_id(env);
+		    
+		    if (null == dim) {
+		    	dim = Util.OVERWORLD_ID;
+		    }
 			
 			Difficulty d = Difficulty.NORMAL;
 			
@@ -125,12 +149,11 @@ public class CreateCommand {
 			}
 			
 			ServerWorld world = MultiworldMod.create_world(id, dim, gen, d, seed);
-			
-			
+
 			if (GameruleCommand.keys.size() == 0) {
 				GameruleCommand.setupServer(MultiworldMod.mc);
 			}
-			
+
 			// Set Gamerules
 			for (String name : GameruleCommand.keys.keySet()) {
 				String key = "gamerule_" + name;

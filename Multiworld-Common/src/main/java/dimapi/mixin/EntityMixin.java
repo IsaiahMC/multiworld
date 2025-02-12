@@ -34,7 +34,6 @@ import dimapi.FabricDimensionInternals;
 @Mixin(Entity.class)
 public class EntityMixin {
 
-	@SuppressWarnings("ConstantConditions")
 	@Inject(method = "getTeleportTarget", at = @At("HEAD"), cancellable = true, allow = 1)
 	public void getTeleportTarget(ServerWorld destination, CallbackInfoReturnable<TeleportTarget> cri) {
 		Entity self = (Entity) (Object) this;
