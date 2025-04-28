@@ -21,7 +21,7 @@ import me.isaiah.multiworld.config.*;
 
 public class CreateCommand {
 	
-	public static HashMap<String, ChunkGenerator> customs;
+	public static HashMap<String, ChunkGenerator> customs = new HashMap<>();
 	
 	// TODO: expose API
 	public static void registerCustomGenerator(Identifier id, ChunkGenerator gen) {
