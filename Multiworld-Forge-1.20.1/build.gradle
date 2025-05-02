@@ -65,7 +65,7 @@ dependencies {
 
 configure([tasks.compileJava]) {
     sourceCompatibility = 21 // for the IDE support
-    options.release = 16
+    options.release = 17
 
     javaCompiler = javaToolchains.compilerFor {
         languageVersion = JavaLanguageVersion.of(21)

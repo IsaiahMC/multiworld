@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "xyz.nucleoid.fantasy.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "MixinMinecraftServer",
+    "MinecraftServerAccess",
+    "ServerChunkManagerMixin",
+    "ServerWorldMixin",
+    "registry.DimensionOptionsMixin",
+    "registry.SimpleRegistryMixin",
+    "registry.RegistryCodecsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

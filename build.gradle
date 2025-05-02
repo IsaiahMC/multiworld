@@ -1,6 +1,6 @@
-	plugins {
-		id "dev.architectury.loom" version "1.9-SNAPSHOT" apply false
-	}
+plugins {
+	id "dev.architectury.loom" version "1.9-SNAPSHOT" apply false
+}
 
 subprojects {
 
@@ -25,6 +25,7 @@ subprojects {
 	  maven { url = 'https://cursemaven.com/' }
 	  maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 	  maven { url = "https://pisaiah.github.io/maven-repo/" }
+	  maven { url = "https://maven.neoforged.net/releases/" }
 	}
 
     plugins.withId('java-library', { _ ->
