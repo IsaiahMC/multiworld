@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="gpl"
+
+[[mods]] #mandatory
+modId="multiworld"
+version="1.21.2"
+displayName="Multiworld"
+authors="isaiah"
+description="This is an example description! Tell everyone what your mod is about!"
+#logoFile=""
+
+[[dependencies.multiworld]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.2.1,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.multiworld]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.2,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[mixins]]
+    config="fantasy.mixins.json"

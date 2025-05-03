@@ -8,23 +8,17 @@ plugins {
 
 architectury {
     platformSetupLoomIde()
-    forge()
+    neoForge {
+        platformPackage = "forge"
+    }
 }
 
 // archivesBaseName = rootProject.archives_base_name
 
 base {
-    archivesBaseName = "Multiworld-Forge"
-    version = "1.18.2"
+    archivesBaseName = "Multiworld-NeoForged"
+    version = "1.21.2"
     group = "me.isaiah.mods"
-}
-
-loom {
-    forge {
-        getMixinConfigs().empty()
-        mixinConfig "dim.mixins.json"
-        mixinConfig "fantasy.mixins.json"
-    }
 }
 
 configurations {
@@ -33,13 +27,16 @@ configurations {
     shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
-    developmentForge.extendsFrom common
+    developmentNeoForge.extendsFrom common
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:1.18.2"
-    forge "net.minecraftforge:forge:${rootProject.forge_version_1_18_2}"
-	mappings "net.fabricmc:yarn:1.18.2+build.2:v2"
+	minecraft "com.mojang:minecraft:1.21.2"
+    neoForge "net.neoforged:neoforge:${rootProject.neoforged_version_1_21_2}"
+    mappings loom.layered {
+        it.mappings("net.fabricmc:yarn:1.21.2+build.1:v2")
+        it.mappings("dev.architectury:yarn-mappings-patch-neoforge:1.21+build.4")
+    }
 	
 	annotationProcessor 'com.pkware.jabel:jabel-javac-plugin:1.0.1-1'
     compileOnly 'com.pkware.jabel:jabel-javac-plugin:1.0.1-1'
@@ -53,11 +50,11 @@ dependencies {
 	// modImplementation("net.fabricmc:fabric-loader:0.14.18")
 
     common(project(path: ":Multiworld-Common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":Multiworld-Common", configuration: "transformProductionForge")) { transitive = false }
+    shadowCommon(project(path: ":Multiworld-Common", configuration: "transformProductionNeoForge")) { transitive = false }
     
     // fantasy api
     //common(project(path: ":fantasy-forge", configuration: "namedElements")) { transitive false }
-    //shadowCommon(project(path: ":fantasy-forge", configuration: "transformProductionForge")) { transitive = false }
+    //shadowCommon(project(path: ":fantasy-forge", configuration: "transformProductionNeoForge")) { transitive = false }
     
     // common( project(path: ":fantasy-forge") )
     // shadowCommon( project(path: ":fantasy-forge") )
@@ -65,7 +62,8 @@ dependencies {
 
 configure([tasks.compileJava]) {
     sourceCompatibility = 21 // for the IDE support
-    options.release = 17
+    options.encoding = "UTF-8"
+    options.release = 21
 
     javaCompiler = javaToolchains.compilerFor {
         languageVersion = JavaLanguageVersion.of(21)
@@ -78,10 +76,18 @@ jar {
             java {
                 exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude("**/dimapi/*.java")
+                exclude("**/dimapi/*.class")
+                exclude("**/dimapi/mixin/*.java")
+                exclude("**/dimapi/mixin/*.class")
             }
 			resources {
 				exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude("**/dimapi/*.java")
+                exclude("**/dimapi/*.class")
+                exclude("**/dimapi/mixin/*.java")
+                exclude("**/dimapi/mixin/*.class")
 			}
         }
     }
@@ -96,6 +102,10 @@ processResources {
 	
 	exclude '**/fabric/*.class'
 	exclude '**/fabric/*.java'
+    exclude("**/dimapi/*.java")
+    exclude("**/dimapi/*.class")
+    exclude("**/dimapi/mixin/*.java")
+    exclude("**/dimapi/mixin/*.class")
 }
 
 shadowJar {
@@ -104,6 +114,10 @@ shadowJar {
             java {
                 exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude("**/dimapi/*.java")
+                exclude("**/dimapi/*.class")
+                exclude("**/dimapi/mixin/*.java")
+                exclude("**/dimapi/mixin/*.class")
             }
         }
     }
@@ -111,6 +125,10 @@ shadowJar {
     exclude "fabric.mod.json"
 	exclude '**/fabric/*.java'
 	exclude '**/fabric/*.class'
+    exclude("**/dimapi/*.java")
+    exclude("**/dimapi/*.class")
+    exclude("**/dimapi/mixin/*.java")
+    exclude("**/dimapi/mixin/*.class")
 
     configurations = [project.configurations.shadowCommon]
     // classifier "dev-shadow"
@@ -164,5 +182,13 @@ publishing {
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
         // Add repositories to publish to here.
+    }
+}
+
+// IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
     }
 }

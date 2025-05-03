@@ -30,3 +30,7 @@ include 'Multiworld-Fabric-bundle'
 include 'Multiworld-Forge-1.18.2'
 include 'Multiworld-Forge-1.19.4'
 include 'Multiworld-Forge-1.20.1'
+
+// NeoForged
+include 'Multiworld-NeoForged-1.21.1'
+include 'Multiworld-NeoForged-1.21.2'
