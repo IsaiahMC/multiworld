@@ -45,7 +45,7 @@ public class MultiworldMod {
     public static ICreator world_creator;
 
 	// Mod Version
-	public static final String VERSION = "1.8";
+	public static final String VERSION = "1.9";
 
     public static void setICreator(ICreator ic) {
         world_creator = ic;
@@ -186,7 +186,7 @@ public class MultiworldMod {
             		"&a/mw tp <id>&r - Teleport to a world",
             		"&a/mw list&r - List all worlds",
             		"&a/mw gamerule <rule> <value>&r - Change a worlds Gamerules",
-            		"&a/mw create <id> <env>&r - create a new world",
+            		"&a/mw create <id> <env> [-g=<generator>]&r - create a new world",
             		"&a/mw difficulty <value> [world id] - Sets the difficulty of a world"
             };
             

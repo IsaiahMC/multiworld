@@ -2,6 +2,7 @@ package me.isaiah.multiworld;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 import com.mojang.brigadier.context.CommandContext;
@@ -10,6 +11,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import me.isaiah.multiworld.command.CreateCommand;
 import me.isaiah.multiworld.command.GameruleCommand;
 import me.isaiah.multiworld.perm.Perm;
 import net.minecraft.server.MinecraftServer;
@@ -95,6 +97,7 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                 builder.suggest("NORMAL");
                 builder.suggest("NETHER");
                 builder.suggest("END");
+                return builder.buildFuture();
             }
             
             if (cmds[1].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule")) ) {
@@ -117,7 +120,31 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                 for (String s : names) builder.suggest(s);
             }
         }
-        
+
+        if (cmds.length <= 4 || (cmds.length <= 5 && !input.endsWith(" "))) {
+        	if (cmds[1].equalsIgnoreCase("create") && (ALL || Perm.has(plr, "multiworld.create")) ) {
+        		if (cmds.length <= 4) {
+        			builder.suggest("-g=<GENERATOR>");
+        			return builder.buildFuture();
+        		}
+        		
+        		if (cmds.length == 5) {
+	        		if (cmds[4].startsWith("-g=")) {
+	        			builder.suggest("-g=NORMAL");
+	        			builder.suggest("-g=FLAT");
+	        			builder.suggest("-g=VOID");
+	        			
+	        			for (String key : CreateCommand.customs.keySet()) {
+	        				builder.suggest("-g=" + key.toUpperCase(Locale.ROOT));
+	        			}
+	        		} else {
+	        			if (cmds[4].startsWith("-")) {
+	        				builder.suggest("-g=<GENERATOR>");
+	        			}
+	        		}
+        		}
+        	}
+        }
         
 
         return builder.buildFuture();

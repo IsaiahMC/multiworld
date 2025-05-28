@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id ("fabric-loom") version "1.6-SNAPSHOT"
+    id ("fabric-loom") version "1.9-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -25,7 +25,7 @@ dependencies {
 	// 1.20.4
     minecraft("com.mojang:minecraft:1.20.6") 
     mappings("net.fabricmc:yarn:1.20.6+build.3:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.15.11")
+    modImplementation("net.fabricmc:fabric-loader:0.16.9")
 
 	include("xyz.nucleoid:fantasy:0.6.2+1.20.6")
 	modImplementation("xyz.nucleoid:fantasy:0.6.2+1.20.6")

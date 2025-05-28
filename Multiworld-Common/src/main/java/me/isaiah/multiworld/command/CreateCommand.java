@@ -1,6 +1,7 @@
 package me.isaiah.multiworld.command;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Random;
 
 import net.minecraft.server.MinecraftServer;
@@ -21,17 +22,17 @@ import me.isaiah.multiworld.config.*;
 
 public class CreateCommand {
 	
-	public static HashMap<String, ChunkGenerator> customs = new HashMap<>();
+	public static HashMap<String, ChunkGenerator> customs= new HashMap<>();
 	
 	// TODO: expose API
 	public static void registerCustomGenerator(Identifier id, ChunkGenerator gen) {
-		customs.put(id.toString(), gen);
+		customs.put(id.toString().toLowerCase(Locale.ROOT), gen);
 	}
 
 	// Run Command
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         if (args.length == 1 || args.length == 2) {
-            plr.sendMessage(text_plain("Usage: /mv create <id> <env>"), false);
+            plr.sendMessage(text_plain("Usage: /mv create <id> <env> [-g <gen>]"), false);
             return 0;
         }
 
@@ -52,8 +53,30 @@ public class CreateCommand {
         	arg1 = "multiworld:" + arg1;
         }
         
+       //  plr.sendMessage(text_plain("DEBUG: " + args.length), false);
+        
+        String customGen = "";
+        
+        if (args.length > 3) {
+        	String aa = args[3];
+        	
+        	if (aa.startsWith("-g ") || aa.startsWith("-g=")) {
+        		String ab = aa.substring("-g ".length());
+        		plr.sendMessage(text_plain("DEBUG: " + ab), false);
+        		
+        		ChunkGenerator gen1 = get_chunk_gen(mc, ab);
+        		if (null != gen1) {
+        			gen = gen1;
+        			customGen = ab;
+        		} else {
+        			plr.sendMessage(text("Invalid ChunkGenerator: \"" + ab + "\"", Formatting.RED), false);
+        		}
+        	}
+        	
+        }
+        
         ServerWorld world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.NORMAL, seed);
-		make_config(world, args[2], seed);
+		make_config(world, args[2], seed, customGen);
 
         plr.sendMessage(text("Created world with id: " + args[1], Formatting.GREEN), false);
         
@@ -80,7 +103,15 @@ public class CreateCommand {
 		if (customs.containsKey(env)) {
 			return MultiworldMod.new_id( env );
 		}
+
+		if (customs.containsKey( env.toLowerCase(Util.AMERICAN_STANDARD) )) {
+			return MultiworldMod.new_id( env );
+		}
 		
+		if (customs.containsKey( env.toUpperCase(Util.AMERICAN_STANDARD) )) {
+			return MultiworldMod.new_id( env );
+		}
+
 		return null;
     }
 
@@ -89,10 +120,18 @@ public class CreateCommand {
      * or NULL if the passed argument is not NORMAL / NETHER / END.
      */
     public static ChunkGenerator get_chunk_gen(MinecraftServer mc, String env) {
-		ChunkGenerator gen = MultiworldMod.get_world_creator().get_chunk_gen(mc, env);
+		ChunkGenerator gen = MultiworldMod.get_world_creator().get_chunk_gen(mc, env.toUpperCase(Locale.ROOT));
 
 		if (customs.containsKey(env)) {
 			return customs.get(env);
+		}
+		
+		if (customs.containsKey( env.toLowerCase(Util.AMERICAN_STANDARD) )) {
+			return customs.get( env.toLowerCase(Util.AMERICAN_STANDARD) );
+		}
+		
+		if (customs.containsKey( env.toUpperCase(Util.AMERICAN_STANDARD) )) {
+			return customs.get( env.toUpperCase(Util.AMERICAN_STANDARD) );
 		}
 		return gen;
     } 
@@ -148,6 +187,18 @@ public class CreateCommand {
 				if (di.equalsIgnoreCase("PEACEFUL")) { d = Difficulty.PEACEFUL; }
 			}
 			
+			// Gen
+			if (config.is_set("custom_generator")) {
+				String cg = config.getString("custom_generator");
+				
+				ChunkGenerator gen1 = get_chunk_gen(mc, cg);
+        		if (null != gen1) {
+        			gen = gen1;
+        		} else {
+        			System.out.println("Invalid ChunkGenerator: \"" + cg + "\"");
+        		}
+			}
+			
 			ServerWorld world = MultiworldMod.create_world(id, dim, gen, d, seed);
 
 			if (GameruleCommand.keys.size() == 0) {
@@ -181,7 +232,7 @@ public class CreateCommand {
         }
 	}
 	
-	public static void make_config(ServerWorld w, String dim, long seed) {
+	public static void make_config(ServerWorld w, String dim, long seed, String cgen) {
         File config_dir = new File("config");
         config_dir.mkdirs();
         
@@ -206,6 +257,9 @@ public class CreateCommand {
 			config.set("path", id.getPath());
 			config.set("environment", dim);
 			config.set("seed", seed);
+			if (null != cgen && cgen.length() > 0) {
+				config.set("custom_generator", cgen);
+			}
 			config.save();
         } catch (Exception e) {
             e.printStackTrace();

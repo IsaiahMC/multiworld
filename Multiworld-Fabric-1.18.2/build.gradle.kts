@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id ("fabric-loom") version "1.6-SNAPSHOT"
+    id ("fabric-loom") version "1.9-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -28,7 +28,7 @@ dependencies {
     // 1.18.2
     minecraft("com.mojang:minecraft:1.18.2") 
     mappings("net.fabricmc:yarn:1.18.2+build.2:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.13.3")
+    modImplementation("net.fabricmc:fabric-loader:0.16.9")
 
     //annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.1")
 	

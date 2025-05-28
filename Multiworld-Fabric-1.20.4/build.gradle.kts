@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id ("fabric-loom") version "1.6-SNAPSHOT"
+    id ("fabric-loom") version "1.9-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -25,13 +25,13 @@ dependencies {
 	// 1.20.4
     minecraft("com.mojang:minecraft:1.20.4") 
     mappings("net.fabricmc:yarn:1.20.4+build.3:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.15.7")
+    modImplementation("net.fabricmc:fabric-loader:0.16.9")
 
 	include("xyz.nucleoid:fantasy:0.5.0+1.20.4")
 	modImplementation("xyz.nucleoid:fantasy:0.5.0+1.20.4")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
 	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
-	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.91.2+1.20.4")
+	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.97.2+1.20.4")
 	
 	
 	setOf(
@@ -41,7 +41,7 @@ dependencies {
 		"fabric-networking-api-v1"
 	).forEach {
 		// Add each module as a dependency
-		modImplementation(fabricApi.module(it, "0.91.2+1.20.4"))
+		modImplementation(fabricApi.module(it, "0.97.2+1.20.4"))
 	}
 }
 

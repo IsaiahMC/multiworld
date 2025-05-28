@@ -2,6 +2,7 @@ package me.isaiah.multiworld.command;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.FileConfiguration;
@@ -10,11 +11,17 @@ import net.minecraft.world.World;
 
 public class Util {
 
+	public static Locale AMERICAN_STANDARD = Locale.ROOT; 
 	
 	// Dimension Ids
     public static final Identifier OVERWORLD_ID = id("overworld");
     public static final Identifier THE_NETHER_ID = id("the_nether");
     public static final Identifier THE_END_ID = id("the_end");
+    
+    // todo
+    public static final Identifier VOID_ID = id("the_void");
+    
+   
 
     public static Identifier id(String id) {
     	return MultiworldMod.new_id(id);

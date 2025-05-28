@@ -1,8 +1,12 @@
 package me.isaiah.multiworld;
 
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.FlatChunkGenerator;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
+import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -47,7 +51,7 @@ public interface ICreator {
      */
     default ChunkGenerator get_chunk_gen(MinecraftServer mc, String env) {
     	ChunkGenerator gen = null;
-    	if (env.contains("NORMAL")) {
+    	if (env.contains("NORMAL") || env.contains("DEFAULT")) {
 			gen = mc.getWorld(World.OVERWORLD).getChunkManager().getChunkGenerator(); // .withSeed(seed);
 		}
 
@@ -58,12 +62,39 @@ public interface ICreator {
 		if (env.contains("END")) {
 			gen = mc.getWorld(World.END).getChunkManager().getChunkGenerator(); // .withSeed(seed);
 		}
+		
+		if (env.contains("FLAT")) {
+			FlatChunkGenerator genn = (FlatChunkGenerator) this.get_flat_chunk_gen(mc);
+
+			FlatChunkGeneratorConfig flat = genn.getConfig();
+			
+			FlatChunkGeneratorLayer[] layers = {
+					new FlatChunkGeneratorLayer(1, Blocks.GRASS_BLOCK),
+					new FlatChunkGeneratorLayer(5, Blocks.DIRT),
+					new FlatChunkGeneratorLayer(2, Blocks.BEDROCK)
+			};
+	        
+	        for (int i = layers.length - 1; i >= 0; --i) {
+	            flat.getLayers().add(layers[i]);
+	        }
+
+	        flat.updateLayerBlocks();
+
+			return genn;
+		}
+		
+		if (env.contains("VOID")) {
+			return this.get_void_chunk_gen(mc);
+		}
 
 		return gen;
     } 
+    
 
 	// TODO: move to icommonlib:
 	public BlockPos get_spawn(ServerWorld world);
 	public boolean is_the_end(ServerWorld world);
+	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc);
+	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc);
 	
 }

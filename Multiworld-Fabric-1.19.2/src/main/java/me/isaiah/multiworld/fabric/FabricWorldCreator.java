@@ -1,22 +1,28 @@
 package me.isaiah.multiworld.fabric;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 import dimapi.FabricDimensionInternals;
 import me.isaiah.multiworld.ICreator;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.FlatChunkGenerator;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.WorldProperties;
+import net.minecraft.world.biome.BiomeKeys;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-
+import net.minecraft.structure.StructureSet;
 import xyz.nucleoid.fantasy.Fantasy;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.fantasy.RuntimeWorldHandle;
-
+import xyz.nucleoid.fantasy.util.VoidChunkGenerator;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -98,6 +104,42 @@ public class FabricWorldCreator implements ICreator {
 	public void teleleport(ServerPlayerEntity player, ServerWorld world, double x, double y, double z) {
         TeleportTarget target = new TeleportTarget(new Vec3d(x, y, z), new Vec3d(1, 1, 1), 0f, 0f);
         FabricDimensionInternals.changeDimension(player, world, target);
+	}
+	
+	@Override
+	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc) {
+		var str = mc.getRegistryManager().get(Registry.STRUCTURE_SET_KEY);
+		var biome = mc.getRegistryManager().get(Registry.BIOME_KEY); //.getEntry(0).get();
+        FlatChunkGeneratorConfig flat = new FlatChunkGeneratorConfig(Optional.empty(), biome);
+        flat.setBiome( biome.getEntry(0).get() );;
+        flat.enableFeatures();
+        FlatChunkGenerator generator = new FlatChunkGenerator(str, flat);
+        return generator;
+	}
+	
+	// Custom Flat Gen
+	class CustomFlatChunkGenerator extends FlatChunkGenerator {
+		public CustomFlatChunkGenerator(Registry<StructureSet> str, FlatChunkGeneratorConfig config) {
+			super(str, config);
+		}
+		
+		@Override
+		public int getMinimumY() {
+			return 0;
+		}
+		
+		@Override
+	    public int getSeaLevel() {
+	        return 0;
+	    }
+	}
+	
+	@Override
+	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc) {
+		var biome1 = mc.getRegistryManager().get(Registry.BIOME_KEY);
+		var biome = biome1.getEntry(BiomeKeys.THE_VOID).get();
+		VoidChunkGenerator gen = new xyz.nucleoid.fantasy.util.VoidChunkGenerator(biome);
+        return gen;
 	}
 
 }
