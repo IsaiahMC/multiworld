@@ -19,10 +19,29 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.world.World;
 import net.minecraft.world.level.ServerWorldProperties;
 
+/**
+ * Our Implementation of a command SuggestionProvider.
+ */
 public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
 
-	public static String[] diff_names = {"PEACEFUL", "EASY", "NORMAL", "HARD"};
+	/**
+	 * Valid Difficulty Arguments
+	 */
+	public static String[] diff_names = {
+			"PEACEFUL", "EASY", "NORMAL", "HARD"
+	};
+
+	/**
+	 * Valid Subcommands
+	 */
+	private static String[] subcommands = {
+			"tp", "list", "version", "create", "spawn", "setspawn", "gamerule", "help", "difficulty",
+			// TODO: Add: delete, load, unload, info, clone, who, import
+	};
 	
+	/**
+	 * Build our Suggestion list
+	 */
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ') + 1);
@@ -34,7 +53,6 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
         boolean ALL = Perm.has(plr, "multiworld.admin");
 
         if (cmds.length <= 1 || (cmds.length <= 2 && !input.endsWith(" "))) {
-            String[] subcommands = {"tp", "list", "version", "create", "spawn", "setspawn", "gamerule", "help", "difficulty"};
             for (String s : subcommands) {
                 builder.suggest(s);
             }
@@ -121,25 +139,37 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
             }
         }
 
-        if (cmds.length <= 4 || (cmds.length <= 5 && !input.endsWith(" "))) {
+        // Create command optional arguments
+        // -g=GENERATOR
+        // -s=SEED
+        
+        int ccoA = 4;
+        int ccoB = 5;
+
+        if (cmds.length <= ccoA || (cmds.length <= ccoB && !input.endsWith(" "))) {
         	if (cmds[1].equalsIgnoreCase("create") && (ALL || Perm.has(plr, "multiworld.create")) ) {
-        		if (cmds.length <= 4) {
+        		if (cmds.length <= ccoA) {
         			builder.suggest("-g=<GENERATOR>");
+        			builder.suggest("-s=<SEED>");
         			return builder.buildFuture();
         		}
-        		
-        		if (cmds.length == 5) {
-	        		if (cmds[4].startsWith("-g=")) {
+
+        		if (cmds.length == ccoB) {
+        			if (cmds[ccoA].startsWith("-s=")) {
+        				builder.suggest("-s=1234");
+        				builder.suggest("-s=RANDOM");
+        			} else if (cmds[ccoA].startsWith("-g=")) {
 	        			builder.suggest("-g=NORMAL");
 	        			builder.suggest("-g=FLAT");
 	        			builder.suggest("-g=VOID");
-	        			
+
 	        			for (String key : CreateCommand.customs.keySet()) {
 	        				builder.suggest("-g=" + key.toUpperCase(Locale.ROOT));
 	        			}
 	        		} else {
 	        			if (cmds[4].startsWith("-")) {
 	        				builder.suggest("-g=<GENERATOR>");
+	        				builder.suggest("-s=<SEED>");
 	        			}
 	        		}
         		}

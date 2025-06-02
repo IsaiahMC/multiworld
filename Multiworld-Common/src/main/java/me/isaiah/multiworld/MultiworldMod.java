@@ -72,7 +72,7 @@ public class MultiworldMod {
     }
 
     public static Identifier new_id(String id) {
-    	// tryParse works from 1.18 to 1.21
+    	// tryParse works from 1.18 to 1.21+
     	return Identifier.tryParse(id);
     }
 

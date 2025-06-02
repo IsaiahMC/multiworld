@@ -2,6 +2,7 @@ package me.isaiah.multiworld.command;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Random;
 
 import net.minecraft.server.MinecraftServer;
@@ -9,17 +10,20 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.World;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import me.isaiah.multiworld.MultiworldMod;
 
 import static me.isaiah.multiworld.MultiworldMod.text;
 import static me.isaiah.multiworld.MultiworldMod.text_plain;
+import static me.isaiah.multiworld.MultiworldMod.message;
 import net.minecraft.server.world.ServerWorld;
 
 import java.io.File;
 import me.isaiah.multiworld.config.*;
 
+/**
+ * The "/mw create" Command
+ */
 public class CreateCommand {
 	
 	public static HashMap<String, ChunkGenerator> customs= new HashMap<>();
@@ -28,8 +32,70 @@ public class CreateCommand {
 	public static void registerCustomGenerator(Identifier id, ChunkGenerator gen) {
 		customs.put(id.toString().toLowerCase(Locale.ROOT), gen);
 	}
+	
+	/*
+	 * Implementation of a Tuple
+	 */
+	static class Tuple<K, V> {
+		private K first;
+		private V second;
 
-	// Run Command
+		public Tuple(K first, V second){        
+			this.first = first;        
+			this.second = second;    
+		}
+	}
+
+	/**
+	 * Parse ChunkGenerator from Arguments
+	 * Ex. ("-g=FLAT") = Tuple: FlatChunkGenerator, "FLAT"
+	 * 
+	 * @param mc - MinecraftServer
+	 * @param arg - The argument from the command
+	 * @return Tuple of ChunkGenerator & Generator Name
+	 */
+	private static Tuple<ChunkGenerator, String> checkArgForGen(MinecraftServer mc, String arg) {
+		String aa = arg;// args[3];
+    	
+    	if (aa.startsWith("-g ") || aa.startsWith("-g=")) {
+    		String ab = aa.substring("-g ".length());
+
+    		ChunkGenerator gen1 = get_chunk_gen(mc, ab);
+    		if (null != gen1) {
+    			return new Tuple<>(gen1, ab);
+    		} else {
+    			return new Tuple<>(null, ab);
+    		}
+    	}
+    	return null;
+	}
+	
+	/**
+	 * Parse World Seed from Arguments.
+	 * Ex. ("-s=1345")
+	 */
+	private static Optional<Long> checkArgForSeed(MinecraftServer mc, String arg) {
+		if (arg.startsWith("-s ") || arg.startsWith("-s=")) {
+			String ab = arg.substring("-s=".length());
+			if (ab.startsWith("RANDOM")) {
+				return Optional.empty();
+			}
+			try {
+				Long f = Long.parseLong(ab);
+				return Optional.of(f);
+			} catch (NumberFormatException e) {
+				// TODO: Check if hashCode is correct convertion here
+				int seedInt = ab.hashCode();
+				Long seed = Long.valueOf(seedInt);
+				return Optional.of(seed);
+			}
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Run Command
+	 */
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         if (args.length == 1 || args.length == 2) {
             plr.sendMessage(text_plain("Usage: /mv create <id> <env> [-g <gen>]"), false);
@@ -58,8 +124,7 @@ public class CreateCommand {
         String customGen = "";
         
         if (args.length > 3) {
-        	String aa = args[3];
-        	
+        	/*String arg = args[3];
         	if (aa.startsWith("-g ") || aa.startsWith("-g=")) {
         		String ab = aa.substring("-g ".length());
         		plr.sendMessage(text_plain("DEBUG: " + ab), false);
@@ -71,6 +136,29 @@ public class CreateCommand {
         		} else {
         			plr.sendMessage(text("Invalid ChunkGenerator: \"" + ab + "\"", Formatting.RED), false);
         		}
+        	}*/
+        	
+        	for (int i = 3; i < args.length; i++) {
+        		String arg = args[i];
+	        	
+	        	// Check if arg is "-g=GENERATOR"
+	        	Tuple<ChunkGenerator, String> resultA = checkArgForGen(mc, arg);
+	        	if (null != resultA) {
+	        		if (null != resultA.first) {
+	        			gen = resultA.first;
+	        			customGen = resultA.second;
+	        			message(plr, "Using ChunkGenerator: \"" + customGen + "\".");
+	        		} else {
+	        			message(plr, "&4Invalid ChunkGenerator: \"" + resultA.second + "\"");
+	        		}
+	        	}
+
+	        	// Check if arg is "-s=SEED"
+	        	Optional<Long> resultB = checkArgForSeed(mc, arg); 
+	        	if (resultB.isPresent()) {
+	        		message(plr, "Using seed \"" + resultB.get() + "\".");
+	        		seed = resultB.get();
+	        	}
         	}
         	
         }
@@ -78,7 +166,8 @@ public class CreateCommand {
         ServerWorld world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.NORMAL, seed);
 		make_config(world, args[2], seed, customGen);
 
-        plr.sendMessage(text("Created world with id: " + args[1], Formatting.GREEN), false);
+        // plr.sendMessage(text("Created world with id: " + args[1], Formatting.GREEN), false);
+		message(plr, "&aCreated world with id: " + args[1]);
         
         return 1;
     }
@@ -136,6 +225,9 @@ public class CreateCommand {
 		return gen;
     } 
 	
+    /**
+     * Load an existing saved World from config (YAML) 
+     */
 	public static void reinit_world_from_config(MinecraftServer mc, String id) {
 		File config_dir = new File("config");
         config_dir.mkdirs();
@@ -232,6 +324,11 @@ public class CreateCommand {
         }
 	}
 	
+	/**
+	 * Saves the World Info to a YAML Config File, to be loaded by
+	 * {@link #reinit_world_from_config(MinecraftServer, String)}
+	 * on next server start.
+	 */
 	public static void make_config(ServerWorld w, String dim, long seed, String cgen) {
         File config_dir = new File("config");
         config_dir.mkdirs();

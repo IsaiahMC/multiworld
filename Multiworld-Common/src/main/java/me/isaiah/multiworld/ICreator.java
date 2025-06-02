@@ -15,6 +15,10 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
+/**
+ * Utility interface for cross-version development support
+ * See implementation in "Multiworld-Fabric-1.XX.X/src/"
+ */
 public interface ICreator {
 
 	/**
@@ -89,9 +93,8 @@ public interface ICreator {
 
 		return gen;
     } 
-    
 
-	// TODO: move to icommonlib:
+	// TODO: move to icommonlib ?:
 	public BlockPos get_spawn(ServerWorld world);
 	public boolean is_the_end(ServerWorld world);
 	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc);
