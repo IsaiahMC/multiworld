@@ -14,7 +14,7 @@ import java.io.File;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.*;
 
-public class TpCommand {
+public class TpCommand implements Command {
 
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         HashMap<String,ServerWorld> worlds = new HashMap<>();

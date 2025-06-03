@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.Heightmap;
 
-public class SpawnCommand {
+public class SpawnCommand implements Command {
 
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         ServerWorld w = (ServerWorld) plr.getWorld();

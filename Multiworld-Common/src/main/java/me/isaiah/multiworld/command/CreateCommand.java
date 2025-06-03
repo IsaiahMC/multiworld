@@ -7,13 +7,11 @@ import java.util.Random;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import me.isaiah.multiworld.MultiworldMod;
 
-import static me.isaiah.multiworld.MultiworldMod.text;
 import static me.isaiah.multiworld.MultiworldMod.text_plain;
 import static me.isaiah.multiworld.MultiworldMod.message;
 import net.minecraft.server.world.ServerWorld;
@@ -24,7 +22,7 @@ import me.isaiah.multiworld.config.*;
 /**
  * The "/mw create" Command
  */
-public class CreateCommand {
+public class CreateCommand implements Command {
 	
 	public static HashMap<String, ChunkGenerator> customs= new HashMap<>();
 	
@@ -55,10 +53,8 @@ public class CreateCommand {
 	 * @return Tuple of ChunkGenerator & Generator Name
 	 */
 	private static Tuple<ChunkGenerator, String> checkArgForGen(MinecraftServer mc, String arg) {
-		String aa = arg;// args[3];
-    	
-    	if (aa.startsWith("-g ") || aa.startsWith("-g=")) {
-    		String ab = aa.substring("-g ".length());
+    	if (arg.startsWith("-g ") || arg.startsWith("-g=")) {
+    		String ab = arg.substring("-g=".length());
 
     		ChunkGenerator gen1 = get_chunk_gen(mc, ab);
     		if (null != gen1) {
@@ -69,7 +65,7 @@ public class CreateCommand {
     	}
     	return null;
 	}
-	
+
 	/**
 	 * Parse World Seed from Arguments.
 	 * Ex. ("-s=1345")
@@ -84,9 +80,7 @@ public class CreateCommand {
 				Long f = Long.parseLong(ab);
 				return Optional.of(f);
 			} catch (NumberFormatException e) {
-				// TODO: Check if hashCode is correct convertion here
-				int seedInt = ab.hashCode();
-				Long seed = Long.valueOf(seedInt);
+				Long seed = Long.valueOf(ab.hashCode());
 				return Optional.of(seed);
 			}
 		}
@@ -98,46 +92,30 @@ public class CreateCommand {
 	 */
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         if (args.length == 1 || args.length == 2) {
-            plr.sendMessage(text_plain("Usage: /mv create <id> <env> [-g <gen>]"), false);
+            plr.sendMessage(text_plain("Usage: /mv create <id> <env> [-g=<gen> -s=<seed>]"), false);
             return 0;
         }
 
         Random r = new Random();
         long seed = r.nextInt();
-        
+
         String env = args[2];
         ChunkGenerator gen = get_chunk_gen(mc, env);
         Identifier dim = get_dim_id(env);
-        
+
         if (null == dim) {
         	System.out.println("Null dimenstion ");
         	dim = Util.OVERWORLD_ID;
         }
-        
+
         String arg1 = args[1];
         if (arg1.indexOf(':') == -1) {
         	arg1 = "multiworld:" + arg1;
         }
-        
-       //  plr.sendMessage(text_plain("DEBUG: " + args.length), false);
-        
+
         String customGen = "";
         
         if (args.length > 3) {
-        	/*String arg = args[3];
-        	if (aa.startsWith("-g ") || aa.startsWith("-g=")) {
-        		String ab = aa.substring("-g ".length());
-        		plr.sendMessage(text_plain("DEBUG: " + ab), false);
-        		
-        		ChunkGenerator gen1 = get_chunk_gen(mc, ab);
-        		if (null != gen1) {
-        			gen = gen1;
-        			customGen = ab;
-        		} else {
-        			plr.sendMessage(text("Invalid ChunkGenerator: \"" + ab + "\"", Formatting.RED), false);
-        		}
-        	}*/
-        	
         	for (int i = 3; i < args.length; i++) {
         		String arg = args[i];
 	        	

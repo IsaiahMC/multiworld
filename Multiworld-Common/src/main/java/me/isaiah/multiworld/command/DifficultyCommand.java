@@ -10,7 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.Difficulty;
 
-public class DifficultyCommand {
+public class DifficultyCommand implements Command {
 
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         ServerWorld w = (ServerWorld) plr.getWorld();

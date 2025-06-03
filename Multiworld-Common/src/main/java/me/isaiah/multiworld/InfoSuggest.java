@@ -1,6 +1,7 @@
 package me.isaiah.multiworld;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -47,7 +48,7 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ') + 1);
 
         String input = builder.getInput();
-        String[] cmds = input.split(" ");
+        String[] cmds = input.trim().split(" ");
 
         ServerCommandSource plr = context.getSource();
         boolean ALL = Perm.has(plr, "multiworld.admin");
@@ -78,12 +79,7 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                  });
                 for (String s : names) builder.suggest(s);
             }
-            
-            if (cmds[1].equalsIgnoreCase("create") && (ALL || Perm.has(plr, "multiworld.create"))) {
-                builder.suggest("myid:myvalue");
-                return builder.buildFuture();
-            }
-            
+
             if (cmds[1].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
                 if (GameruleCommand.keys.size() == 0) {
                 	GameruleCommand.setupServer(MultiworldMod.mc);
@@ -111,13 +107,6 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
         }
 
         if (cmds.length <= 3 || (cmds.length <= 4 && !input.endsWith(" "))) {
-            if (cmds[1].equalsIgnoreCase("create") && (ALL || Perm.has(plr, "multiworld.create")) ) {
-                builder.suggest("NORMAL");
-                builder.suggest("NETHER");
-                builder.suggest("END");
-                return builder.buildFuture();
-            }
-            
             if (cmds[1].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule")) ) {
                 // TODO: IntRules
             	builder.suggest("true");
@@ -125,7 +114,6 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
             }
             
             if (cmds[1].equalsIgnoreCase("difficulty") && (ALL || Perm.has(plr, "multiworld.difficulty")) ) {
-                // TODO: IntRules
             	ArrayList<String> names = new ArrayList<>();
             	MultiworldMod.mc.getWorldRegistryKeys().forEach(r -> {
                     String val = r.getValue().toString();
@@ -133,51 +121,73 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                         val = val.replace("multiworld:", "");
                     }
                     names.add(val);
-                    //builder.suggest(val);
                  });
                 for (String s : names) builder.suggest(s);
             }
         }
 
-        // Create command optional arguments
-        // -g=GENERATOR
-        // -s=SEED
-        
-        int ccoA = 4;
-        int ccoB = 5;
-
-        if (cmds.length <= ccoA || (cmds.length <= ccoB && !input.endsWith(" "))) {
-        	if (cmds[1].equalsIgnoreCase("create") && (ALL || Perm.has(plr, "multiworld.create")) ) {
-        		if (cmds.length <= ccoA) {
-        			builder.suggest("-g=<GENERATOR>");
-        			builder.suggest("-s=<SEED>");
-        			return builder.buildFuture();
-        		}
-
-        		if (cmds.length == ccoB) {
-        			if (cmds[ccoA].startsWith("-s=")) {
-        				builder.suggest("-s=1234");
-        				builder.suggest("-s=RANDOM");
-        			} else if (cmds[ccoA].startsWith("-g=")) {
-	        			builder.suggest("-g=NORMAL");
-	        			builder.suggest("-g=FLAT");
-	        			builder.suggest("-g=VOID");
-
-	        			for (String key : CreateCommand.customs.keySet()) {
-	        				builder.suggest("-g=" + key.toUpperCase(Locale.ROOT));
-	        			}
-	        		} else {
-	        			if (cmds[4].startsWith("-")) {
-	        				builder.suggest("-g=<GENERATOR>");
-	        				builder.suggest("-s=<SEED>");
-	        			}
-	        		}
-        		}
-        	}
+        // Create Command
+        if (cmds[1].equalsIgnoreCase("create") && (ALL || Perm.has(plr, "multiworld.create")) ) {
+        	getSuggestions_CreateCommand(builder, input, cmds, plr, ALL);
         }
-        
 
         return builder.buildFuture();
+    }
+
+    /**
+     * Create Command, "/mw Create"
+     * 
+     * "/mw create <id> <env> [-g=<generator> -s=<seed>]"
+     */
+    public void getSuggestions_CreateCommand(SuggestionsBuilder builder, String input, String[] cmds, ServerCommandSource plr, boolean ALL) {
+    	if ( !(ALL || Perm.has(plr, "multiworld.create")) ) return; // No Permission
+
+    	// Argument 1: <id>
+    	if (cmds.length <= 2 || (cmds.length <= 3 && !input.endsWith(" "))) {
+    		builder.suggest("myid:myvalue");
+    		return;
+    	}
+    	
+    	// Argument 2: <env>
+    	if (cmds.length <= 3 || (cmds.length <= 4 && !input.endsWith(" ")) ) {
+    		builder.suggest("NORMAL");
+    		builder.suggest("NETHER");
+    		builder.suggest("END");
+    		return;
+    	}
+
+    	// Optional Arguments
+    	int maxDebug = 7;
+        if (cmds.length <= 4 || (cmds.length <= maxDebug && !input.endsWith(" "))) {
+        	if (cmds.length <= 4) {
+        		builder.suggest("-g=<GENERATOR>");
+        		builder.suggest("-s=<SEED>");
+        		return;
+        	}
+
+        	int n = 4 - 1;
+        	String current = cmds[cmds.length - 1];
+        	String[] beforeCurrent = Arrays.copyOfRange(cmds, n + 1, cmds.length - 1);
+        	String beforeStr = String.join(" " , beforeCurrent);
+
+        	if (current.startsWith("-s=")) {
+        		builder.suggest("-s=1234");
+        		builder.suggest("-s=RANDOM");
+        	} else if (current.startsWith("-g=")) {
+	        	builder.suggest("-g=NORMAL");
+	        	builder.suggest("-g=FLAT");
+	        	builder.suggest("-g=VOID");
+
+	        	for (String key : CreateCommand.customs.keySet()) {
+	        		builder.suggest("-g=" + key.toUpperCase(Locale.ROOT));
+	        	}
+	        } else {
+	        	if (current.startsWith("-")) {
+	        		if (!beforeStr.contains("-g=")) builder.suggest("-g=<GENERATOR>");
+	        		if (!beforeStr.contains("-s=")) builder.suggest("-s=<SEED>");
+	        	}
+	        }
+        }
     }
 
 }

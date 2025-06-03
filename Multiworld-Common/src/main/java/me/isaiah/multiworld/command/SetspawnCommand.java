@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 import static me.isaiah.multiworld.MultiworldMod.text;
 import static me.isaiah.multiworld.MultiworldMod.text_plain;
 
-public class SetspawnCommand {
+public class SetspawnCommand implements Command {
 
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         World w = plr.getWorld();

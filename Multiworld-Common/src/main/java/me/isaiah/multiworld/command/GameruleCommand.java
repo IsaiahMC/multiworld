@@ -17,7 +17,7 @@ import net.minecraft.world.GameRules.BooleanRule;
 import net.minecraft.world.GameRules.IntRule;
 import net.minecraft.world.GameRules.Rule;
 
-public class GameruleCommand {
+public class GameruleCommand implements Command {
 
 	// TODO
 	public static GameRules getGameRules(ServerWorld world) {

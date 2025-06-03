@@ -16,6 +16,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import me.isaiah.multiworld.command.CreateCommand;
+import me.isaiah.multiworld.command.DeleteCommand;
 import me.isaiah.multiworld.command.DifficultyCommand;
 import me.isaiah.multiworld.command.GameruleCommand;
 import me.isaiah.multiworld.command.SetspawnCommand;
@@ -43,6 +44,17 @@ public class MultiworldMod {
     public static MinecraftServer mc;
     public static String CMD = "mw";
     public static ICreator world_creator;
+    
+    public static String[] COMMAND_HELP = {
+    		"&4Multiworld Mod Commands:&r",
+    		"&a/mw spawn&r - Teleport to current world spawn",
+    		"&a/mw setspawn&r - Sets the current world spawn",
+    		"&a/mw tp <id>&r - Teleport to a world",
+    		"&a/mw list&r - List all worlds",
+    		"&a/mw gamerule <rule> <value>&r - Change a worlds Gamerules",
+    		"&a/mw create <id> <env> [-g=<generator> -s=<seed>]&r - create a new world",
+    		"&a/mw difficulty <value> [world id] - Sets the difficulty of a world"
+    };
 
 	// Mod Version
 	public static final String VERSION = "1.9";
@@ -134,9 +146,38 @@ public class MultiworldMod {
                                     }
                                  }))); 
     }
-   
+    
+    public static int broadcast_console(ServerCommandSource source, String message) throws CommandSyntaxException {
+    	if (null == message) {
+			//source.sendMessage(text_plain("Multiworld Mod for Minecraft " + mc.getVersion()));
+			return 1;
+		}
+
+    	String[] args = message.split(" ");
+    	if (args[0].equalsIgnoreCase("help")) {
+            for (String s : COMMAND_HELP) {
+            	System.out.println(s);
+            }
+        }
+
+    	// Delete Command (Console Only)
+        if (args[0].equalsIgnoreCase("delete")) {
+        	DeleteCommand.run(mc, source, args);
+        	return 1;
+        }
+
+    	throw ServerCommandSource.REQUIRES_PLAYER_EXCEPTION.create();
+    }
+
     public static int broadcast(ServerCommandSource source, Formatting formatting, String message) throws CommandSyntaxException {
-        final ServerPlayerEntity plr = get_player(source); // source.getPlayerOrThrow();
+    	/*
+    	if (!source.isExecutedByPlayer()) {
+    		if (!source.getName().equalsIgnoreCase("Server")) return 1;
+    		return broadcast_console(source, message);
+    	}
+    	*/
+    	
+    	final ServerPlayerEntity plr = get_player(source); // source.getPlayerOrThrow();
 
         if (null == message) {
             plr.sendMessage(text("Multiworld Mod for Minecraft " + mc.getVersion(), Formatting.AQUA), false);
@@ -179,21 +220,9 @@ public class MultiworldMod {
         
         // Help Command
         if (args[0].equalsIgnoreCase("help")) {
-            String[] lines = {
-            		"&4Multiworld Mod Commands:&r",
-            		"&a/mw spawn&r - Teleport to current world spawn",
-            		"&a/mw setspawn&r - Sets the current world spawn",
-            		"&a/mw tp <id>&r - Teleport to a world",
-            		"&a/mw list&r - List all worlds",
-            		"&a/mw gamerule <rule> <value>&r - Change a worlds Gamerules",
-            		"&a/mw create <id> <env> [-g=<generator>]&r - create a new world",
-            		"&a/mw difficulty <value> [world id] - Sets the difficulty of a world"
-            };
-            
-            for (String s : lines) {
+            for (String s : COMMAND_HELP) {
             	message(plr, s);
             }
-            
         }
         
         // Debug
@@ -244,12 +273,22 @@ public class MultiworldMod {
                 plr.sendMessage(Text.of("No permission! Missing permission: multiworld.cmd"), false);
                 return 1;
             }
-            plr.sendMessage(text("All Worlds:", Formatting.AQUA), false);
+
+            message(plr, "&bAll Worlds:");
+            
+            World pworld = plr.getWorld();
+            Identifier pwid = pworld.getRegistryKey().getValue();
+            
             mc.getWorlds().forEach(world -> {
-                String name = world.getRegistryKey().getValue().toString();
+            	Identifier id = world.getRegistryKey().getValue();
+                String name = id.toString();
                 if (name.startsWith("multiworld:")) name = name.replace("multiworld:", "");
 
-                plr.sendMessage(text_plain("- " + name), false);
+                if (id.equals(pwid)) {
+                	message(plr, "- " + name + " &a(Currently in)");
+                } else {
+                	message(plr, "- " + name);
+                }
             });
         }
 
@@ -266,6 +305,15 @@ public class MultiworldMod {
                 return 1;
             }
             return CreateCommand.run(mc, plr, args);
+        }
+        
+        // Delete Command
+        if (args[0].equalsIgnoreCase("delete")) {
+        	if (!ALL) {
+                message(plr, "No permission! Missing permission: multiworld.admin");
+                return 1;
+            }
+        	message(plr, "Delete Command is Console-only for security.");
         }
 
         return Command.SINGLE_SUCCESS; // Success
