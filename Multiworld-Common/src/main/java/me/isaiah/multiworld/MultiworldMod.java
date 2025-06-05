@@ -7,6 +7,9 @@ package me.isaiah.multiworld;
 import com.mojang.brigadier.CommandDispatcher;
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -39,6 +42,8 @@ import net.minecraft.world.World;
  * Multiworld Mod
  */
 public class MultiworldMod {
+	
+	public static final Logger LOGGER = LoggerFactory.getLogger("multiworld");
 
     public static final String MOD_ID = "multiworld";
     public static MinecraftServer mc;
@@ -121,6 +126,20 @@ public class MultiworldMod {
     	}
     	return plr;
     }
+    
+    public static boolean isPlayer(ServerCommandSource s) {
+    	try {
+    		ServerPlayerEntity plr = s.getPlayer();
+    		if (null == plr) {
+    			return false;
+    		}
+    	} catch (Exception ex) {
+    		if (ex instanceof CommandSyntaxException) {
+    			if (s.getName().equalsIgnoreCase("Server")) return false;
+    		}
+    	}
+    	return true;
+    }
 
     // On command register
     public static void register_commands(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -147,27 +166,6 @@ public class MultiworldMod {
                                  }))); 
     }
     
-    public static int broadcast_console(ServerCommandSource source, String message) throws CommandSyntaxException {
-    	if (null == message) {
-			//source.sendMessage(text_plain("Multiworld Mod for Minecraft " + mc.getVersion()));
-			return 1;
-		}
-
-    	String[] args = message.split(" ");
-    	if (args[0].equalsIgnoreCase("help")) {
-            for (String s : COMMAND_HELP) {
-            	System.out.println(s);
-            }
-        }
-
-    	// Delete Command (Console Only)
-        if (args[0].equalsIgnoreCase("delete")) {
-        	DeleteCommand.run(mc, source, args);
-        	return 1;
-        }
-
-    	throw ServerCommandSource.REQUIRES_PLAYER_EXCEPTION.create();
-    }
 
     public static int broadcast(ServerCommandSource source, Formatting formatting, String message) throws CommandSyntaxException {
     	/*
@@ -176,6 +174,11 @@ public class MultiworldMod {
     		return broadcast_console(source, message);
     	}
     	*/
+    	
+    	if (!isPlayer(source)) {
+    		ConsoleCommand.broadcast_console(mc, source, message);
+    		return 1;
+    	}
     	
     	final ServerPlayerEntity plr = get_player(source); // source.getPlayerOrThrow();
 

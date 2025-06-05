@@ -1,4 +1,4 @@
-package net.fabricmc.loader.api;
+package net.fabricmcold.loader.api;
 
 import java.nio.file.Path;
 import java.io.File;

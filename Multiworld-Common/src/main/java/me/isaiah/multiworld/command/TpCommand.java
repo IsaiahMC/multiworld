@@ -6,11 +6,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
-import static me.isaiah.multiworld.MultiworldMod.text;
 import java.io.File;
 
+import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.*;
 
@@ -25,6 +24,16 @@ public class TpCommand implements Command {
         
         String arg1 = args[1];
         if (arg1.indexOf(':') == -1) arg1 = "multiworld:" + arg1;
+        
+        if (null == plr) {
+        	// Console
+        	if (args.length <= 2) {
+        		return 0;
+        	}
+        	
+        	String target = args[2];
+        	plr = mc.getPlayerManager().getPlayer(target);
+        }
 
         if (worlds.containsKey(arg1)) {
             ServerWorld w = worlds.get(arg1);
@@ -55,14 +64,18 @@ public class TpCommand implements Command {
 			}
 			
             if (null == sp) {
-                plr.sendMessage(text("Error: null getSpawnPos", Formatting.RED), false);
+                // Send Null Spawn Message
+                I18n.message(plr, I18n.NULL_SPAWN);
                 sp = new BlockPos(1, 40, 1);
             }
-            plr.sendMessage(text("Teleporting...", Formatting.GOLD), false);
+            // plr.sendMessage(text("Teleporting...", Formatting.GOLD), false);
+            
+            // Send Teleporting Message
+            I18n.message(plr, I18n.TELEPORTING);
 
             sp = findSafePos(w, sp);
 
-            // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(1, 1, 1), 0f, 0f);
+            // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(0, 0, 0), 0f, 0f);
             // FabricDimensionInternals.changeDimension(plr, w, target);
 
             MultiworldMod.get_world_creator().teleleport(plr, w, sp.getX(), sp.getY(), sp.getZ());
@@ -82,8 +95,8 @@ public class TpCommand implements Command {
         int i = lv.getX();
         int j = lv.getY() - 2;
         int k = lv.getZ();
-        BlockPos.iterate(i - 2, j + 1, k - 2, i + 2, j + 3, k + 2).forEach(pos -> world.setBlockState((BlockPos)pos, Blocks.AIR.getDefaultState()));
-        BlockPos.iterate(i - 2, j, k - 2, i + 2, j, k + 2).forEach(pos -> world.setBlockState((BlockPos)pos, Blocks.OBSIDIAN.getDefaultState()));
+        BlockPos.iterate(i - 2, j + 1, k - 2, i + 2, j + 3, k + 2).forEach(pos -> world.setBlockState(pos, Blocks.AIR.getDefaultState()));
+        BlockPos.iterate(i - 2, j, k - 2, i + 2, j, k + 2).forEach(pos -> world.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState()));
     }
 
     private static BlockPos findSafePos(ServerWorld w, BlockPos sp) {

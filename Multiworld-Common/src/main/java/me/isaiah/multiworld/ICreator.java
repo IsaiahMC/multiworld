@@ -99,5 +99,7 @@ public interface ICreator {
 	public boolean is_the_end(ServerWorld world);
 	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc);
 	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc);
+
+	void delete_world(String id);
 	
 }

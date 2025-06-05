@@ -1,28 +1,32 @@
 package me.isaiah.multiworld.command;
 
+import static me.isaiah.multiworld.MultiworldMod.message;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import me.isaiah.multiworld.I18n;
+import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import me.isaiah.multiworld.MultiworldMod;
-
-import static me.isaiah.multiworld.MultiworldMod.text_plain;
-import static me.isaiah.multiworld.MultiworldMod.message;
-import net.minecraft.server.world.ServerWorld;
-
-import java.io.File;
-import me.isaiah.multiworld.config.*;
 
 /**
  * The "/mw create" Command
  */
 public class CreateCommand implements Command {
+	
+	public static final Logger LOGGER = LoggerFactory.getLogger("multiworld");
 	
 	public static HashMap<String, ChunkGenerator> customs= new HashMap<>();
 	
@@ -92,7 +96,8 @@ public class CreateCommand implements Command {
 	 */
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         if (args.length == 1 || args.length == 2) {
-            plr.sendMessage(text_plain("Usage: /mv create <id> <env> [-g=<gen> -s=<seed>]"), false);
+            // Command Usage Message
+            I18n.message(plr, I18n.USAGE_CREATE);
             return 0;
         }
 
@@ -144,8 +149,7 @@ public class CreateCommand implements Command {
         ServerWorld world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.NORMAL, seed);
 		make_config(world, args[2], seed, customGen);
 
-        // plr.sendMessage(text("Created world with id: " + args[1], Formatting.GREEN), false);
-		message(plr, "&aCreated world with id: " + args[1]);
+		message(plr, I18n.CREATED_WORLD + args[1]);
         
         return 1;
     }
@@ -245,7 +249,7 @@ public class CreateCommand implements Command {
 		    }
 			
 			Difficulty d = Difficulty.NORMAL;
-			
+
 			// Set saved Difficulty
 			if (config.is_set("difficulty")) {
 				String di = config.getString("difficulty");
@@ -256,7 +260,7 @@ public class CreateCommand implements Command {
 				if (di.equalsIgnoreCase("NORMAL"))   { d = Difficulty.NORMAL; }
 				if (di.equalsIgnoreCase("PEACEFUL")) { d = Difficulty.PEACEFUL; }
 			}
-			
+
 			// Gen
 			if (config.is_set("custom_generator")) {
 				String cg = config.getString("custom_generator");
@@ -271,6 +275,8 @@ public class CreateCommand implements Command {
 			
 			ServerWorld world = MultiworldMod.create_world(id, dim, gen, d, seed);
 
+			MultiworldMod.get_world_creator().set_difficulty(id, d);
+			
 			if (GameruleCommand.keys.size() == 0) {
 				GameruleCommand.setupServer(MultiworldMod.mc);
 			}

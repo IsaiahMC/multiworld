@@ -52,4 +52,41 @@ public class Util {
         return config;
     }
     
+    
+    /**
+     * 
+     */
+    public static FileConfiguration get_config(Identifier id) throws IOException {
+        File cf = new File(get_platform_config_dir(), "multiworld"); 
+        cf.mkdirs();
+
+        File worlds = new File(cf, "worlds");
+        worlds.mkdirs();
+
+        File namespace = new File(worlds, id.getNamespace());
+        namespace.mkdirs();
+
+        File wc = new File(namespace, id.getPath() + ".yml");
+        wc.createNewFile();
+        FileConfiguration config = new FileConfiguration(wc);
+        return config;
+    }
+    
+    /**
+     * 
+     */
+    public static File get_config_file(Identifier id) throws IOException {
+        File cf = new File(get_platform_config_dir(), "multiworld"); 
+        cf.mkdirs();
+
+        File worlds = new File(cf, "worlds");
+        worlds.mkdirs();
+
+        File namespace = new File(worlds, id.getNamespace());
+        namespace.mkdirs();
+
+        File wc = new File(namespace, id.getPath() + ".yml");
+        return wc;
+    }
+    
 }

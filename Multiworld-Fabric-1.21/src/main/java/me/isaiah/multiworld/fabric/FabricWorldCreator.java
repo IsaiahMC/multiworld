@@ -103,7 +103,7 @@ public class FabricWorldCreator implements ICreator {
 	
 	@Override
 	public void teleleport(ServerPlayerEntity player, ServerWorld world, double x, double y, double z) {
-        TeleportTarget target = new TeleportTarget(world, new Vec3d(x, y, z), new Vec3d(1, 1, 1), 0f, 0f, TeleportTarget.NO_OP);
+        TeleportTarget target = new TeleportTarget(world, new Vec3d(x, y, z), new Vec3d(0, 0, 0), 0f, 0f, TeleportTarget.NO_OP);
         
         // FabricDimensionInternals.changeDimension(player, world, target);
         

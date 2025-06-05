@@ -1,4 +1,4 @@
-package net.fabricmc.loader.api;
+package net.fabricmcold.loader.api;
 
 import java.nio.file.Path;
 import java.io.File;
@@ -25,9 +25,5 @@ public class FabricLoader {
 		}
 		return dir.toPath();
 	}
-	
-	//public java.util.Optional<ModContainer> getModContainer(String id) {
-	//	return java.util.Optional.empty();
-	//}
-	
+
 }

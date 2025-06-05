@@ -65,6 +65,7 @@ public class NeoForgeWorldCreator implements ICreator {
         return RegistryKey.of(RegistryKeys.DIMENSION_TYPE, id);
     }
     
+    @Override
     public void delete_world(String id) {
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(Identifier.of(id), null);
@@ -98,7 +99,7 @@ public class NeoForgeWorldCreator implements ICreator {
 
 	@Override
 	public void teleleport(ServerPlayerEntity player, ServerWorld world, double x, double y, double z) {
-		TeleportTarget target = new TeleportTarget(world, new Vec3d(x, y, z), new Vec3d(1, 1, 1), 0f, 0f, TeleportTarget.NO_OP);
+		TeleportTarget target = new TeleportTarget(world, new Vec3d(x, y, z), new Vec3d(0, 1, 0), 0f, 0f, TeleportTarget.NO_OP);
 		// FabricDimensionInternals.changeDimension(player, world, target);
 
 		// Per https://fabricmc.net/2024/05/31/121.html
@@ -109,6 +110,8 @@ public class NeoForgeWorldCreator implements ICreator {
 	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc) {
 		var biome = mc.getRegistryManager().getOrThrow(RegistryKeys.BIOME).getOrThrow(BiomeKeys.PLAINS);
         FlatChunkGeneratorConfig flat = new FlatChunkGeneratorConfig(Optional.empty(), biome, Collections.emptyList());
+        flat.enableFeatures();
+
         FlatChunkGenerator generator = new CustomFlatChunkGenerator(flat);
         return generator;
 	}

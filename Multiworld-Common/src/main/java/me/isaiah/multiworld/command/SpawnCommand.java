@@ -23,7 +23,7 @@ public class SpawnCommand implements Command {
         // we are teleporting to the same world.
         plr.teleport(sp.getX(), sp.getY(), sp.getZ(), true);
 
-        // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(1, 1, 1), 0f, 0f);
+        // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(0, 0, 0), 0f, 0f);
         // ServerPlayerEntity teleported = FabricDimensionInternals.changeDimension(plr, w, target);
         return 1;
     }
