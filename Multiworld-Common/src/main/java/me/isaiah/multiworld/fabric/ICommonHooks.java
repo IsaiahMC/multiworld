@@ -6,7 +6,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 
 public class ICommonHooks {
-
+	
 	public static boolean hasICommon() {
 		Optional<ModContainer> container = FabricLoader.getInstance().getModContainer("icommon");
 		
@@ -17,6 +17,11 @@ public class ICommonHooks {
 		// TODO: Check ICommonMod.API_VERSION
 
 		return true;
+	}
+	
+	// @EventHandler
+	public void onPortalEnter() {
+		
 	}
 	
 }

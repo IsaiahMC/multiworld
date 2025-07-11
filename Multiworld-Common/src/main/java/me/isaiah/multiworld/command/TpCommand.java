@@ -30,7 +30,7 @@ public class TpCommand implements Command {
         	if (args.length <= 2) {
         		return 0;
         	}
-        	
+
         	String target = args[2];
         	plr = mc.getPlayerManager().getPlayer(target);
         }

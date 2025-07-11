@@ -1,4 +1,6 @@
 import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+
 
 plugins {
     id ("fabric-loom") version "1.10-SNAPSHOT"
@@ -12,7 +14,8 @@ java {
 }
 
 base {
-    archivesBaseName = "Multiworld-Fabric"
+    // archivesBaseName = "Multiworld-Fabric"
+    archivesName  = "Multiworld-Fabric"
     version = "1.20.6"
     group = "me.isaiah.mods"
 }
@@ -43,6 +46,17 @@ dependencies {
 		// Add each module as a dependency
 		modImplementation(fabricApi.module(it, "0.99.0+1.20.6"))
 	}
+	
+	val ic = DefaultExternalModuleDependency(
+		"com.javazilla.mods",
+		"icommon-fabric-1.21.4",
+		"1.21.4",
+		null
+	).apply {
+		isChanging = true // Make sure we get the latest version of iCommon
+	}
+
+	modImplementation(ic)
 }
 
 
@@ -66,7 +80,7 @@ sourceSets {
 // Jabel
 tasks.withType<JavaCompile>().configureEach {
     sourceCompatibility = JavaVersion.VERSION_21.toString() // for the IDE support
-    options.release.set(8)
+    options.release.set(17)
 
     javaCompiler.set(
         javaToolchains.compilerFor {
@@ -106,11 +120,11 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = project.group.toString()
-            artifactId = project.name.toLowerCase()
+            artifactId = project.name.lowercase()
             version = project.version.toString()
             
             pom {
-                name.set(project.name.toLowerCase())
+                name.set(project.name.lowercase())
                 description.set("A concise description of my library")
                 url.set("http://www.example.com/")
             }

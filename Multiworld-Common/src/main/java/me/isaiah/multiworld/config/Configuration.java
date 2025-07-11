@@ -9,6 +9,8 @@ package me.isaiah.multiworld.config;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unchecked")
 public class Configuration {
@@ -91,5 +93,37 @@ public class Configuration {
 
     public void save() throws IOException {
     }
+    
+    /**
+     */
+	public boolean hasSection(String sect) {
+		for (String s : contentMap.keySet()) {
+			if (s.startsWith(sect)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public LinkedHashMap<String, Object> getSection(String sect) {
+	    LinkedHashMap<String, Object> contentMapSection = new LinkedHashMap<>();
+	    
+	    for (Map.Entry<String, Object> entry : contentMap.entrySet()) {
+	        if (entry.getKey().startsWith(sect)) {
+	        	
+	        	if (entry.getKey().startsWith(sect)) {
+
+	        		if (entry.getKey().indexOf('.') == -1) {
+	        			continue;
+	        		}
+	        		
+	        		String key2 =  entry.getKey().split(Pattern.quote("."))[1].split(Pattern.quote("."))[0];
+	        		contentMapSection.put(key2, entry.getValue());
+	        	}
+	        }
+	    }
+	    
+	    return contentMapSection;
+	}
 
 }

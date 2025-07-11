@@ -1,4 +1,6 @@
 import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+
 
 plugins {
     id ("fabric-loom") version "1.10-SNAPSHOT"
@@ -44,6 +46,7 @@ sourceSets {
         java {
             // Needs fixing for 1.18:
             exclude("me/isaiah/**/*.java")
+            exclude("multiworld/**/*.java")
             exclude("**/Multiworld.mixins.json")
             exclude("org/minecarts/**/*.java")
 			
@@ -94,11 +97,11 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = project.group.toString()
-            artifactId = project.name.toLowerCase()
+            artifactId = project.name.lowercase()
             version = project.version.toString()
             
             pom {
-                name.set(project.name.toLowerCase())
+                name.set(project.name.lowercase())
                 description.set("A concise description of my library")
                 url.set("http://www.example.com/")
             }

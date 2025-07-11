@@ -4,28 +4,30 @@
  */
 package me.isaiah.multiworld;
 
-import com.mojang.brigadier.CommandDispatcher;
-import java.io.File;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+import java.io.File;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import me.isaiah.multiworld.command.CreateCommand;
-import me.isaiah.multiworld.command.DeleteCommand;
 import me.isaiah.multiworld.command.DifficultyCommand;
 import me.isaiah.multiworld.command.GameruleCommand;
+import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.command.SetspawnCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.command.TpCommand;
 import me.isaiah.multiworld.perm.Perm;
+import me.isaiah.multiworld.portal.Portal;
+import me.isaiah.multiworld.portal.WandEventHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -34,9 +36,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 /**
  * Multiworld Mod
@@ -62,7 +64,7 @@ public class MultiworldMod {
     };
 
 	// Mod Version
-	public static final String VERSION = "1.9";
+	public static final String VERSION = "1.10";
 
     public static void setICreator(ICreator ic) {
         world_creator = ic;
@@ -86,6 +88,11 @@ public class MultiworldMod {
      */
     public static void init() {
         System.out.println("Multiworld init");
+        
+        // TODO: Testing
+        // PortalCommand.test();
+        
+        WandEventHandler.register();
     }
 
     public static Identifier new_id(String id) {
@@ -96,6 +103,9 @@ public class MultiworldMod {
     // On server start
     public static void on_server_started(MinecraftServer mc) {
         MultiworldMod.mc = mc;
+        
+        // LOGGER.info("Registering events...");
+        // WandEventHandler.register();
 		
 		File cfg_folder = new File("config");
 		if (cfg_folder.exists()) {
@@ -108,10 +118,15 @@ public class MultiworldMod {
 					}
 					for (File fi : f.listFiles()) {
 						String id = f.getName() + ":" + fi.getName().replace(".yml", "");
-						System.out.println("Found saved world " + id);
+						LOGGER.info("Found saved world " + id);
 						CreateCommand.reinit_world_from_config(mc, id);
 					}
 				}
+			}
+			
+			int loaded = Portal.reinit_portals_from_config(mc);
+			if (loaded > 0) {
+				LOGGER.info("Found " + loaded + " saved world portals.");
 			}
 		}
     }
@@ -183,7 +198,7 @@ public class MultiworldMod {
     	final ServerPlayerEntity plr = get_player(source); // source.getPlayerOrThrow();
 
         if (null == message) {
-            plr.sendMessage(text("Multiworld Mod for Minecraft " + mc.getVersion(), Formatting.AQUA), false);
+            message(plr, "&bMultiworld Mod for Minecraft " + mc.getVersion());
             
             World world = plr.getWorld();
             Identifier id = world.getRegistryKey().getValue();
@@ -318,15 +333,29 @@ public class MultiworldMod {
             }
         	message(plr, "Delete Command is Console-only for security.");
         }
+        
+        // Help Command
+        if (args[0].equalsIgnoreCase("portal")) {
+        	if (!(ALL || Perm.has(plr, "multiworld.portal"))) {
+                message(plr, "No permission! Missing permission: multiworld.portal");
+                return 1;
+            }
+        	
+        	PortalCommand.run(mc, plr, args);
+        }
 
         return Command.SINGLE_SUCCESS; // Success
     }
 
-    @Deprecated
-	public static Text text(String txt, Formatting color) {
-		return world_creator.colored_literal(txt, color);
+	public static Text text(String message) {
+		try {
+			return Text.of(translate_alternate_color_codes('&', message));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return text_plain(message);
+		}
 	}
-	
+
 	public static void message(PlayerEntity player, String message) {
 		try {
 			player.sendMessage(Text.of(translate_alternate_color_codes('&', message)), false);
@@ -334,7 +363,7 @@ public class MultiworldMod {
 			e.printStackTrace();
 		}
     }
-    
+
     private static final char COLOR_CHAR = '\u00A7';
     private static String translate_alternate_color_codes(char altColorChar, String textToTranslate) {
         char[] b = textToTranslate.toCharArray();

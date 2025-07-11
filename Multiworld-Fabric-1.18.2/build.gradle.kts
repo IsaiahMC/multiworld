@@ -1,4 +1,6 @@
 import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+
 
 plugins {
     id ("fabric-loom") version "1.10-SNAPSHOT"
@@ -7,8 +9,8 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 base {
@@ -38,12 +40,23 @@ dependencies {
 	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
 	modImplementation("net.fabricmc.fabric-api:fabric-api:0.76.0+1.18.2")
 	// modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.76.0+1.18.2")
+	
+	val ic = DefaultExternalModuleDependency(
+		"com.javazilla.mods",
+		"icommon-fabric-1.21.4",
+		"1.21.4",
+		null
+	).apply {
+		isChanging = true // Make sure we get the latest version of iCommon
+	}
+
+	modImplementation(ic)
 }
 
 // Jabel
 tasks.withType<JavaCompile>().configureEach {
     sourceCompatibility = JavaVersion.VERSION_17.toString() // for the IDE support
-    options.release.set(8)
+    options.release.set(17)
 
     javaCompiler.set(
         javaToolchains.compilerFor {
@@ -102,11 +115,11 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = project.group.toString()
-            artifactId = project.name.toLowerCase()
+            artifactId = project.name.lowercase()
             version = project.version.toString()
             
             pom {
-                name.set(project.name.toLowerCase())
+                name.set(project.name.lowercase())
                 description.set("A concise description of my library")
                 url.set("http://www.example.com/")
             }

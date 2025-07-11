@@ -72,16 +72,6 @@ public class FabricWorldCreator implements ICreator {
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new Identifier(id), null);
         worldHandle.delete();
     }
-	
-	@Override
-	public Text colored_literal(String txt, Formatting color) {
-		try {
-			return Text.of(txt).copy().formatted(color);
-		} catch (Exception | IncompatibleClassChangeError e) {
-			// Fallback
-			return Text.of(txt);
-		}
-	}
 
 	@Override
 	public boolean is_the_end(ServerWorld world) {

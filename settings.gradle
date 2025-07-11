@@ -6,7 +6,18 @@ pluginManagement {
         }
         maven { url "https://maven.architectury.dev/" }
         maven { url "https://files.minecraftforge.net/maven/" }
+		maven {
+            name = 'Jitpack'
+            url = 'https://jitpack.io'
+        }
         gradlePluginPortal()
+    }
+	resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id.equals("com.replaymod.preprocess")) {
+                useModule("com.github.replaymod:preprocessor:${requested.version}")
+            }
+        }
     }
 }
 
@@ -30,8 +41,8 @@ include 'Multiworld-Fabric-bundle'
 // Forge
 // include 'Multiworld-Forge-1.18.2'
 // include 'Multiworld-Forge-1.19.4'
-include 'Multiworld-Forge-1.20.1'
+//include 'Multiworld-Forge-1.20.1'
 
 // NeoForged
-include 'Multiworld-NeoForged-1.21.1'
-include 'Multiworld-NeoForged-1.21.2'
+//include 'Multiworld-NeoForged-1.21.1'
+//include 'Multiworld-NeoForged-1.21.2'

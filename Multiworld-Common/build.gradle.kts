@@ -1,4 +1,6 @@
 import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+
 
 plugins {
 
@@ -13,8 +15,11 @@ architectury {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 base {
@@ -55,6 +60,18 @@ dependencies {
 	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
 	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.92.5+1.20.1")
 	
+	val ic = DefaultExternalModuleDependency(
+		"com.javazilla.mods",
+		"icommon-fabric-1.21.4",
+		"1.21.4",
+		null
+	).apply {
+		isChanging = true // Make sure we get the latest version of iCommon
+	}
+
+	modImplementation(ic)
+
+
 	setOf(
 		"fabric-api-base",
 		//"fabric-command-api-v1",

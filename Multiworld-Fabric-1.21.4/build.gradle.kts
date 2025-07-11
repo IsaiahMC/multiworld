@@ -1,4 +1,6 @@
 import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+
 
 plugins {
     id ("fabric-loom") version "1.10-SNAPSHOT"
@@ -9,7 +11,11 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
+
 
 base {
     archivesBaseName = "Multiworld-Fabric"
@@ -54,6 +60,17 @@ dependencies {
 		// modImplementation(fabricApi.module(it, "0.100.1+1.21"))
 		modImplementation(fabricApi.module(it, "0.107.0+1.21.4"))
 	}
+	
+	val ic = DefaultExternalModuleDependency(
+		"com.javazilla.mods",
+		"icommon-fabric-1.21.4",
+		"1.21.4",
+		null
+	).apply {
+		isChanging = true // Make sure we get the latest version of iCommon
+	}
+
+	modImplementation(ic)
 }
 
 // Note: dimapi is not needed for 1.21
@@ -80,7 +97,7 @@ sourceSets {
 // Jabel
 tasks.withType<JavaCompile>().configureEach {
     sourceCompatibility = JavaVersion.VERSION_21.toString() // for the IDE support
-    options.release.set(8)
+    options.release.set(17)
 
     javaCompiler.set(
         javaToolchains.compilerFor {

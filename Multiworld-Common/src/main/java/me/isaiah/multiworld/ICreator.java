@@ -31,7 +31,8 @@ public interface ICreator {
 
 	/**
 	 */
-	public default Text colored_literal(String txt, Formatting color) {
+	@Deprecated
+	public default Text colored_literal_(String txt, Formatting color) {
 		try {
 			return Text.of(txt).copy().formatted(color);
 		} catch (Exception | IncompatibleClassChangeError e) {

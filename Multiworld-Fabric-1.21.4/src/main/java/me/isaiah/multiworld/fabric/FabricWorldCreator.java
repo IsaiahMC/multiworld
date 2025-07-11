@@ -81,16 +81,6 @@ public class FabricWorldCreator implements ICreator {
     }
 
 	@Override
-	public Text colored_literal(String txt, Formatting color) {
-		try {
-			return Text.of(txt).copy().formatted(color);
-		} catch (Exception | IncompatibleClassChangeError e) {
-			// Fallback
-			return Text.of(txt);
-		}
-	}
-
-	@Override
 	public boolean is_the_end(ServerWorld world) {
 		return world.getDimensionEntry() == DimensionTypes.THE_END;
 	}

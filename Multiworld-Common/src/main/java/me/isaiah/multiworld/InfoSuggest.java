@@ -14,9 +14,14 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import me.isaiah.multiworld.command.CreateCommand;
 import me.isaiah.multiworld.command.GameruleCommand;
+import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.perm.Perm;
+import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.level.ServerWorldProperties;
 
@@ -36,7 +41,7 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
 	 * Valid Subcommands
 	 */
 	private static String[] subcommands = {
-			"tp", "list", "version", "create", "spawn", "setspawn", "gamerule", "help", "difficulty",
+			"tp", "list", "version", "create", "spawn", "setspawn", "gamerule", "help", "difficulty", "portal"
 			// TODO: Add: delete, load, unload, info, clone, who, import
 	};
 	
@@ -104,6 +109,13 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
                 }
                 return builder.buildFuture();
             }
+            
+            if (cmds[1].equalsIgnoreCase("portal")) {
+            	for (String s : PortalCommand.SUBCOMMANDS) {
+                    builder.suggest(s);
+                }
+            	return builder.buildFuture();
+            }
         }
 
         if (cmds.length <= 3 || (cmds.length <= 4 && !input.endsWith(" "))) {
@@ -130,8 +142,32 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
         if (cmds[1].equalsIgnoreCase("create") && (ALL || Perm.has(plr, "multiworld.create")) ) {
         	getSuggestions_CreateCommand(builder, input, cmds, plr, ALL);
         }
+        
+        // Portal Command
+        if (cmds[1].equalsIgnoreCase("portal")) {
+        	PortalCommand.getSuggestions_PortalCommand(builder, input, cmds, plr, ALL);
+        }
 
         return builder.buildFuture();
+    }
+    
+    public static List<String> getWorldNames() {
+    	 MinecraftServer mc = MultiworldMod.mc;
+         List<String> names = new ArrayList<>();
+         mc.getWorlds().forEach(world -> {
+             String name = ((ServerWorldProperties) world.getLevelProperties()).getLevelName();
+             if (names.contains(name)) {
+                 if (world.getRegistryKey() == World.NETHER) name = name + "_nether";
+                 if (world.getRegistryKey() == World.END) name = name + "_the_end";
+             }
+         });
+         mc.getWorldRegistryKeys().forEach(r -> {
+             String val = r.getValue().toString();
+             if (val.startsWith("multiworld:"))
+                 val = val.replace("multiworld:", "");
+             names.add(val);
+          });
+         return names;
     }
 
     /**

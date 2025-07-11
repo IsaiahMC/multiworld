@@ -1,18 +1,17 @@
 package me.isaiah.multiworld.command;
 
+import static me.isaiah.multiworld.MultiworldMod.message;
+import static me.isaiah.multiworld.MultiworldMod.text_plain;
+
 import java.io.File;
 import java.io.IOException;
 
 import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import static me.isaiah.multiworld.MultiworldMod.text;
-import static me.isaiah.multiworld.MultiworldMod.text_plain;
 
 public class SetspawnCommand implements Command {
 
@@ -23,8 +22,7 @@ public class SetspawnCommand implements Command {
             setSpawn(w, pos);
 			
 			String txt = "Spawn for world \"" + w.getRegistryKey().getValue() + "\" changed to " + pos.toShortString();
-			
-            plr.sendMessage(text(txt, Formatting.GOLD), false);
+            message(plr, "&6" + txt);
         } catch (IOException e) {
             plr.sendMessage(text_plain("Error: " + e.getMessage()), false);
             e.printStackTrace();

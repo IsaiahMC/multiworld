@@ -24,5 +24,8 @@ public class I18n {
 	public static final String NULL_SPAWN = "&4Error: null getSpawnPos";
 	public static final String USAGE_CREATE = "Usage: /mv create <id> <env> [-g=<gen> -s=<seed>]";
 	public static final String CREATED_WORLD = "&aCreated world with id: ";
+	public static final String CMD_PORTAL_USAGE = "&4Usage: /mw portal <subcommand> [arguments]";
+	public static final String CMD_PORTAL_USAGE_CREATE = "&4Usage: /mw portal create <name> <destination>";
+	public static final String CMD_PORTAL_NO_SELECTION = "You need to make an area selection first. (/mw portal wand)";
 
 }
