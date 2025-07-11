@@ -6,14 +6,14 @@ package me.isaiah.multiworld.portal;
 import java.util.HashMap;
 import java.util.UUID;
 
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import static me.isaiah.multiworld.MultiworldMod.message;
 
@@ -29,28 +29,26 @@ public class WandEventHandler {
 
 	private static final ItemStack wand = new ItemStack(Items.WOODEN_AXE);
     
-    public static void register() {
-    	
-    	// TODO: Hook into WorldEdit.
-    	
-        // Left-click = Position 1
-        AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
-            if (!world.isClient && isHoldingWand(player)) {
-                setPosition(player, pos, 1);
-                return ActionResult.PASS;
-            }
+    /**
+     * Left-click = Position 1
+     */
+    public static ActionResult leftClickBlock(PlayerEntity player, World world, BlockPos pos) {
+    	 if (!world.isClient && isHoldingWand(player)) {
+             setPosition(player, pos, 1);
+             return ActionResult.PASS;
+         }
+         return ActionResult.PASS;
+    }
+    
+    /**
+     * Right-click = Position 2
+     */
+    public static ActionResult rightClickBlock(PlayerEntity player, World world, BlockHitResult hitResult) {
+    	if (!world.isClient && isHoldingWand(player)) {
+            setPosition(player, hitResult.getBlockPos(), 2);
             return ActionResult.PASS;
-        });
-
-        // Right-click = Position 2
-        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (!world.isClient && isHoldingWand(player)) {
-                setPosition(player, hitResult.getBlockPos(), 2);
-                return ActionResult.PASS;
-            }
-            return ActionResult.PASS;
-        });
-
+        }
+        return ActionResult.PASS;
     }
     
     public static ItemStack getItemStack() {

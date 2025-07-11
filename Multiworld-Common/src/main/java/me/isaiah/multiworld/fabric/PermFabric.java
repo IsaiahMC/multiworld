@@ -8,6 +8,9 @@ public class PermFabric extends Perm {
     
     public static void init() {
         Perm.setPerm(new PermFabric());
+        
+        // TODO: move this
+        FabricEvents.register();
     }
 
     @Override

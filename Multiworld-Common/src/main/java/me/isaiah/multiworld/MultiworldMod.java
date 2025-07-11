@@ -92,7 +92,7 @@ public class MultiworldMod {
         // TODO: Testing
         // PortalCommand.test();
         
-        WandEventHandler.register();
+        //WandEventHandler.register();
     }
 
     public static Identifier new_id(String id) {
