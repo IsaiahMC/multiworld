@@ -18,7 +18,7 @@ The permission `multiworld.admin` or being `/op`-ed grants access to every comma
 | /mw tp | multiworld.tp |
 | /mw spawn | multiworld.spawn |
 | /mw setspawn | multiworld.setspawn |
-| /mw create | multiworld.create |
+| /mw create <id> <dim> [-g=GENERATOR -s=SEED] | multiworld.create |
 | /mw gamerule | multiworld.gamerule |
 
  

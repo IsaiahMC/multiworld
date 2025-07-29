@@ -34,8 +34,8 @@ dependencies {
     mappings("net.fabricmc:yarn:1.21.5+build.1")
     modImplementation("net.fabricmc:fabric-loader:0.16.14")
 
-	include("xyz.nucleoid:fantasy:0.6.5+1.21.2")
-	modImplementation("xyz.nucleoid:fantasy:0.6.5+1.21.2")
+	include("xyz.nucleoid:fantasy:0.6.7+1.21.5")
+	modImplementation("xyz.nucleoid:fantasy:0.6.7+1.21.5")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
 	modImplementation("me.lucko:fabric-permissions-api:0.3.3")
 	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.127.0+1.21.5")

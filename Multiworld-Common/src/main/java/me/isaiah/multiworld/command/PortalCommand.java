@@ -70,8 +70,9 @@ public class PortalCommand implements Command {
 			return 0;
 		}
 		
-		if (!ICommonHooks.hasICommon()) {
+		if (!Util.isForgeOrHasICommon()) {
 			message(plr,  "&4WARN: iCommonLib is required for Portals to function properly");
+			// return 0;
 		}
 		
 		// Refresh

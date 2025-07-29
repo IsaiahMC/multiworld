@@ -10,6 +10,7 @@ public class PermFabric extends Perm {
         Perm.setPerm(new PermFabric());
         
         // TODO: move this
+        ICommonHooks.register();
         FabricEvents.register();
     }
 

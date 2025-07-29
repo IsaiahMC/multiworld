@@ -10,7 +10,8 @@
     "ServerWorldMixin",
     "registry.DimensionOptionsMixin",
     "registry.SimpleRegistryMixin",
-    "registry.RegistryCodecsMixin"
+    "registry.RegistryCodecsMixin",
+    "multiworld.MixinServerPlayerEntity"
   ],
   "injectors": {
     "defaultRequire": 1

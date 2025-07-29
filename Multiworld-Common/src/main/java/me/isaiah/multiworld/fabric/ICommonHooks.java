@@ -29,14 +29,18 @@ public class ICommonHooks {
 		return true;
 	}
 	
-	public void register() {
+	public static void register() {
+		new ICommonHooks().registerThis();
+	}
+	
+	public void registerThis() {
 		if (!hasICommon()) {
 			MultiworldMod.LOGGER.info("Note: iCommonLib is required for full functionality of mod");
 			return;
 		}
 		
 		int r = EventRegistery.registerAll(this);
-        MultiworldMod.LOGGER.info("Registered '" + r + "' iCommon events.");
+        MultiworldMod.LOGGER.info("Multiworld: Registered '" + r + "' iCommon events.");
 	}
 	
 	@EventHandler

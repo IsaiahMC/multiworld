@@ -21,6 +21,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Direction.Axis;
 
 /**
  * Representation of a Multiworld Portal
@@ -208,18 +209,6 @@ public class Portal {
 			config.set(prefix + ".location", this.getLocationConfigString()); // x1,y1,z1:x2,y2,z2
 			config.set(prefix + ".world", this.getOriginWorldId());
 			config.set(prefix + ".destination", this.getDestination());
-			
-			/*
-			ArrayList<Long> blockList = new ArrayList<Long>();
-			
-			for (BlockPos pos : blocks) {
-				long l = pos.asLong();
-				blockList.add(l);
-			}
-			if (blockList.size() > 0) {
-				config.set(prefix + ".blocks", blockList);
-			}
-			*/
 
 			config.save();
         } catch (Exception e) {
@@ -302,7 +291,19 @@ public class Portal {
 		if (start.equalsIgnoreCase("p")) {
 			Portal pp = PortalCommand.getKnownPortal( name.split(Pattern.quote("p:"))[1] );
 			if (null != pp) {
-				return PortalUtil.findSafeExit(pp.getDestWorld(), pp.getCenterExit(), 2, getMaxY(4));
+				
+				Direction.Axis axis = (Math.abs(pp.getMinPos().getX() - getMaxPos().getX()) > Math.abs(getMinPos().getZ() - getMaxPos().getZ()))
+		        	    ? Direction.Axis.X
+		        	    : Direction.Axis.Z;
+			
+				BlockPos cen = PortalUtil.findSafeExit(pp.getDestWorld(), pp.getCenterExit(), 2, getMaxY(4));
+				if (axis == Axis.X) {
+					cen = cen.add(0, 0, 2);
+				} else {
+					cen = cen.add(3, 0, 0);
+				}
+				
+				return cen;
 			}
 		}
 		
@@ -443,7 +444,7 @@ public class Portal {
 	                if (isOnEdge) {
 	                    // Frame block
 	                	if (world.isAir(currentPos)) {
-	                		world.setBlockState(currentPos, Blocks.STONE.getDefaultState());
+	                		world.setBlockState(currentPos, Blocks.OBSIDIAN.getDefaultState());
 	                	}
 	                } else {
 	                    // Inner portal
