@@ -78,10 +78,14 @@ jar {
             java {
                 exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude 'net/fabricmc/**/*.java'
+                exclude 'net/fabricmc/**/*.class'
             }
 			resources {
 				exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude 'net/fabricmc/**/*.java'
+                exclude 'net/fabricmc/**/*.class'
 			}
         }
     }
@@ -93,9 +97,11 @@ processResources {
     filesMatching("META-INF/mods.toml") {
         expand "version": project.version
     }
-	
+
 	exclude '**/fabric/*.class'
 	exclude '**/fabric/*.java'
+	exclude 'net/fabricmc/**/*.class'
+	exclude 'net/fabricmc/**/*.java'
 }
 
 shadowJar {
@@ -104,6 +110,8 @@ shadowJar {
             java {
                 exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude 'net/fabricmc/**/*.java'
+                exclude 'net/fabricmc/**/*.class'
             }
         }
     }
@@ -111,6 +119,8 @@ shadowJar {
     exclude "fabric.mod.json"
 	exclude '**/fabric/*.java'
 	exclude '**/fabric/*.class'
+	exclude 'net/fabricmc/**/*.java'
+	exclude 'net/fabricmc/**/*.class'
 
     configurations = [project.configurations.shadowCommon]
     // classifier "dev-shadow"
@@ -119,12 +129,14 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-	
+
 	sourceSets {
         main {
             java {
                 exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude 'net/fabricmc/**/*.java'
+                exclude 'net/fabricmc/**/*.class'
             }
         }
     }
