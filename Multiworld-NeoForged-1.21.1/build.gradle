@@ -76,6 +76,8 @@ jar {
             java {
                 exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude 'net/fabricmc/**/*.java'
+                exclude 'net/fabricmc/**/*.class'
                 exclude("**/dimapi/*.java")
                 exclude("**/dimapi/*.class")
                 exclude("**/dimapi/mixin/*.java")
@@ -84,6 +86,8 @@ jar {
 			resources {
 				exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude 'net/fabricmc/**/*.java'
+                exclude 'net/fabricmc/**/*.class'
                 exclude("**/dimapi/*.java")
                 exclude("**/dimapi/*.class")
                 exclude("**/dimapi/mixin/*.java")
@@ -99,9 +103,11 @@ processResources {
     filesMatching("META-INF/mods.toml") {
         expand "version": project.version
     }
-	
+
 	exclude '**/fabric/*.class'
 	exclude '**/fabric/*.java'
+	exclude 'net/fabricmc/**/*.class'
+	exclude 'net/fabricmc/**/*.java'
     exclude("**/dimapi/*.java")
     exclude("**/dimapi/*.class")
     exclude("**/dimapi/mixin/*.java")
@@ -114,6 +120,8 @@ shadowJar {
             java {
                 exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude 'net/fabricmc/**/*.java'
+                exclude 'net/fabricmc/**/*.class'
                 exclude("**/dimapi/*.java")
                 exclude("**/dimapi/*.class")
                 exclude("**/dimapi/mixin/*.java")
@@ -125,6 +133,8 @@ shadowJar {
     exclude "fabric.mod.json"
 	exclude '**/fabric/*.java'
 	exclude '**/fabric/*.class'
+	exclude 'net/fabricmc/**/*.java'
+	exclude 'net/fabricmc/**/*.class'
     exclude("**/dimapi/*.java")
     exclude("**/dimapi/*.class")
     exclude("**/dimapi/mixin/*.java")
@@ -137,12 +147,14 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-	
+
 	sourceSets {
         main {
             java {
                 exclude '**/fabric/*.java'
                 exclude '**/fabric/*.class'
+                exclude 'net/fabricmc/**/*.java'
+                exclude 'net/fabricmc/**/*.class'
             }
         }
     }
