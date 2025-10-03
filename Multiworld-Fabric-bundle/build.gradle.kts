@@ -34,10 +34,11 @@ dependencies {
 	// include(project(":Multiworld-Fabric-1.19.2"))
 	// include(project(":Multiworld-Fabric-1.19.4"))
 	include(project(":Multiworld-Fabric-1.20.1"))
-	include(project(":Multiworld-Fabric-1.20.4"))
+	// include(project(":Multiworld-Fabric-1.20.4"))
 	include(project(":Multiworld-Fabric-1.20.6"))
 	include(project(":Multiworld-Fabric-1.21"))
 	include(project(":Multiworld-Fabric-1.21.4"))
+	include(project(":Multiworld-Fabric-1.21.5"))
 }
 
 
