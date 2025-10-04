@@ -22,7 +22,7 @@ pluginManagement {
 }
 
 rootProject.name = 'Multiworld'
-mod_version = '1.9'
+mod_version = '1.10'
 
 include 'Multiworld-Common'
 

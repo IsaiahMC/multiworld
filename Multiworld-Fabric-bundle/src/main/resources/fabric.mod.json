@@ -4,12 +4,12 @@
   "version": "${version}",
 
   "name": "Multiworld-bundle",
-  "description": "Multiworld-bundle contains nested 1.18/1.19/1.20 versions of Multiworld. Loader should choose the right one",
+  "description": "Multiworld-bundle contains nested 1.19/1.20/1.21 versions of Multiworld. Farbic-Loader should choose the right one",
   "authors": [
     "isaiah"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
+    "homepage": "https://pisaiah.com",
     "sources": "https://github.com/isaiahmc/multiworld/"
   },
 
@@ -24,6 +24,6 @@
   },
 
   "depends": {
-    "fabricloader": ">=0.11.0"
+    "fabricloader": ">=0.14.9"
   }
 }
