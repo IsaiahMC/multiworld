@@ -16,12 +16,8 @@ import me.isaiah.multiworld.command.CreateCommand;
 import me.isaiah.multiworld.command.GameruleCommand;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.perm.Perm;
-import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.level.ServerWorldProperties;
 

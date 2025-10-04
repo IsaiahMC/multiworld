@@ -1,6 +1,6 @@
 /**
  * Multiworld Mod
- * Copyright (c) 2021-2024 by Isaiah.
+ * Copyright (c) 2021-2025 by Isaiah.
  */
 package me.isaiah.multiworld;
 
@@ -27,7 +27,6 @@ import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.command.TpCommand;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
-import me.isaiah.multiworld.portal.WandEventHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -52,6 +51,7 @@ public class MultiworldMod {
     public static String CMD = "mw";
     public static ICreator world_creator;
     
+    // Help Text For Command
     public static String[] COMMAND_HELP = {
     		"&4Multiworld Mod Commands:&r",
     		"&a/mw spawn&r - Teleport to current world spawn",
@@ -63,7 +63,7 @@ public class MultiworldMod {
     		"&a/mw difficulty <value> [world id] - Sets the difficulty of a world"
     };
 
-	// Mod Version
+	// Multiworld Mod Version
 	public static final String VERSION = "1.10";
 
     public static void setICreator(ICreator ic) {
