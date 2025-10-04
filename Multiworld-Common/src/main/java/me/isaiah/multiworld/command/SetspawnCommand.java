@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 public class SetspawnCommand implements Command {
 
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
-        World w = plr.getWorld();
+        World w = plr.getEntityWorld();
         BlockPos pos = plr.getBlockPos();
         try {
             setSpawn(w, pos);

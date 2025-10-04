@@ -33,7 +33,7 @@ public class WandEventHandler {
      * Left-click = Position 1
      */
     public static ActionResult leftClickBlock(PlayerEntity player, World world, BlockPos pos) {
-    	 if (!world.isClient && isHoldingWand(player)) {
+    	 if (!world.isClient() && isHoldingWand(player)) {
              setPosition(player, pos, 1);
              return ActionResult.PASS;
          }
@@ -44,7 +44,7 @@ public class WandEventHandler {
      * Right-click = Position 2
      */
     public static ActionResult rightClickBlock(PlayerEntity player, World world, BlockHitResult hitResult) {
-    	if (!world.isClient && isHoldingWand(player)) {
+    	if (!world.isClient() && isHoldingWand(player)) {
             setPosition(player, hitResult.getBlockPos(), 2);
             return ActionResult.PASS;
         }
@@ -66,7 +66,7 @@ public class WandEventHandler {
         positions[index] = pos;
         playerPositions.put(uuid, positions);
         
-        positions[0] = (ServerWorld) player.getWorld();
+        positions[0] = (ServerWorld) player.getEntityWorld();
 
         message(player, "&9[MultiworldPortals]&a📍&r Position " + index + " set to: " + pos.toShortString());
     }

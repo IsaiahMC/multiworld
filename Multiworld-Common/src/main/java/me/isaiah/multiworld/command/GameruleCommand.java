@@ -29,7 +29,7 @@ public class GameruleCommand implements Command {
 	
     @SuppressWarnings("unchecked")
 	public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
-        ServerWorld w = (ServerWorld) plr.getWorld();
+        ServerWorld w = (ServerWorld) plr.getEntityWorld();
 
 		if (keys.isEmpty()) {
 			setup(w);

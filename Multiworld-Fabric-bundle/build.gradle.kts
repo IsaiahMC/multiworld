@@ -3,7 +3,7 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDepen
 
 
 plugins {
-    id ("fabric-loom") version "1.10-SNAPSHOT"
+    id ("fabric-loom") version "1.11-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -36,9 +36,10 @@ dependencies {
 	include(project(":Multiworld-Fabric-1.20.1"))
 	// include(project(":Multiworld-Fabric-1.20.4"))
 	include(project(":Multiworld-Fabric-1.20.6"))
-	include(project(":Multiworld-Fabric-1.21"))
+	include(project(":Multiworld-Fabric-1.21.1"))
 	include(project(":Multiworld-Fabric-1.21.4"))
 	include(project(":Multiworld-Fabric-1.21.5"))
+	include(project(":Multiworld-Fabric-1.21.9"))
 }
 
 

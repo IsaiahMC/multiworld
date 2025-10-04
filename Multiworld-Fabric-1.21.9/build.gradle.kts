@@ -3,7 +3,7 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDepen
 
 
 plugins {
-    id ("fabric-loom") version "1.10-SNAPSHOT"
+    id ("fabric-loom") version "1.11-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -15,7 +15,7 @@ java {
 
 base {
     archivesBaseName = "Multiworld-Fabric"
-    version = "1.21"
+    version = "1.21.9"
     group = "me.isaiah.mods"
 }
 
@@ -25,42 +25,35 @@ repositories {
 }
 
 dependencies {
-
 	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
-
-	// 1.21
-    // minecraft("com.mojang:minecraft:1.21") 
-    // mappings("net.fabricmc:yarn:1.21+build.2:v2")
-    // modImplementation("net.fabricmc:fabric-loader:0.16.9")
 	
-	// 1.21.1
-    minecraft("com.mojang:minecraft:1.21.1") 
-    mappings("net.fabricmc:yarn:1.21.1+build.3:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.16.3")
-
-	include("xyz.nucleoid:fantasy:0.6.3+1.21")
-	modImplementation("xyz.nucleoid:fantasy:0.6.3+1.21")
+	// 1.21.9
+    minecraft("com.mojang:minecraft:1.21.9") 
+    mappings("net.fabricmc:yarn:1.21.9+build.1")
+    modImplementation("net.fabricmc:fabric-loader:0.17.2")
+	
+	include("xyz.nucleoid:fantasy:0.6.8+1.21.9")
+	modImplementation("xyz.nucleoid:fantasy:0.6.8+1.21.9")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
-	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
-	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.100.1+1.21")
+	modImplementation("me.lucko:fabric-permissions-api:0.5.0")
+	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.134.0+1.21.9")
 	
 	
 	setOf(
 		"fabric-api-base",
-		//"fabric-command-api-v1",
 		"fabric-lifecycle-events-v1",
-		"fabric-networking-api-v1"
+		"fabric-networking-api-v1",
+		"fabric-events-interaction-v0",
+		"fabric-command-api-v2"
 	).forEach {
-		// Add each module as a dependency
-		// modImplementation(fabricApi.module(it, "0.100.1+1.21"))
-		modImplementation(fabricApi.module(it, "0.103.0+1.21.1"))
+		modImplementation(fabricApi.module(it, "0.134.0+1.21.9"))
 	}
 	
 	val ic = DefaultExternalModuleDependency(
 		"com.javazilla.mods",
-		"icommon-fabric-1.21.4",
-		"1.21.4",
+		"icommon-fabric-1.21.7",
+		"1.21.7",
 		null
 	).apply {
 		isChanging = true // Make sure we get the latest version of iCommon

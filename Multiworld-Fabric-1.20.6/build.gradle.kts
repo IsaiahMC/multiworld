@@ -3,7 +3,7 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDepen
 
 
 plugins {
-    id ("fabric-loom") version "1.10-SNAPSHOT"
+    id ("fabric-loom") version "1.11-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }

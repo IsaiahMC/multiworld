@@ -27,15 +27,16 @@ mod_version = '1.10'
 include 'Multiworld-Common'
 
 // Fabric
-include 'Multiworld-Fabric-1.18.2'
-include 'Multiworld-Fabric-1.19.2'
-include 'Multiworld-Fabric-1.19.4'
+// include 'Multiworld-Fabric-1.18.2'
+// include 'Multiworld-Fabric-1.19.2'
+// include 'Multiworld-Fabric-1.19.4'
 include 'Multiworld-Fabric-1.20.1'
 include 'Multiworld-Fabric-1.20.4'
 include 'Multiworld-Fabric-1.20.6'
-include 'Multiworld-Fabric-1.21'
+include 'Multiworld-Fabric-1.21.1'
 include 'Multiworld-Fabric-1.21.4'
 include 'Multiworld-Fabric-1.21.5'
+include 'Multiworld-Fabric-1.21.9'
 include 'Multiworld-Fabric-bundle'
 
 // Forge

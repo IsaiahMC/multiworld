@@ -6,7 +6,7 @@ plugins {
 
     id ("java-library")
     id ("maven-publish")
-	id ("dev.architectury.loom") version "1.10-SNAPSHOT"
+	id ("dev.architectury.loom") version "1.11-SNAPSHOT"
 	id ("architectury-plugin") version "3.4-SNAPSHOT"
 }
 
