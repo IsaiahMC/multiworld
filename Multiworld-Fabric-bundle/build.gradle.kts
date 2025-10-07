@@ -48,7 +48,7 @@ sourceSets {
         java {
             // Needs fixing for 1.18:
             exclude("me/isaiah/**/*.java")
-            exclude("multiworld/**/*.java")
+            exclude("multiworld/mixin/*.java")
             exclude("**/Multiworld.mixins.json")
             exclude("org/minecarts/**/*.java")
 			

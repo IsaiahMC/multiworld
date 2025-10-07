@@ -17,6 +17,8 @@ import net.minecraft.util.math.BlockPos;
 
 public class ICommonHooks {
 	
+	/*
+	@Deprecated
 	public static boolean hasICommon() {
 		Optional<ModContainer> container = FabricLoader.getInstance().getModContainer("icommon");
 		
@@ -28,13 +30,14 @@ public class ICommonHooks {
 
 		return true;
 	}
+	*/
 	
 	public static void register() {
 		new ICommonHooks().registerThis();
 	}
 	
 	public void registerThis() {
-		if (!hasICommon()) {
+		if (!ICommonCheck.hasICommon()) {
 			MultiworldMod.LOGGER.info("Note: iCommonLib is required for full functionality of mod");
 			return;
 		}

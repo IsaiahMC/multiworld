@@ -164,6 +164,7 @@ public class MultiworldMod {
                             return source.hasPermissionLevel(1) || Perm.has(get_player(source), "multiworld.cmd") ||
                                     Perm.has(get_player(source), "multiworld.admin");
                         } catch (Exception e) {
+                        	e.printStackTrace();
                             return source.hasPermissionLevel(1);
                         }
                     }) 

@@ -8,7 +8,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.InfoSuggest;
-import me.isaiah.multiworld.fabric.ICommonHooks;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
 import me.isaiah.multiworld.portal.WandEventHandler;
@@ -148,6 +147,13 @@ public class PortalCommand implements Command {
 			if (!Perm.has(plr, "multiworld.portal.create")) {
 				message(plr, "Invalid permission! Missing: multiworld.portal.create");
 				return 0;
+			}
+			
+			if (!Util.isForgeOrHasICommon()) {
+				message(plr,  "&4WARN: ");
+				message(plr,  "&4WARN: iCommonLib Mod not found! Portals may not work.");
+				message(plr,  "&4WARN: ");
+				// return 0;
 			}
 
 			return createPortal(plr, args);

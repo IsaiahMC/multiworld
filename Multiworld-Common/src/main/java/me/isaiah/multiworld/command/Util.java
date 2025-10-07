@@ -103,7 +103,7 @@ public class Util {
 		Class<?> hookClaz = null;
 		
 		try {
-			hookClaz = Class.forName("me.isaiah.multiworld.fabric.ICommonHooks");
+			hookClaz = Class.forName("me.isaiah.multiworld.fabric.ICommonCheck");
 		} catch (ClassNotFoundException e) {
 			// NeoForge
 			isForgeOrHasICommon = true;
