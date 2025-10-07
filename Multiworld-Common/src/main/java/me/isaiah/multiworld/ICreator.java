@@ -57,7 +57,18 @@ public interface ICreator {
     default ChunkGenerator get_chunk_gen(MinecraftServer mc, String env) {
     	ChunkGenerator gen = null;
     	if (env.contains("NORMAL") || env.contains("DEFAULT")) {
-			gen = mc.getWorld(World.OVERWORLD).getChunkManager().getChunkGenerator(); // .withSeed(seed);
+			var overworldGen = mc.getOverworld().getChunkManager().getChunkGenerator();
+    		if (overworldGen instanceof net.minecraft.world.gen.chunk.FlatChunkGenerator) {
+        		long seed = mc.getOverworld().getSeed();
+				var rm = mc.getRegistryManager();
+				var biomes = rm.get(net.minecraft.registry.RegistryKeys.BIOME);
+				var structs = rm.get(net.minecraft.registry.RegistryKeys.STRUCTURE_SET);
+				var noises = rm.get(net.minecraft.registry.RegistryKeys.NOISE_PARAMETERS);
+				var settings = rm.get(net.minecraft.registry.RegistryKeys.CHUNK_GENERATOR_SETTINGS).getOrThrow(net.minecraft.world.gen.chunk.ChunkGeneratorSettings.OVERWORLD);
+				var source = net.minecraft.world.biome.source.MultiNoiseBiomeSource.Preset.OVERWORLD.getBiomeSource(biomes, seed);
+				return new net.minecraft.world.gen.chunk.NoiseChunkGenerator(structs, noises, source, seed, () -> settings);				
+    		}
+    		return overworldGen; 
 		}
 
 		if (env.contains("NETHER")) {
