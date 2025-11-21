@@ -16,11 +16,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+/**
+ * Note: Only applied for <=1.21.4
+ */
 @Mixin(NetherPortalBlock.class)
 public class MixinNetherPortalBlock {
-	
-	
-	
+
 	/**
 	 * TODO: check: 1.21.5 Changes this.
 	 */

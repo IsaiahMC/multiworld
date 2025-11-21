@@ -19,6 +19,9 @@
       "me.isaiah.multiworld.fabric.MultiworldModFabric"
     ]
   },
+  "mixins": [
+    "multiworld.mixins.json"
+  ],
   "depends": {
     "fabric": "*",
     "minecraft": ">=1.21.9- <=1.21.10"

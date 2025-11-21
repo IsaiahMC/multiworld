@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
 import xyz.nucleoid.fantasy.util.VoidWorldProgressListener;
 
-class RuntimeWorld extends ServerWorld {
+public class RuntimeWorld extends ServerWorld {
     final Style style;
     private boolean flat;
 

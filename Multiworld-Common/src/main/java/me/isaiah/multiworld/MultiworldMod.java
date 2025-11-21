@@ -364,6 +364,15 @@ public class MultiworldMod {
 			e.printStackTrace();
 		}
     }
+	
+	public static void message(ServerCommandSource s, String message) {
+		try {
+			ServerPlayerEntity player = s.getPlayer();
+			player.sendMessage(Text.of(translate_alternate_color_codes('&', message)), false);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
 
     private static final char COLOR_CHAR = '\u00A7';
     private static String translate_alternate_color_codes(char altColorChar, String textToTranslate) {

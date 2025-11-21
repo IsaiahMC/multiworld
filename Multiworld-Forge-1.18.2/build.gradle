@@ -3,7 +3,7 @@ plugins {
 	id "maven-publish"
     id "com.github.johnrengelman.shadow" version "7.1.1"
     id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.11-SNAPSHOT"
+    id "dev.architectury.loom" version "1.13-SNAPSHOT"
 }
 
 architectury {

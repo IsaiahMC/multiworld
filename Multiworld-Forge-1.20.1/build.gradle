@@ -3,7 +3,7 @@ plugins {
 	id "maven-publish"
     id "com.github.johnrengelman.shadow" version "7.1.1"
     id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.11-SNAPSHOT"
+    id "dev.architectury.loom" version "1.13-SNAPSHOT"
 }
 
 architectury {
@@ -61,6 +61,9 @@ dependencies {
     
     // common( project(path: ":fantasy-forge") )
     // shadowCommon( project(path: ":fantasy-forge") )
+    
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
+    implementation(include("io.github.llamalad7:mixinextras-forge:0.5.0"))
 }
 
 configure([tasks.compileJava]) {

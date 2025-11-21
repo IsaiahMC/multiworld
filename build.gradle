@@ -1,7 +1,7 @@
 import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
 
 plugins {
-	id "dev.architectury.loom" version "1.11-SNAPSHOT" apply false
+	id "dev.architectury.loom" version "1.13-SNAPSHOT" apply false
 }
 
 subprojects {
