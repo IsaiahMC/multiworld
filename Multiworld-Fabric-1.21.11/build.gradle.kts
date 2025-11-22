@@ -33,8 +33,9 @@ dependencies {
     mappings("net.fabricmc:yarn:1.21.11-pre2+build.1")
     modImplementation("net.fabricmc:fabric-loader:0.17.2")
 	
-	include("xyz.nucleoid:fantasy:0.6.8+1.21.9")
-	modImplementation("xyz.nucleoid:fantasy:0.6.8+1.21.9")
+	// fantasy snapshot: https://pisaiah.com/maven-repo/
+	include("xyz.nucleoid:fantasy:0.6.8+1.21.11-pre2")
+	modImplementation("xyz.nucleoid:fantasy:0.6.8+1.21.11-pre2")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
 	modImplementation("me.lucko:fabric-permissions-api:0.5.0")
 	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.134.0+1.21.9")
