@@ -10,6 +10,7 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +21,12 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import me.isaiah.multiworld.command.CreateCommand;
 import me.isaiah.multiworld.command.DifficultyCommand;
-import me.isaiah.multiworld.command.GameruleCommand;
+import me.isaiah.multiworld.command.IGameruleCommand;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.command.SetspawnCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.command.TpCommand;
+import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.entity.player.PlayerEntity;
@@ -64,12 +66,19 @@ public class MultiworldMod {
     };
 
 	// Multiworld Mod Version
-	public static final String VERSION = "1.10";
+	public static final String VERSION = "1.11";
 
     public static void setICreator(ICreator ic) {
         world_creator = ic;
     }
 
+    /**
+     * Same as get_world_creator, as class also used for version support
+     */
+    public static ICreator versionSupport() {
+    	return world_creator;
+    }
+    
     /**
      * Gets the Multiversion ICreator instance
      */
@@ -155,17 +164,24 @@ public class MultiworldMod {
     	}
     	return true;
     }
+    
+    /**
+     * <= >= 1.21.11 Compact.
+     */
+    public static boolean permissionLevel(ServerCommandSource source, int level) {
+    	return Perm.permissionLevel(source, level);
+    }
 
     // On command register
     public static void register_commands(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal(CMD)
                     .requires(source -> {
                         try {
-                            return source.hasPermissionLevel(1) || Perm.has(get_player(source), "multiworld.cmd") ||
+                            return permissionLevel(source, 1) || Perm.has(get_player(source), "multiworld.cmd") ||
                                     Perm.has(get_player(source), "multiworld.admin");
                         } catch (Exception e) {
                         	e.printStackTrace();
-                            return source.hasPermissionLevel(1);
+                            return permissionLevel(source, 1);
                         }
                     }) 
                         .executes(ctx -> {
@@ -181,7 +197,6 @@ public class MultiworldMod {
                                     }
                                  }))); 
     }
-    
 
     public static int broadcast(ServerCommandSource source, Formatting formatting, String message) throws CommandSyntaxException {
     	/*
@@ -265,7 +280,7 @@ public class MultiworldMod {
         
         // Gamerule Command
         if (args[0].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
-        	return GameruleCommand.run(mc, plr, args);
+        	return Util.getGameruleCommand().run(mc, plr, args);
         }
         
         // Difficulty Command

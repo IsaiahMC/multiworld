@@ -16,6 +16,7 @@ import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureSet;
@@ -130,6 +131,16 @@ public class FabricWorldCreator implements ICreator {
 		var biome = biome1.getEntry(BiomeKeys.THE_VOID).get();
 		VoidChunkGenerator gen = new xyz.nucleoid.fantasy.util.VoidChunkGenerator(biome);
         return gen;
+	}
+	
+	@Override
+	public boolean permissionLevel(ServerCommandSource source, int level) {
+		return source.hasPermissionLevel(level);
+	}
+
+	@Override
+	public boolean permissionLevel(ServerPlayerEntity plr, int level) {
+		return plr.hasPermissionLevel(level);
 	}
 
 }

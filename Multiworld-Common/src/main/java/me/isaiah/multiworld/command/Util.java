@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.Optional;
 
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.FileConfiguration;
@@ -129,5 +130,47 @@ public class Util {
 		return false;
 		
 	}
-    
+
+	public static Optional<Class<?>> findGameruleCmdClass() {
+		return findClass("me.isaiah.multiworld.command.GameruleCommand", "me.isaiah.multiworld.command.GameruleCommand2");
+	}
+
+	public static Optional<Class<?>> findClass(String name, String name2) {
+		try {
+			return Optional.of( Class.forName(name) );
+		} catch (ClassNotFoundException e) {
+			try {
+				return Optional.of( Class.forName(name2) );
+			} catch (ClassNotFoundException e2) {
+				return Optional.empty();
+			}
+		}
+	}
+
+	private static IGameruleCommand gameruleCommand;
+
+	public static IGameruleCommand getGameruleCommand() {
+		if (null != gameruleCommand) {
+			return gameruleCommand;
+		}
+
+		Optional<Class<?>> opt = findGameruleCmdClass();
+
+		if (opt.isEmpty()) {
+			return null;
+		}
+
+		Class<?> clz = opt.get();
+
+		try {
+			gameruleCommand = (IGameruleCommand) clz.newInstance();
+			return gameruleCommand;
+		} catch (InstantiationException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+
 }

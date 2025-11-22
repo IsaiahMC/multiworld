@@ -13,8 +13,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import me.isaiah.multiworld.command.CreateCommand;
-import me.isaiah.multiworld.command.GameruleCommand;
+import me.isaiah.multiworld.command.IGameruleCommand;
 import me.isaiah.multiworld.command.PortalCommand;
+import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.perm.Perm;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -82,13 +83,19 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
             }
 
             if (cmds[1].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
-                if (GameruleCommand.keys.size() == 0) {
-                	GameruleCommand.setupServer(MultiworldMod.mc);
-                }
+                
+            	IGameruleCommand gameruleCommand = Util.getGameruleCommand();
+
+            	if (gameruleCommand == null) {
+            		builder.suggest("IGameruleCommand implementation does not exist");
+            		return builder.buildFuture();
+            	}
+
+            	gameruleCommand.initRulesMapIfNeeded(MultiworldMod.mc);
                 
                 String last = input.substring(input.lastIndexOf(' ')).trim();
 
-                for (String name : GameruleCommand.keys.keySet()) {
+                for (String name : gameruleCommand.getKeys()) {
                 	if (name.startsWith(last) || last.contains("gamerule") || name.toLowerCase().contains(last)) {
                 		builder.suggest(name);
                 	}

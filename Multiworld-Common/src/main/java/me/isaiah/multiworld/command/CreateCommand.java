@@ -276,36 +276,46 @@ public class CreateCommand implements Command {
 			ServerWorld world = MultiworldMod.create_world(id, dim, gen, d, seed);
 
 			MultiworldMod.get_world_creator().set_difficulty(id, d);
-			
-			if (GameruleCommand.keys.size() == 0) {
-				GameruleCommand.setupServer(MultiworldMod.mc);
-			}
 
-			// Set Gamerules
-			for (String name : GameruleCommand.keys.keySet()) {
-				String key = "gamerule_" + name;
-				
-				if (config.is_set(key)) {
-					
-					Object o = config.getObject(key);
-					
-					// BoleanRule
-					if (o instanceof Boolean) {
-						o = ((Boolean) o) ? "true" : "false";
-					}
-					
-					// IntRule
-					if (o instanceof Integer) {
-						o = String.valueOf((Integer) o);
-					}
-					
-					GameruleCommand.set_gamerule_from_cfg(world, key, (String) o);
-				}
-			}
+			reinitWorldGamerules(config, world);
 			
         } catch (Exception e) {
             e.printStackTrace();
         }
+	}
+	
+	private static void reinitWorldGamerules(FileConfiguration config, ServerWorld world) {
+		IGameruleCommand gameruleCommand = Util.getGameruleCommand();
+		
+		if (null == gameruleCommand) {
+			// Our custom Gamerule command doesn't exist
+			// 1.21.11+
+			return;
+		}
+
+		Util.getGameruleCommand().initRulesMapIfNeeded(MultiworldMod.mc);
+
+		// Set Gamerules
+		for (String name : gameruleCommand.getKeys()) {
+			String key = "gamerule_" + name;
+			
+			if (config.is_set(key)) {
+				
+				Object o = config.getObject(key);
+				
+				// BoleanRule
+				if (o instanceof Boolean) {
+					o = ((Boolean) o) ? "true" : "false";
+				}
+				
+				// IntRule
+				if (o instanceof Integer) {
+					o = String.valueOf((Integer) o);
+				}
+				
+				gameruleCommand.set_gamerule_from_cfg(world, key, (String) o);
+			}
+		}
 	}
 	
 	/**

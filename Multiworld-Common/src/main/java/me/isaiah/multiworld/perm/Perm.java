@@ -17,17 +17,33 @@ public class Perm {
     public static boolean has(ServerPlayerEntity plr, String perm) {
         if (null == INSTANCE) {
             System.out.println("Platform Permission Handler not found!");
-            return plr.hasPermissionLevel(1);
+            return permissionLevel(plr, 1);
         }
         return INSTANCE.has_impl(plr, perm) || plr.isCreativeLevelTwoOp();
     }
 
     public static boolean has(ServerCommandSource s, String perm) {
         try {
-            return has(MultiworldMod.get_player(s), perm) || s.hasPermissionLevel(1);
+            return has(MultiworldMod.get_player(s), perm) || permissionLevel(s, 1);
         } catch (Exception e) {
-            return s.hasPermissionLevel(1);
+            return permissionLevel(s, 1);
         }
     }
+    
+    /**
+     * Check Vanilla Permission Level
+     */
+	public static boolean permissionLevel(ServerCommandSource source, int level) {
+		return MultiworldMod.versionSupport().permissionLevel(source, level);
+		// return source.hasPermissionLevel(level);
+	}
+    
+    /**
+     * Check Vanilla Permission Level
+     */
+	public static boolean permissionLevel(ServerPlayerEntity plr, int level) {
+		return MultiworldMod.versionSupport().permissionLevel(plr, level);
+		// return plr.hasPermissionLevel(level);
+	}
 
 }

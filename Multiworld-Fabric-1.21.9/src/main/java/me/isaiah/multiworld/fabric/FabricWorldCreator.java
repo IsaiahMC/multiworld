@@ -9,6 +9,7 @@ import me.isaiah.multiworld.MultiworldMod;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
@@ -140,6 +141,16 @@ public class FabricWorldCreator implements ICreator {
 	    public int getSeaLevel() {
 	        return 0;
 	    }
+	}
+	
+	@Override
+	public boolean permissionLevel(ServerCommandSource source, int level) {
+		return source.hasPermissionLevel(level);
+	}
+
+	@Override
+	public boolean permissionLevel(ServerPlayerEntity plr, int level) {
+		return plr.hasPermissionLevel(level);
 	}
 
 }

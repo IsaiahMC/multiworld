@@ -10,6 +10,7 @@ import me.isaiah.multiworld.MultiworldMod;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -128,6 +129,16 @@ public class NeoForgeWorldCreator implements ICreator {
 	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc) {
 		// TODO
         return get_flat_chunk_gen(mc);
+	}
+	
+	@Override
+	public boolean permissionLevel(ServerCommandSource source, int level) {
+		return source.hasPermissionLevel(level);
+	}
+
+	@Override
+	public boolean permissionLevel(ServerPlayerEntity plr, int level) {
+		return plr.hasPermissionLevel(level);
 	}
 
 }

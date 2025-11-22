@@ -68,7 +68,8 @@ public class WandEventHandler {
         
         positions[0] = (ServerWorld) player.getEntityWorld();
 
-        message(player, "&9[MultiworldPortals]&a📍&r Position " + index + " set to: " + pos.toShortString());
+        // TODO: Make less annoying
+        // message(player, "&9[MultiworldPortals]&a📍&r Position " + index + " set to: " + pos.toShortString());
     }
 
     public static Object[] getWandPositions(UUID playerId) {

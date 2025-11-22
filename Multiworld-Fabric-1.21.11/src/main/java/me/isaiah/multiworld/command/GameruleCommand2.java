@@ -8,26 +8,31 @@ import java.util.Set;
 
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.FileConfiguration;
-
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry.Reference;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.GameRules;
+import net.minecraft.world.rule.GameRule;
+import net.minecraft.world.rule.GameRuleVisitor;
+import net.minecraft.world.rule.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.world.GameRules.BooleanRule;
-import net.minecraft.world.GameRules.IntRule;
-import net.minecraft.world.GameRules.Rule;
 
-public class GameruleCommand implements Command, IGameruleCommand {
+/**
+ * 1.21.11 Replacement for GameruleCommand
+ */
+public class GameruleCommand2 implements Command, IGameruleCommand {
 
 	// TODO
-	private static GameRules getGameRules(ServerWorld world) {
+	public static GameRules getGameRules(ServerWorld world) {
 		return world.getGameRules();
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private static HashMap<String, GameRules.Key> keys = new HashMap<>();
+	private static HashMap<String, GameRule> keys = new HashMap<>();
 	
 	/**
 	 * @return keys.size()
@@ -44,7 +49,7 @@ public class GameruleCommand implements Command, IGameruleCommand {
 	}
 	
     @SuppressWarnings("unchecked")
-    public int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
+	public int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
         ServerWorld w = (ServerWorld) plr.getEntityWorld();
 
 		if (keys.isEmpty()) {
@@ -54,7 +59,10 @@ public class GameruleCommand implements Command, IGameruleCommand {
         // GameRules rules = new GameRules();
 
 		if (args.length < 3) {
-			Rule<?> rule = getGameRules(w).get(keys.get(args[1]));
+			// Rule<?> rule = getGameRules(w).get(keys.get(args[1]));
+			
+			var rule = getGameRules(w).getValue( keys.get(args[1]) );
+
 			MultiworldMod.message(plr, "[&4Multiworld&r] Value of " + args[1] + " is: " + rule);
 			return 1;
 		}
@@ -99,12 +107,18 @@ public class GameruleCommand implements Command, IGameruleCommand {
 
         if (is_bol) {
         	// Boolean Rule
-        	BooleanRule rule = (BooleanRule) getGameRules(w).get(keys.get(a1));
-        	rule.set(Boolean.valueOf(a2), mc);
+        	
+        	getGameRules(w).setValue(keys.get(a1), Boolean.valueOf(a1), MultiworldMod.mc);
+        	
+        	//BooleanRule rule = (BooleanRule) getGameRules(world).get(keys.get(name));
+        	//rule.set(Boolean.valueOf(a1), MultiworldMod.mc);
         } else {
+        	
+        	getGameRules(w).setValue(keys.get(a1), Integer.valueOf(a1), MultiworldMod.mc);
+        	
         	// Int Rule
-        	IntRule rule = (IntRule) getGameRules(w).get(keys.get(a1));
-        	rule.set(Integer.valueOf(a2), mc);
+        	//IntRule rule = (IntRule) getGameRules(world).get(keys.get(name));
+        	// rule.set(Integer.valueOf(a1), MultiworldMod.mc);
         }
 
         // Save to world config
@@ -133,6 +147,19 @@ public class GameruleCommand implements Command, IGameruleCommand {
     private static void setupServer(MinecraftServer server) {
         keys.clear();
         // Create a temporary GameRules instance to access the accept method
+        
+        // .Registries.gamer
+        
+        Reference<Registry<GameRule<?>>> regf = server.getRegistryManager().getEntryOrThrow(RegistryKeys.GAME_RULE);
+        
+        Registry<GameRule<?>> reg = regf.comp_349();
+        
+        reg.getKeys().forEach(key -> {
+        	Identifier name = key.getValue();
+        	keys.put(name.toString(), reg.get(key));
+        });
+        
+        /*
         server.getGameRules().accept(new GameRules.Visitor() {
             @Override
             public <T extends GameRules.Rule<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
@@ -140,21 +167,33 @@ public class GameruleCommand implements Command, IGameruleCommand {
                 keys.put(name, key);
             }
         });
+        */
     }
     
     /**
      * Read the Gamerule names – fetches gamerules from world
      */
-    private static void setup(ServerWorld world) {
+    public static void setup(ServerWorld world) {
         keys.clear();
+        
+        world.getGameRules().streamRules().forEach(rule -> {
+        	Identifier name = rule.getId();
+            keys.put(name.toString(), rule);
+        });
+
+        /*
         // Create a temporary GameRules instance to access the accept method
-        world.getGameRules().accept(new GameRules.Visitor() {
+        world.getGameRules().accept(new GameRuleVisitor() {
             @Override
             public <T extends GameRules.Rule<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
+            	
+            	super.
+            	
                 String name = key.getName();
                 keys.put(name, key);
             }
         });
+        */
     }
     
     /**
@@ -164,7 +203,7 @@ public class GameruleCommand implements Command, IGameruleCommand {
      * @param a - The Gamerule name (ex: "doDaylightCycle")
      * @param b - The value for the Gamerule (ex: "true", or "100")
      */
-    private static void set_rule_cfg(World w, String a, String b) throws IOException {
+    public static void set_rule_cfg(World w, String a, String b) throws IOException {
         File cf = new File(Util.get_platform_config_dir(), "multiworld"); 
         cf.mkdirs();
 
@@ -213,12 +252,18 @@ public class GameruleCommand implements Command, IGameruleCommand {
 		
         if (is_bol) {
         	// Boolean Rule
-        	BooleanRule rule = (BooleanRule) getGameRules(world).get(keys.get(name));
-        	rule.set(Boolean.valueOf(a1), MultiworldMod.mc);
+        	
+        	getGameRules(world).setValue(keys.get(name), Boolean.valueOf(a1), MultiworldMod.mc);
+        	
+        	//BooleanRule rule = (BooleanRule) getGameRules(world).get(keys.get(name));
+        	//rule.set(Boolean.valueOf(a1), MultiworldMod.mc);
         } else {
+        	
+        	getGameRules(world).setValue(keys.get(name), Integer.valueOf(a1), MultiworldMod.mc);
+        	
         	// Int Rule
-        	IntRule rule = (IntRule) getGameRules(world).get(keys.get(name));
-        	rule.set(Integer.valueOf(a1), MultiworldMod.mc);
+        	//IntRule rule = (IntRule) getGameRules(world).get(keys.get(name));
+        	// rule.set(Integer.valueOf(a1), MultiworldMod.mc);
         }
 		
 	}

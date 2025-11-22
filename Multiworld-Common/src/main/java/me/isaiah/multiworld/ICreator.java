@@ -8,6 +8,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -100,6 +101,10 @@ public interface ICreator {
 	public boolean is_the_end(ServerWorld world);
 	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc);
 	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc);
+
+	// Vanilla Permissions
+	public boolean permissionLevel(ServerCommandSource source, int level);
+	public boolean permissionLevel(ServerPlayerEntity plr, int level);
 
 	void delete_world(String id);
 	

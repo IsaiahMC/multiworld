@@ -2,19 +2,18 @@ package me.isaiah.multiworld.fabric;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 import me.isaiah.multiworld.ICreator;
 import me.isaiah.multiworld.MultiworldMod;
+import net.minecraft.command.DefaultPermissions;
+import net.minecraft.command.permission.Permission;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -56,8 +55,13 @@ public class FabricWorldCreator implements ICreator {
 				.setShouldTickTime(true)
                 ;
 
+        if (gen instanceof CustomFlatChunkGenerator) {
+        	config.setFlat(true);
+        }
+
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new_id(id), config);
+
         this.worldConfigs.put(id, config);
         return worldHandle.asWorld();
     }
@@ -89,9 +93,12 @@ public class FabricWorldCreator implements ICreator {
 	
 	@Override
 	public BlockPos get_spawn(ServerWorld world) {
-		return world.getLevelProperties().getSpawnPos();
+		
+		return world.getSpawnPoint().getPos();
+		
+		// return world.getLevelProperties().getSpawnPos();
 	}
-	
+
 	@Override
 	public void teleleport(ServerPlayerEntity player, ServerWorld world, double x, double y, double z) {
         TeleportTarget target = new TeleportTarget(world, new Vec3d(x, y, z), new Vec3d(0, 0, 0), 0f, 0f, TeleportTarget.NO_OP);
@@ -104,10 +111,20 @@ public class FabricWorldCreator implements ICreator {
 	}
 	
 	@Override
+	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc) {
+		var biome = mc.getRegistryManager().getOrThrow(RegistryKeys.BIOME).getOrThrow(BiomeKeys.THE_VOID);
+		VoidChunkGenerator gen = new xyz.nucleoid.fantasy.util.VoidChunkGenerator(biome);
+        return gen;
+	}
+
+	@Override
 	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc) {
-		var biome = mc.getRegistryManager().get(RegistryKeys.BIOME).getEntry(mc.getRegistryManager().get(RegistryKeys.BIOME).getOrThrow(BiomeKeys.PLAINS));
+		var biome = mc.getRegistryManager().getOrThrow(RegistryKeys.BIOME).getOrThrow(BiomeKeys.PLAINS);
         FlatChunkGeneratorConfig flat = new FlatChunkGeneratorConfig(Optional.empty(), biome, Collections.emptyList());
+
+        flat.enableFeatures();
         FlatChunkGenerator generator = new CustomFlatChunkGenerator(flat);
+
         return generator;
 	}
 	
@@ -128,21 +145,52 @@ public class FabricWorldCreator implements ICreator {
 	    }
 	}
 	
-	@Override
-	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc) {
-		// var biome = mc.getRegistryManager().getOrThrow(RegistryKeys.BIOME).getOrThrow(BiomeKeys.THE_VOID);
-		VoidChunkGenerator gen = new xyz.nucleoid.fantasy.util.VoidChunkGenerator(mc);
-        return gen;
-	}
-	
+	/**
+	 * 1.21.10/OP -> 1.21.11/Mojang-Permissions-API values: (from wiki)
+	 * 
+	 * Level 1 -> MOD
+	 * Level 2 -> GAMEMASTERS
+	 * Level 3 -> ADMIN
+	 * Level 4 -> OWNER
+	 */
 	@Override
 	public boolean permissionLevel(ServerCommandSource source, int level) {
-		return source.hasPermissionLevel(level);
+		
+		if (level == 0) {
+			// Should not be 0
+			return true;
+		}
+		
+		Permission perm = DefaultPermissions.MODERATORS;
+
+		switch (level) {
+			case 1:
+				perm = DefaultPermissions.MODERATORS;
+				break;
+			case 2:
+				perm = DefaultPermissions.GAMEMASTERS;
+				break;
+			case 3:
+				perm = DefaultPermissions.ADMINS;
+				break;
+			case 4:
+				perm = DefaultPermissions.OWNERS;
+				break;
+		}
+
+		return source.getPermissions().hasPermission(perm);
 	}
 
 	@Override
 	public boolean permissionLevel(ServerPlayerEntity plr, int level) {
-		return plr.hasPermissionLevel(level);
+
+		if (level == 1) { return plr.getPermissions().hasPermission(DefaultPermissions.MODERATORS); }
+		if (level == 2) { return plr.getPermissions().hasPermission(DefaultPermissions.GAMEMASTERS); }
+		if (level == 3) { return plr.getPermissions().hasPermission(DefaultPermissions.ADMINS); }
+		
+		return plr.isCreativeLevelTwoOp();
+		
+		//return plr.hasPermissionLevel(level);
 	}
 
 }

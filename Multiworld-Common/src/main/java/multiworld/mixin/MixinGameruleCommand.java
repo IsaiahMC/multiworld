@@ -15,6 +15,9 @@ import net.minecraft.world.GameRules;
 
 import static me.isaiah.multiworld.MultiworldMod.message;
 
+/**
+ * @implNote Note: according to 1.21.11 "GameRuleCommand" source, this bug should be fixed
+ */
 @Mixin(GameRuleCommand.class)
 public class MixinGameruleCommand {
 
