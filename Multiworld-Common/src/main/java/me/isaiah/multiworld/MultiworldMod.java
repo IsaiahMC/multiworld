@@ -10,6 +10,7 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -86,6 +87,11 @@ public class MultiworldMod {
     	return world_creator;
     }
 
+    public static ServerWorld createConfigAndWorld(String id, String dimStr, Identifier dimId, ChunkGenerator gen, Difficulty dif, long seed, String cgen) {
+    	CreateCommand.make_config(new_id(id), dimStr, seed, cgen);
+    	return world_creator.create_world(id, dimId, gen, dif, seed);
+    }
+    
     public static ServerWorld create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed) {
     	return world_creator.create_world(id, dim, gen, dif, seed);
     }
@@ -96,7 +102,15 @@ public class MultiworldMod {
      * @see {@link me.isaiah.multiworld.fabric.MultiworldModFabric}
      */
     public static void init() {
-        System.out.println("Multiworld init");
+    	// Load Translations
+    	I18n.loadConfig();
+    	try {
+			I18n.save();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	LOGGER.info("Multiworld Mod Init");
         
         // TODO: Testing
         // PortalCommand.test();
@@ -139,6 +153,10 @@ public class MultiworldMod {
 			}
 		}
     }
+    
+    public static void getFileConfiguration() {
+    	
+    }
 
     public static ServerPlayerEntity get_player(ServerCommandSource s) throws CommandSyntaxException {
     	ServerPlayerEntity plr = s.getPlayer();
@@ -177,8 +195,8 @@ public class MultiworldMod {
         dispatcher.register(literal(CMD)
                     .requires(source -> {
                         try {
-                            return permissionLevel(source, 1) || Perm.has(get_player(source), "multiworld.cmd") ||
-                                    Perm.has(get_player(source), "multiworld.admin");
+                            return Perm.has(get_player(source), "multiworld.cmd") ||
+                                    Perm.has(get_player(source), "multiworld.admin") || permissionLevel(source, 1);
                         } catch (Exception e) {
                         	e.printStackTrace();
                             return permissionLevel(source, 1);

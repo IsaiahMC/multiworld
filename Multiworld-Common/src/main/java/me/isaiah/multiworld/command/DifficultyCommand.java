@@ -3,6 +3,7 @@ package me.isaiah.multiworld.command;
 import java.io.IOException;
 import java.util.HashMap;
 
+import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.server.MinecraftServer;
@@ -16,7 +17,7 @@ public class DifficultyCommand implements Command {
         ServerWorld w = (ServerWorld) plr.getEntityWorld();
 
 		if (args.length < 2) {
-			MultiworldMod.message(plr, "[&4Multiworld&r] Usage: /mw difficulty <value> [world id]");
+			MultiworldMod.message(plr, I18n.CMD_DIFF_USAGE);
 			return 1;
 		}
 		

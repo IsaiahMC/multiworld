@@ -1,0 +1,27 @@
+package me.isaiah.multiworld.fabric;
+
+import net.minecraft.world.level.LevelProperties;
+
+public class SaveProperties2 extends LevelProperties {
+
+	private String nameOverride;
+	
+	public SaveProperties2(LevelProperties original) {
+		super(original.getLevelInfo(), original.getGeneratorOptions(), original.getLifecycle());
+	}
+	
+	public SaveProperties2 withName(String name) {
+		this.nameOverride = name;
+		return this;
+	}
+	
+	@Override
+	public String getLevelName() {
+		return (null != nameOverride) ? nameOverride : super.getLevelName();
+	}
+
+	public void mw$setLevelName(String name) {
+		this.nameOverride = name;
+	}
+
+}

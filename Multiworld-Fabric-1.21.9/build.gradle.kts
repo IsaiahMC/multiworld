@@ -35,10 +35,11 @@ dependencies {
 	
 	include("xyz.nucleoid:fantasy:0.6.8+1.21.9")
 	modImplementation("xyz.nucleoid:fantasy:0.6.8+1.21.9")
-	modImplementation("curse.maven:cyber-permissions-407695:4640544")
+	modImplementation("curse.maven:cyber-permissions-407695:7068279")
 	modImplementation("me.lucko:fabric-permissions-api:0.5.0")
+
+	modImplementation("net.fabricmc.fabric-api:fabric-api:0.134.0+1.21.9")
 	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.134.0+1.21.9")
-	
 	
 	setOf(
 		"fabric-api-base",
@@ -52,8 +53,8 @@ dependencies {
 	
 	val ic = DefaultExternalModuleDependency(
 		"com.javazilla.mods",
-		"icommon-fabric-1.21.7",
-		"1.21.7",
+		"icommon-fabric-1.21.9",
+		"1.21.9",
 		null
 	).apply {
 		isChanging = true // Make sure we get the latest version of iCommon

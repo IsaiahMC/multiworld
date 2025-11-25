@@ -146,10 +146,15 @@ public class CreateCommand implements Command {
         	
         }
         
-        ServerWorld world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.NORMAL, seed);
-		make_config(world, args[2], seed, customGen);
+        
+        // createConfigAndWorld(String id, String dimStr, Identifier dimId, ChunkGenerator gen, Difficulty dif, long seed, String cgen) {
+        ServerWorld world = MultiworldMod.createConfigAndWorld(arg1, args[2], dim, gen, Difficulty.NORMAL, seed, customGen);
+        
+        // make_config(MultiworldMod.new_id(arg1), args[2], seed, customGen);
+        // ServerWorld world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.NORMAL, seed);
+		// make_config(world, args[2], seed, customGen);
 
-		message(plr, I18n.CREATED_WORLD + args[1]);
+		message(plr, I18n.CREATED_WORLD + args[1] + " (" + world.getRegistryKey().getValue() + ")");
         
         return 1;
     }
@@ -323,7 +328,17 @@ public class CreateCommand implements Command {
 	 * {@link #reinit_world_from_config(MinecraftServer, String)}
 	 * on next server start.
 	 */
-	public static void make_config(ServerWorld w, String dim, long seed, String cgen) {
+	private static void make_config(ServerWorld w, String dim, long seed, String cgen) {
+		Identifier id = w.getRegistryKey().getValue();
+		make_config(id, dim, seed, cgen);
+	}
+	
+	/**
+	 * Saves the World Info to a YAML Config File, to be loaded by
+	 * {@link #reinit_world_from_config(MinecraftServer, String)}
+	 * on next server start.
+	 */
+	public static void make_config(Identifier id, String dim, long seed, String cgen) {
         File config_dir = new File("config");
         config_dir.mkdirs();
         
@@ -333,7 +348,7 @@ public class CreateCommand implements Command {
         File worlds = new File(cf, "worlds");
         worlds.mkdirs();
 
-        Identifier id = w.getRegistryKey().getValue();
+        // Identifier id = w.getRegistryKey().getValue();
         File namespace = new File(worlds, id.getNamespace());
         namespace.mkdirs();
 
@@ -351,6 +366,10 @@ public class CreateCommand implements Command {
 			if (null != cgen && cgen.length() > 0) {
 				config.set("custom_generator", cgen);
 			}
+			
+			// New World Saver
+			config.set("isMultiworldWorld", true);
+			
 			config.save();
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,15 +1,24 @@
 package me.isaiah.multiworld.fabric;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
+
+import com.mojang.datafixers.DataFixer;
+import com.mojang.serialization.Dynamic;
 
 import me.isaiah.multiworld.ICreator;
 import me.isaiah.multiworld.MultiworldMod;
 import net.minecraft.command.DefaultPermissions;
 import net.minecraft.command.permission.Permission;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.Impl;
+import net.minecraft.resource.DataConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -17,15 +26,26 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.path.SymlinkFinder;
+import net.minecraft.util.path.SymlinkValidationException;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.SaveProperties;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.biome.BiomeKeys;
+import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
+import net.minecraft.world.level.LevelProperties;
+import net.minecraft.world.level.storage.LevelStorage;
+import net.minecraft.world.level.storage.LevelStorage.Session;
+import net.minecraft.world.rule.GameRule;
+import net.minecraft.world.rule.GameRuleType;
+import net.minecraft.world.rule.GameRules;
 import xyz.nucleoid.fantasy.Fantasy;
+import xyz.nucleoid.fantasy.RuntimeWorld;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.fantasy.RuntimeWorldHandle;
 import xyz.nucleoid.fantasy.util.VoidChunkGenerator;
@@ -45,14 +65,27 @@ public class FabricWorldCreator implements ICreator {
     public static void init() {
         MultiworldMod.setICreator(new FabricWorldCreator());
     }
+    
+    private RuntimeWorld.Constructor worldConstructor = MultiworldWorld::new;
 
     public ServerWorld create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed) {
-        RuntimeWorldConfig config = new RuntimeWorldConfig()
+        
+    	Identifier idd = new_id(id);
+    	GameRules rules = null;
+		try {
+			rules = readGameRules(idd);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
+		}
+    	
+    	RuntimeWorldConfig config = new RuntimeWorldConfig()
                 .setDimensionType(dim_of(dim))
                 .setGenerator(gen)
                 .setDifficulty(dif)
 				.setSeed(seed)
 				.setShouldTickTime(true)
+				.setWorldConstructor(MultiworldWorld::new)
                 ;
 
         if (gen instanceof CustomFlatChunkGenerator) {
@@ -60,10 +93,61 @@ public class FabricWorldCreator implements ICreator {
         }
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
-        RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new_id(id), config);
-
+        RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(idd, config);
+        ServerWorld world = worldHandle.asWorld();
+        
+        if (null != rules) {
+        	final GameRules rulesFinal = rules;
+	        rules.streamRules().forEach(rule -> {
+				if (rule.getType() == GameRuleType.BOOL) {
+					world.getGameRules().setValue( (GameRule<Boolean>) rule, rulesFinal.getValue((GameRule<Boolean>) rule), null);
+				}
+	
+				if (rule.getType() == GameRuleType.INT) {
+					world.getGameRules().setValue( (GameRule<Integer>) rule, rulesFinal.getValue((GameRule<Integer>) rule), null);
+				}
+			});
+        }
+        
         this.worldConfigs.put(id, config);
-        return worldHandle.asWorld();
+        return world;
+    }
+    
+    /**
+     * Reads the gamerules from a level.dat file in the given world folder.
+     * @param savesDir Path to the root saves directory (e.g. ./saves).
+     * @param worldName Name of the world folder.
+     * @param dataFixer The server's DataFixer instance.
+     * @return A GameRules object containing the rules from level.dat.
+     * @throws IOException if the file cannot be read.
+     * @throws SymlinkValidationException 
+     */
+    public static GameRules readGameRules(Identifier id) throws IOException {
+
+        try (Session session = MultiworldWorld.mw$getSession(MultiworldMod.mc, id)) {
+            Dynamic<?> dynamic = session.readLevelProperties();
+            
+            RegistryWrapper.WrapperLookup lookup = MultiworldMod.mc.getRegistryManager();
+            
+            Registry<DimensionOptions> dimensionRegistry = MultiworldMod.mc.getRegistryManager().getOrThrow(RegistryKeys.DIMENSION);
+            
+            DataConfiguration dataConfig = MultiworldMod.mc.getSaveProperties().getDataConfiguration();
+
+            SaveProperties props = LevelStorage.parseSaveProperties(
+                dynamic,
+                dataConfig,
+                dimensionRegistry,
+                MultiworldMod.mc.getRegistryManager()
+            ).properties();
+            
+            if (!(props instanceof LevelProperties levelProps)) {
+                throw new IllegalStateException("SaveProperties is not a LevelProperties");
+            }
+            
+            session.close();
+            // Return the gamerules object
+            return levelProps.getGameRules();
+        }
     }
     
     @Override

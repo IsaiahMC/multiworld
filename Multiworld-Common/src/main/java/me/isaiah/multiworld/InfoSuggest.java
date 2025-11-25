@@ -183,7 +183,7 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
 
     	// Argument 1: <id>
     	if (cmds.length <= 2 || (cmds.length <= 3 && !input.endsWith(" "))) {
-    		builder.suggest("myid:myvalue");
+    		builder.suggest("myworldname");
     		return;
     	}
     	

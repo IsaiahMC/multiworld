@@ -15,8 +15,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class CyberHandler {
     
     public static boolean hasPermission(ServerPlayerEntity plr, String perm) {
-        Permission p = new Permission(perm, "A permission for Multiworld", PermissionDefaults.OPERATOR);
-        return Perm.permissionLevel(plr, 2) || CyberPermissions.getPlayerPermissible(plr).hasPermission(p);
+        // Permission p = new Permission(perm, "A permission for Multiworld", PermissionDefaults.OPERATOR);
+        return Perm.permissionLevel(plr, 2); // || CyberPermissions.getPlayerPermissible(plr).hasPermission(p);
     }
 
 }

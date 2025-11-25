@@ -150,9 +150,12 @@ public class GameruleCommand2 implements Command, IGameruleCommand {
         
         // .Registries.gamer
         
-        Reference<Registry<GameRule<?>>> regf = server.getRegistryManager().getEntryOrThrow(RegistryKeys.GAME_RULE);
+       // Reference<Registry<GameRule<?>>> regf = server.getRegistryManager().getEntryOrThrow(RegistryKeys.GAME_RULE);
         
-        Registry<GameRule<?>> reg = regf.comp_349();
+
+        //var o = net.minecraft.registry.Registries.GAME_RULE;
+        
+        Registry<GameRule<?>> reg = net.minecraft.registry.Registries.GAME_RULE; // regf.comp_349();
         
         reg.getKeys().forEach(key -> {
         	Identifier name = key.getValue();
