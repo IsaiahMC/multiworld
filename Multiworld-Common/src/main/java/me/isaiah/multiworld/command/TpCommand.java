@@ -6,11 +6,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import java.io.File;
 
 import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.config.*;
 
 public class TpCommand implements Command {
@@ -39,9 +41,9 @@ public class TpCommand implements Command {
             ServerWorld w = worlds.get(arg1);
             // BlockPos sp = multiworld_method_43126(w);
             BlockPos sp = SpawnCommand.getSpawn(w);
-			
+
 			boolean isEnd = false;
-			
+
 			try {
 				boolean is_the_end = MultiworldMod.get_world_creator().is_the_end(w);
 				if (is_the_end) {
@@ -50,7 +52,7 @@ public class TpCommand implements Command {
 			} catch (NoSuchMethodError | Exception e) {
 			}
 			
-			String env = read_env_from_config(arg1);
+			String env = read_env_from_config(arg1, w.getRegistryKey().getValue());
 			if (null != env) {
 				if (env.equalsIgnoreCase("END")) {
 					isEnd = true;
@@ -104,6 +106,14 @@ public class TpCommand implements Command {
         while (w.getBlockState(pos) != Blocks.AIR.getDefaultState()) {
             pos = pos.add(0, 1, 0);
         }
+        
+        BlockPos under = pos.add(0, -2, 0);
+        
+        while (under.getY() > -60 && w.getBlockState(under) == Blocks.AIR.getDefaultState()) {
+        	pos = pos.add(0, -1, 0);
+        	under = pos.add(0, -1, 0);
+        }
+        
         return pos;
     }
 	
@@ -112,8 +122,9 @@ public class TpCommand implements Command {
         return SpawnCommand.multiworld_method_43126(world);
     }
 	
-	public static String read_env_from_config(String id) {
-        File config_dir = new File("config");
+	public static String read_env_from_config(String idStr, Identifier id) {
+        /*
+		File config_dir = new File("config");
         config_dir.mkdirs();
 		
 		String[] spl = id.split(":");
@@ -128,12 +139,13 @@ public class TpCommand implements Command {
         namespace.mkdirs();
 
         File wc = new File(namespace, spl[1] + ".yml");
+        */
         FileConfiguration config;
         try {
-			if (!wc.exists()) {
-				wc.createNewFile();
+			config = Utils.getConfigOrNull(id);
+			if (null == config) {
+				return "NORMAL";
 			}
-            config = new FileConfiguration(wc);
 			String env = config.getString("environment");
 			return env;
         } catch (Exception e) {

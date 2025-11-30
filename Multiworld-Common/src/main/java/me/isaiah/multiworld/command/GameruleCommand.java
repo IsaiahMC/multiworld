@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.config.FileConfiguration;
 
 import net.minecraft.server.MinecraftServer;
@@ -168,6 +169,7 @@ public class GameruleCommand implements Command, IGameruleCommand {
         File cf = new File(Util.get_platform_config_dir(), "multiworld"); 
         cf.mkdirs();
 
+        /*
         File worlds = new File(cf, "worlds");
         worlds.mkdirs();
 
@@ -178,7 +180,11 @@ public class GameruleCommand implements Command, IGameruleCommand {
         File wc = new File(namespace, id.getPath() + ".yml");
         wc.createNewFile();
         FileConfiguration config = new FileConfiguration(wc);
+        */
 
+		Identifier id = w.getRegistryKey().getValue();
+        FileConfiguration config = Utils.getConfigOrNull(id);
+        
         if (!config.is_set("gamerules")) {
         	config.set("gamerules", new ArrayList<String>());
         }

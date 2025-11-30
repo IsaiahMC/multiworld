@@ -6,6 +6,7 @@ import static me.isaiah.multiworld.MultiworldMod.text_plain;
 import java.io.File;
 import java.io.IOException;
 
+import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -34,6 +35,7 @@ public class SetspawnCommand implements Command {
         File cf = new File(Util.get_platform_config_dir(), "multiworld"); 
         cf.mkdirs();
 
+        /*
         File worlds = new File(cf, "worlds");
         worlds.mkdirs();
 
@@ -44,6 +46,14 @@ public class SetspawnCommand implements Command {
         File wc = new File(namespace, id.getPath() + ".yml");
         wc.createNewFile();
         FileConfiguration config = new FileConfiguration(wc);
+        */
+        Identifier id = w.getRegistryKey().getValue();
+        FileConfiguration config = Utils.getConfigOrNull(id);
+        
+        if (null == config) {
+        	// TODO
+        	return;
+        }
 
         config.set("spawnpos", spawn.asLong());
         config.save();

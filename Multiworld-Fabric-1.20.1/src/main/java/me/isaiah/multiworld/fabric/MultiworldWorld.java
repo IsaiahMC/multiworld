@@ -71,12 +71,7 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
         this.mw$levelStorageAccess = session;
         this.style = style;
     }
-    
-    // Exerpt from CraftServer: getWorldContainer
-	public static File getWorldContainer(MinecraftServer server) {
-		return ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD).getParent().toFile();
-	}
-	
+
     private static Session mw$session(MinecraftServer server, Identifier id) {
     	boolean useUs = Utils.shouldUseNewWorldFormat(server, id);
     	if (!useUs) { return ((MinecraftServerAccess) server).getSession(); }
@@ -84,12 +79,17 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
     	return mw$getSession(server, id);
     }
     
+    public static LevelStorage mw$getStorage() {
+    	Path customWorldPath = Utils.getWorldStoragePath();
+    	LevelStorage levelStorage = LevelStorage.create(customWorldPath);
+    	return levelStorage;
+    }
+    
     public static Session mw$getSession(MinecraftServer server, Identifier id) {
     	String name = Utils.getWorldName(id);
-    	Path customWorldPath = getWorldContainer(server).toPath();
+    	Path customWorldPath = Utils.getWorldStoragePath();
     	LevelStorage levelStorage = LevelStorage.create(customWorldPath);
-    	try {
-			LevelStorage.Session session = levelStorage.createSession( name );
+    	try (LevelStorage.Session session = levelStorage.createSession( name )) {
 			return session;
 		} catch (IOException | SymlinkValidationException e) {
 			e.printStackTrace();

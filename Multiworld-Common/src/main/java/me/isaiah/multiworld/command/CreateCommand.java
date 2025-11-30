@@ -3,6 +3,7 @@ package me.isaiah.multiworld.command;
 import static me.isaiah.multiworld.MultiworldMod.message;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -213,6 +215,24 @@ public class CreateCommand implements Command {
     } 
 	
     /**
+     * Check if World (by ID) exists.
+     * 
+     * @param id - World Identifier
+     */
+    public static boolean checkIfWorldExists(String id) {
+    	Path path = Utils.getWorldDirectory(MultiworldMod.new_id(id));
+		
+		if (!path.toFile().isDirectory()) {
+			if (MultiworldMod.mc.isDedicated()) {
+				MultiworldMod.LOGGER.info("Error loading World \"" + id + "\" could not find world folder: " + path);
+			}
+			// Singleplayer
+			return false;
+		}
+    	return true;
+    }
+    
+    /**
      * Load an existing saved World from config (YAML) 
      */
 	public static void reinit_world_from_config(MinecraftServer mc, String id) {
@@ -229,6 +249,11 @@ public class CreateCommand implements Command {
 
         File namespace = new File(worlds, spl[0]);
         namespace.mkdirs();
+        
+        // Check if World data exists
+        if (!checkIfWorldExists(id)) {
+        	return;
+        }
 
         File wc = new File(namespace, spl[1] + ".yml");
         FileConfiguration config;
@@ -277,7 +302,7 @@ public class CreateCommand implements Command {
         			System.out.println("Invalid ChunkGenerator: \"" + cg + "\"");
         		}
 			}
-			
+
 			ServerWorld world = MultiworldMod.create_world(id, dim, gen, d, seed);
 
 			MultiworldMod.get_world_creator().set_difficulty(id, d);
@@ -289,7 +314,7 @@ public class CreateCommand implements Command {
         }
 	}
 	
-	private static void reinitWorldGamerules(FileConfiguration config, ServerWorld world) {
+	public static void reinitWorldGamerules(FileConfiguration config, ServerWorld world) {
 		IGameruleCommand gameruleCommand = Util.getGameruleCommand();
 		
 		if (null == gameruleCommand) {
@@ -353,6 +378,50 @@ public class CreateCommand implements Command {
         namespace.mkdirs();
 
         File wc = new File(namespace, id.getPath() + ".yml");
+        FileConfiguration config;
+        try {
+			if (!wc.exists()) {
+				wc.createNewFile();
+			}
+            config = new FileConfiguration(wc);
+			config.set("namespace", id.getNamespace());
+			config.set("path", id.getPath());
+			config.set("environment", dim);
+			config.set("seed", seed);
+			if (null != cgen && cgen.length() > 0) {
+				config.set("custom_generator", cgen);
+			}
+			
+			// New World Saver
+			config.set("isMultiworldWorld", true);
+			
+			config.save();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+	
+	/**
+	 * Saves the World Info to a YAML Config File, to be loaded by
+	 * {@link Utils#loadSavedMultiworldWorld(MinecraftServer, Path, Optional)}
+	 * on next server start.
+	 */
+	public static void makeConfigFile(Identifier id, String dim, long seed, String cgen) {
+        File config_dir = new File("config");
+        config_dir.mkdirs();
+        
+        File cf = new File(config_dir, "multiworld"); 
+        cf.mkdirs();
+        
+        Path pDir = Utils.getWorldDirectory(id);
+        
+        if (!pDir.toFile().exists()) {
+        	pDir.toFile().mkdirs();
+        }
+        
+    	Path pYml = pDir.resolve(Utils.WORLD_YML_NAME);
+
+        File wc = pYml.toFile();
         FileConfiguration config;
         try {
 			if (!wc.exists()) {

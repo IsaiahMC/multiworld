@@ -9,6 +9,7 @@ import com.mojang.serialization.Dynamic;
 
 import me.isaiah.multiworld.ICreator;
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.Utils;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -21,6 +22,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.path.SymlinkValidationException;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SaveProperties;
@@ -65,6 +67,8 @@ public class FabricWorldCreator implements ICreator {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();
 		}
+		
+		MultiworldMod.LOGGER.info("DEBUG: " + dim_of(dim));
     	
     	RuntimeWorldConfig config = new RuntimeWorldConfig()
                 .setDimensionType(dim_of(dim))
@@ -90,7 +94,7 @@ public class FabricWorldCreator implements ICreator {
     
     public static GameRules readGameRules(Identifier id) throws IOException {
 
-        try (Session session = MultiworldWorld.mw$getSession(MultiworldMod.mc, id)) {
+        try (Session session = MultiworldWorld.mw$getStorage().createSession(Utils.getWorldName(id))) {
             Dynamic<?> dynamic = session.readLevelProperties();
             
             RegistryWrapper.WrapperLookup lookup = MultiworldMod.mc.getRegistryManager();
@@ -113,7 +117,11 @@ public class FabricWorldCreator implements ICreator {
             session.close();
             // Return the gamerules object
             return levelProps.getGameRules();
-        }
+        } catch (SymlinkValidationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
     }
     
     @Override

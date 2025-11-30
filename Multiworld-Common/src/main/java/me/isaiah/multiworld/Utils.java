@@ -3,19 +3,28 @@ package me.isaiah.multiworld;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import me.isaiah.multiworld.command.CreateCommand;
+import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.path.SymlinkValidationException;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.LevelStorage.Session;
 import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
 
 public class Utils {
 
+	public static final String WORLD_YML_NAME = "multiworld-world.yml";
+	
 	public static Identifier getEnvironment(MinecraftServer server, Identifier id) {
     	try {
 			FileConfiguration config = getConfigOrNull(id);
@@ -91,6 +100,19 @@ public class Utils {
     }
     
     /**
+     * @param <T>
+     */
+    public static <T> T getConfigValue(Identifier id, String key, T defaul) {
+    	try {
+			FileConfiguration config = getConfigOrNull(id);
+			return config.getOrDefault(key, defaul);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+    }
+    
+    /**
      * 
      */
     public static FileConfiguration getConfigOrNull(Identifier id) throws IOException {
@@ -98,15 +120,32 @@ public class Utils {
         File worlds = new File(cf, "worlds");
         File namespace = new File(worlds, id.getNamespace());
         
-        cf.mkdirs();
-        worlds.mkdirs();
-        namespace.mkdirs();
-
-        File wc = new File(namespace, id.getPath() + ".yml");
-        if (!wc.exists()) {
+        // Not Us.
+        if (id.getNamespace().equalsIgnoreCase("minecraft")) {
         	return null;
         }
         
+        cf.mkdirs();
+        
+        Path pDir = Utils.getWorldDirectory(id);
+    	Path pYml = pDir.resolve(WORLD_YML_NAME);
+    	
+    	if (pYml.toFile().exists()) {
+    		FileConfiguration config = new FileConfiguration(pYml.toFile());
+            return config;
+    	}
+    	
+    	File wc = new File(namespace, id.getPath() + ".yml");
+        if (!wc.exists()) {
+        	
+        	pDir.toFile().mkdirs();
+        	pYml.toFile().createNewFile();
+        	
+        	return null;
+        }
+
+        worlds.mkdirs();
+        namespace.mkdirs();
         wc.createNewFile();
         FileConfiguration config = new FileConfiguration(wc);
         return config;
@@ -120,32 +159,202 @@ public class Utils {
 		}
 		return id.toUnderscoreSeparatedString();
 	}
-    
-    private static Session mw$session(MinecraftServer server, Identifier id) {
-    	boolean useUs = Utils.shouldUseNewWorldFormat(server, id);
-    	if (!useUs) { return ((MinecraftServerAccess) server).getSession(); }
-    	
-    	String name = Utils.getWorldName(id);
-    	Path customWorldPath = getWorldContainer(server).toPath();
-    	LevelStorage levelStorage = LevelStorage.create(customWorldPath);
-    	try {
-			LevelStorage.Session session = levelStorage.createSession( name );
-			return session;
-		} catch (IOException | SymlinkValidationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return ((MinecraftServerAccess) server).getSession();
-		}
 
-    }
-    
-    // Exerpt from CraftServer: getWorldContainer
- 	public static File getWorldContainer(MinecraftServer server) {
- 		return ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD).getParent().toFile();
+ 	public static Path getWorldStoragePath() {
+ 		return getWorldStoragePath(MultiworldMod.mc);
  	}
  	
  	public static Path getWorldStoragePath(MinecraftServer server) {
- 		return ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD).getParent();
+ 		Path overworld = ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD); 
+ 		
+ 		// Client side
+ 		if (!MultiworldMod.mc.isDedicated()) {
+ 			Path mw = overworld.resolve("multiworlds");
+ 			return mw;
+ 		}
+ 		
+ 		return overworld.getParent();
  	}
+ 	
+ 	public static Path getWorldDirectory(Identifier id) {
+ 		return getWorldStoragePath().resolve( getWorldName(id) );
+ 	}
+ 	
+ 	public static List<Path> searchForWorlds() {
+ 		Path storage = getWorldStoragePath();
+ 		return searchForWorlds(storage);
+ 	}
+
+ 	public static List<Path> searchForWorlds(Path storage) {
+ 		List<Path> worldPaths = new ArrayList<>(); 
+ 		
+ 		System.out.println("DEBUG: " + storage);
+ 		
+ 		File fold = storage.toFile();
+ 		
+ 		if (!fold.exists()) {
+ 			fold.mkdir();
+ 			return worldPaths;
+ 		}
+ 		
+ 		for (File f : fold.listFiles()) {
+ 			if (!f.isDirectory()) {
+ 				continue;
+ 			}
+ 			
+ 			Path dirPath = storage.resolve(f.getName());
+ 			
+ 			// File levelData = new File(f, "level.dat");
+ 			File multiworldConfig = new File(f, "multiworld-world.yml");
+ 			
+ 			if (/*levelData.exists() ||*/ multiworldConfig.exists()) {
+ 				worldPaths.add(dirPath);
+ 			}
+ 			
+ 		}
+ 		
+ 		return worldPaths;
+ 	}
+ 	
+ 	/**
+     * Check if World (by ID) exists.
+     * 
+     * @param id - World Identifier
+     */
+    public static boolean checkIfWorldExists(String id) {
+    	Path path = Utils.getWorldDirectory(MultiworldMod.new_id(id));
+		
+		if (!path.toFile().isDirectory()) {
+			if (MultiworldMod.mc.isDedicated()) {
+				MultiworldMod.LOGGER.info("Error loading World \"" + id + "\" could not find world folder: " + path);
+			}
+			// Singleplayer
+			return false;
+		}
+    	return true;
+    }
+    
+ 	/**
+     * Check if World (by Path) exists.
+     * 
+     * @param id - World Identifier
+     */
+    public static boolean checkIfWorldExists(Path path) {
+    	// Path path = Utils.getWorldDirectory(MultiworldMod.new_id(id));
+		
+		if (!path.toFile().isDirectory()) {
+			if (MultiworldMod.mc.isDedicated()) {
+				MultiworldMod.LOGGER.info("Error loading Multiworld world, could not find world folder: " + path);
+			}
+			return false;
+		}
+    	return true;
+    }
+    
+    /**
+     * @return config/multiworld/
+     */
+    public static File getConfigDir() {
+    	File config_dir = new File("config");
+        config_dir.mkdirs();
+
+        File cf = new File(config_dir, "multiworld"); 
+        cf.mkdirs();
+        return cf;
+    }
+ 	
+ 	/**
+     * Load an existing saved World from config (YAML) 
+     */
+	public static void loadSavedMultiworldWorld(MinecraftServer mc, Path worldPath, Optional<String> optId) {
+        // File cf = getConfigDir();
+
+        // String[] spl = id.split(":");
+
+        /*
+        File worlds = new File(cf, "worlds");
+        worlds.mkdirs();
+
+        File namespace = new File(worlds, spl[0]);
+        namespace.mkdirs();
+        */
+        
+        // Check if World data exists
+        if (!checkIfWorldExists(worldPath)) {
+        	return;
+        }
+
+        File wc = worldPath.resolve(WORLD_YML_NAME).toFile();// new File(namespace, spl[1] + ".yml");
+        FileConfiguration config;
+        try {
+			if (!wc.exists()) {
+				wc.createNewFile();
+			}
+            config = new FileConfiguration(wc);
+			String env = config.getString("environment");
+			long seed = 0;
+			
+			try {
+				seed = config.getLong("seed");
+			} catch (Exception e) {
+				seed = config.getInt("seed");
+			}
+
+			ChunkGenerator gen = CreateCommand.get_chunk_gen(mc, env);
+		    Identifier dim = CreateCommand.get_dim_id(env);
+		    
+		    if (null == dim) {
+		    	dim = Util.OVERWORLD_ID;
+		    }
+			
+			Difficulty d = Difficulty.NORMAL;
+
+			// Set saved Difficulty
+			if (config.is_set("difficulty")) {
+				String di = config.getString("difficulty");
+				d = getDifficultyFromName(di);
+			}
+
+			// Gen
+			if (config.is_set("custom_generator")) {
+				String cg = config.getString("custom_generator");
+				
+				ChunkGenerator gen1 = CreateCommand.get_chunk_gen(mc, cg);
+        		if (null != gen1) {
+        			gen = gen1;
+        		} else {
+        			System.out.println("Invalid ChunkGenerator: \"" + cg + "\"");
+        		}
+			}
+			
+			String id = optId.orElseGet(() -> {
+				String namespace = config.getString("namespace");
+				String path = config.getString("path");
+				String savedId = namespace + ":" + path;
+				return savedId;
+			});
+
+			ServerWorld world = MultiworldMod.create_world(id, dim, gen, d, seed);
+
+			MultiworldMod.get_world_creator().set_difficulty(id, d);
+
+			CreateCommand.reinitWorldGamerules(config, world);
+			
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+	}
+	
+	/**
+	 */
+	private static Difficulty getDifficultyFromName(String di) {
+		// String to Difficulty
+		Difficulty d = Difficulty.NORMAL;
+		if (di.equalsIgnoreCase("EASY"))     { d = Difficulty.EASY; }
+		if (di.equalsIgnoreCase("HARD"))     { d = Difficulty.HARD; }
+		if (di.equalsIgnoreCase("NORMAL"))   { d = Difficulty.NORMAL; }
+		if (di.equalsIgnoreCase("PEACEFUL")) { d = Difficulty.PEACEFUL; }
+		return d;
+	}
 	
 }

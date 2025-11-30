@@ -5,21 +5,30 @@ import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.fantasy.RuntimeWorldProperties;
 
 import com.google.common.collect.ImmutableList;
+
+import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.Utils;
 import multiworld.api.IMultiworldWorld;
 import multiworld.mixin.MixinLevelInfo;
+import net.minecraft.block.BlockState;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.RandomSequencesState;
 import net.minecraft.util.path.SymlinkValidationException;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.dimension.DimensionOptions;
+import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.ServerWorldProperties;
@@ -42,12 +51,21 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
 	
 	public final LevelStorage.Session mw$levelStorageAccess;
 	
+	private static DimensionOptions config_createDimensionOptions(MinecraftServer server) {
+
+		DimensionOptions dimensionOptions = server.getRegistryManager()
+			    .getOrThrow(RegistryKeys.DIMENSION)
+			    .get(DimensionOptions.OVERWORLD);
+		
+		return dimensionOptions;
+	}
+	
 	protected MultiworldWorld(MinecraftServer server, RegistryKey<World> registryKey, RuntimeWorldConfig config, Style style) {
         this(
                 server, Util.getMainWorkerExecutor(), mw$session(server, registryKey.getValue()),
                 new RuntimeWorldProperties(new SaveProperties2((LevelProperties) server.getSaveProperties()).withName(registryKey.getValue().toUnderscoreSeparatedString().replace("multiworld_", "")), config),
                 registryKey,
-                config.createDimensionOptions(server),
+                config_createDimensionOptions(server),
                 false,
                 BiomeAccess.hashSeed(config.getSeed()),
                 ImmutableList.of(),
@@ -57,22 +75,20 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
 
         this.flat = config.isFlat().orElse(super.isFlat());
         // ((LevelProperties) this.properties).getLevelInfo().name = "";
-
-        // ((MixinLevelInfo) (Object) info).setName(multiworld$getLevelName());
         
         // Save World
         this.save(null, true, false); 
     }
 
     private MultiworldWorld(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, ServerWorldProperties properties, RegistryKey<World> worldKey, DimensionOptions dimensionOptions, boolean debugWorld, long seed, List<SpecialSpawner> spawners, boolean shouldTickTime, @Nullable RandomSequencesState randomSequencesState, Style style) {
-        super(server, workerExecutor, session, properties, worldKey, dimensionOptions, debugWorld, seed, spawners, shouldTickTime, randomSequencesState, style);
+        super(server, workerExecutor, session, properties, worldKey, dimensionOptions, false, seed, spawners, shouldTickTime, randomSequencesState, style);
         this.mw$levelStorageAccess = session;
         this.style = style;
     }
     
     // Exerpt from CraftServer: getWorldContainer
-	public static File getWorldContainer(MinecraftServer server) {
-		return ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD).getParent().toFile();
+	public static File getWorldContainer1(MinecraftServer server) {
+		return Utils.getWorldStoragePath(server).toFile();
 	}
 	
     private static Session mw$session(MinecraftServer server, Identifier id) {
@@ -82,17 +98,26 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
     	return mw$getSession(server, id);
     }
     
+    public static LevelStorage mw$getStorage() {
+    	Path customWorldPath = Utils.getWorldStoragePath();
+    	LevelStorage levelStorage = LevelStorage.create(customWorldPath);
+    	return levelStorage;
+    }
+    
     public static Session mw$getSession(MinecraftServer server, Identifier id) {
     	String name = Utils.getWorldName(id);
-    	Path customWorldPath = getWorldContainer(server).toPath();
+    	Path customWorldPath = Utils.getWorldStoragePath();
     	LevelStorage levelStorage = LevelStorage.create(customWorldPath);
-    	try {
-			LevelStorage.Session session = levelStorage.createSession( name );
+    	try (LevelStorage.Session session = levelStorage.createSession( name )) {
 			return session;
 		} catch (IOException | SymlinkValidationException e) {
 			e.printStackTrace();
 			return ((MinecraftServerAccess) server).getSession();
 		}
+    }
+    
+    public Session mw$getSession() {
+    	return mw$getSession(MultiworldMod.mc, this.getRegistryKey().getValue());
     }
     
     @Override
@@ -160,7 +185,9 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
     
     @Override
     public void multiworld$saveLevelDatFile() {
-        this.mw$levelStorageAccess.backupLevelDataFile(this.getServer().getRegistryManager(), getSaveProperties(), this.getServer().getPlayerManager().getUserData());
+    	Session s = multiworld$getLevelStorageSession();
+        s.backupLevelDataFile(this.getServer().getRegistryManager(), getSaveProperties(), this.getServer().getPlayerManager().getUserData());
+        // s.tryClose();
     }
 
 }

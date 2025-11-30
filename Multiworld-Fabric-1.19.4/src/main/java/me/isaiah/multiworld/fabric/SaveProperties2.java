@@ -5,9 +5,11 @@ import net.minecraft.world.level.LevelProperties;
 public class SaveProperties2 extends LevelProperties {
 
 	private String nameOverride;
+	private LevelProperties original;
 	
 	public SaveProperties2(LevelProperties original) {
 		super(original.getLevelInfo(), original.getGeneratorOptions(), getSpecialProperty(original), original.getLifecycle());
+		this.original = original;
 	}
 	
 	public SaveProperties2 withName(String name) {

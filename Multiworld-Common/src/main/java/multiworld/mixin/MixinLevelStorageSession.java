@@ -1,5 +1,7 @@
 package multiworld.mixin;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.command.Util;
+import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
@@ -45,6 +48,23 @@ public class MixinLevelStorageSession {
 
 			String dirName = ((Session) (Object) this).getDirectoryName();
 			Path path = mw$getStorageFolder( Utils.getWorldStoragePath(MultiworldMod.mc).resolve( dirName ), id, dim);
+			
+			String s = Utils.getConfigValue(id, "worldDirectoryPath", "none");
+			if (null != s && !s.equalsIgnoreCase("none")) {
+				Path pat = new File(s).toPath();
+				ci.setReturnValue(pat);
+			}
+			
+			try {
+				FileConfiguration config = Utils.getConfigOrNull(id);
+				if (null != config) {
+					config.set("worldDirectoryPath", path.toString());
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			// Path path = mw$getStorageFolder( ((Session) (Object) this).getDirectory().comp_732(), id, dim);
 			ci.setReturnValue(path);
 			return;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -29,26 +30,15 @@ public class SpawnCommand implements Command {
     }
 
     public static BlockPos getSpawn(ServerWorld w) {
-        File config_dir = new File("config");
-        config_dir.mkdirs();
-        
-        File cf = new File(config_dir, "multiworld"); 
-        cf.mkdirs();
-
-        File worlds = new File(cf, "worlds");
-        worlds.mkdirs();
+        Utils.getConfigDir();
 
         Identifier id = w.getRegistryKey().getValue();
-        File namespace = new File(worlds, id.getNamespace());
-        namespace.mkdirs();
-
-        File wc = new File(namespace, id.getPath() + ".yml");
-        if (!wc.exists()) {
-            return multiworld_method_43126(w);
-        }
         FileConfiguration config;
         try {
-            config = new FileConfiguration(wc);
+            config = Utils.getConfigOrNull(id);
+            if (null == config) {
+            	return multiworld_method_43126(w);
+            }
             if (config.is_set("spawnpos")) {
             	return BlockPos.fromLong(config.getLong("spawnpos"));
             } else {

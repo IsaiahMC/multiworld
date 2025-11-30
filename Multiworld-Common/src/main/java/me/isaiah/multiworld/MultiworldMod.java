@@ -11,6 +11,8 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -88,7 +90,8 @@ public class MultiworldMod {
     }
 
     public static ServerWorld createConfigAndWorld(String id, String dimStr, Identifier dimId, ChunkGenerator gen, Difficulty dif, long seed, String cgen) {
-    	CreateCommand.make_config(new_id(id), dimStr, seed, cgen);
+    	// CreateCommand.make_config(new_id(id), dimStr, seed, cgen);
+    	CreateCommand.makeConfigFile(new_id(id), dimStr, seed, cgen);
     	return world_creator.create_world(id, dimId, gen, dif, seed);
     }
     
@@ -146,12 +149,21 @@ public class MultiworldMod {
 					}
 				}
 			}
-			
+		}
+		
+		List<Path> savedWorlds = Utils.searchForWorlds();
+		for (Path dir : savedWorlds) {
+			LOGGER.info("Loading a saved world from: " + dir.toString());
+			Utils.loadSavedMultiworldWorld(mc, dir, Optional.empty());
+		}
+		
+		if (cfg_folder.exists()) {
 			int loaded = Portal.reinit_portals_from_config(mc);
 			if (loaded > 0) {
 				LOGGER.info("Found " + loaded + " saved world portals.");
 			}
 		}
+		
     }
     
     public static void getFileConfiguration() {
