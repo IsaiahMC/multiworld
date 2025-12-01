@@ -30,4 +30,9 @@ public class SaveProperties2 extends LevelProperties {
 		this.nameOverride = name;
 	}
 
+	@Override
+	public long getTime() {
+		return original.getTime();
+	}
+	
 }

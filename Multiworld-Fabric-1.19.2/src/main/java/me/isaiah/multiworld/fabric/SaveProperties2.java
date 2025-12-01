@@ -25,5 +25,10 @@ public class SaveProperties2 extends LevelProperties {
 	public void mw$setLevelName(String name) {
 		this.nameOverride = name;
 	}
+	
+	@Override
+	public long getTime() {
+		return original.getTime();
+	}
 
 }

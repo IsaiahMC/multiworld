@@ -22,7 +22,7 @@ pluginManagement {
 }
 
 rootProject.name = 'Multiworld'
-mod_version = '1.11'
+mod_version = '1.12'
 
 include 'Multiworld-Common'
 
@@ -48,3 +48,6 @@ include 'Multiworld-Forge-1.20.1'
 // NeoForged
 include 'Multiworld-NeoForged-1.21.1'
 include 'Multiworld-NeoForged-1.21.2'
+
+include(':Multiworld-NeoForged-1.21.10')
+project(':Multiworld-NeoForged-1.21.10').projectDir = new File(rootDir, 'neoforge/Multiworld-NeoForged-1.21.10')

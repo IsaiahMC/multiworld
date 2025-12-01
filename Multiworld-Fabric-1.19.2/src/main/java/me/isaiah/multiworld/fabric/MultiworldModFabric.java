@@ -23,5 +23,11 @@ public class MultiworldModFabric implements ModInitializer {
         );
 
         MultiworldMod.init();
+        versionSupportMessage();
     }
+    
+    private void versionSupportMessage() {
+    	MultiworldMod.LOGGER.info("WARNING - Multiworld Fabric 1.19.2 support is limited. Please upgrade your server.");
+    }
+    
 }
