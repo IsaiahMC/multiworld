@@ -31,11 +31,11 @@ configurations {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:1.21.2"
-    neoForge "net.neoforged:neoforge:${rootProject.neoforged_version_1_21_2}"
+	minecraft "com.mojang:minecraft:1.21.10"
+    neoForge "net.neoforged:neoforge:${rootProject.neoforged_version_1_21_10}"
     mappings loom.layered {
-        it.mappings("net.fabricmc:yarn:1.21.2+build.1:v2")
-        it.mappings("dev.architectury:yarn-mappings-patch-neoforge:1.21+build.4")
+        it.mappings("net.fabricmc:yarn:1.21.10+build.2:v2")
+        it.mappings("dev.architectury:yarn-mappings-patch-neoforge:1.21+build.6")
     }
 	
 	annotationProcessor 'com.pkware.jabel:jabel-javac-plugin:1.0.1-1'
