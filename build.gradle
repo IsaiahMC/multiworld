@@ -10,9 +10,10 @@ subprojects {
 		mod_version = project.mod_version
 		set("mod_version", project.mod_version)
 	}
-	
+
 	project.afterEvaluate {
 		processResources {
+			inputs.property("modVersion",  project.mod_version)
 			duplicatesStrategy = DuplicatesStrategy.INCLUDE
 			filesMatching("fabric.mod.json") {
 				expand "version": project.mod_version

@@ -1,14 +1,21 @@
 package me.isaiah.multiworld.neoforge;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import com.mojang.serialization.Dynamic;
+
 import me.isaiah.multiworld.ICreator;
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.Utils;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.resource.DataConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,14 +25,21 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.path.SymlinkValidationException;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.SaveProperties;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.biome.BiomeKeys;
+import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
+import net.minecraft.world.level.LevelProperties;
+import net.minecraft.world.level.storage.LevelStorage;
+import net.minecraft.world.level.storage.LevelStorage.Session;
 import xyz.nucleoid.fantasy.Fantasy;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.fantasy.RuntimeWorldHandle;
@@ -33,6 +47,10 @@ import xyz.nucleoid.fantasy.RuntimeWorldHandle;
 public class NeoForgeWorldCreator implements ICreator {
     
 	public HashMap<String, RuntimeWorldConfig> worldConfigs;
+	
+	public Identifier new_id(String id) {
+    	return Identifier.of(id);
+    }
 	
 	public NeoForgeWorldCreator() {
 		this.worldConfigs = new HashMap<>();
@@ -43,18 +61,69 @@ public class NeoForgeWorldCreator implements ICreator {
     }
 
     public ServerWorld create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed) {
-        RuntimeWorldConfig config = new RuntimeWorldConfig()
+    	Identifier idd = new_id(id);
+    	GameRules rules = null;
+		try {
+			rules = readGameRules(idd);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
+		}
+		
+		// MultiworldMod.LOGGER.info("DEBUG: " + dim_of(dim));
+    	
+    	RuntimeWorldConfig config = new RuntimeWorldConfig()
                 .setDimensionType(dim_of(dim))
                 .setGenerator(gen)
                 .setDifficulty(dif)
 				.setSeed(seed)
 				.setShouldTickTime(true)
+				.setWorldConstructor(MultiworldWorld::new)
                 ;
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
-        RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(Identifier.of(id), config);
+        RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(new_id(id), config);
         this.worldConfigs.put(id, config);
-        return worldHandle.asWorld();
+        ServerWorld world = worldHandle.asWorld();
+        
+        if (null != rules) {
+        	world.getGameRules().setAllValues(rules, null);
+        }
+        
+        this.worldConfigs.put(id, config);
+        return world;
+    }
+    
+    public static GameRules readGameRules(Identifier id) throws IOException {
+
+        try (Session session = MultiworldWorld.mw$getStorage().createSession(Utils.getWorldName(id))) {
+            Dynamic<?> dynamic = session.readLevelProperties();
+            
+            RegistryWrapper.WrapperLookup lookup = MultiworldMod.mc.getRegistryManager();
+            
+            Registry<DimensionOptions> dimensionRegistry = MultiworldMod.mc.getRegistryManager().getOrThrow(RegistryKeys.DIMENSION);
+            
+            DataConfiguration dataConfig = MultiworldMod.mc.getSaveProperties().getDataConfiguration();
+
+            SaveProperties props = LevelStorage.parseSaveProperties(
+                dynamic,
+                dataConfig,
+                dimensionRegistry,
+                MultiworldMod.mc.getRegistryManager()
+            ).properties();
+            
+            if (!(props instanceof LevelProperties levelProps)) {
+                throw new IllegalStateException("SaveProperties is not a LevelProperties");
+            }
+            
+            session.close();
+            // Return the gamerules object
+            return levelProps.getGameRules();
+        } catch (SymlinkValidationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
     }
     
     @Override
@@ -85,7 +154,7 @@ public class NeoForgeWorldCreator implements ICreator {
 	
 	@Override
 	public BlockPos get_spawn(ServerWorld world) {
-		return world.getLevelProperties().getSpawnPos();
+		return world.getSpawnPoint().getPos();
 	}
 
 	@Override

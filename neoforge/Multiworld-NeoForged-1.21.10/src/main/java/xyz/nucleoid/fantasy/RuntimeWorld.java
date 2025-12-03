@@ -6,11 +6,19 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.random.RandomSequencesState;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.dimension.DimensionOptions;
+import net.minecraft.world.level.ServerWorldProperties;
+import net.minecraft.world.level.storage.LevelStorage;
+import net.minecraft.world.spawner.SpecialSpawner;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
-import xyz.nucleoid.fantasy.util.VoidWorldProgressListener;
+
+import java.util.List;
+import java.util.concurrent.Executor;
 
 public class RuntimeWorld extends ServerWorld {
     final Style style;
@@ -22,7 +30,6 @@ public class RuntimeWorld extends ServerWorld {
                 new RuntimeWorldProperties(server.getSaveProperties(), config),
                 registryKey,
                 config.createDimensionOptions(server),
-                VoidWorldProgressListener.INSTANCE,
                 false,
                 BiomeAccess.hashSeed(config.getSeed()),
                 ImmutableList.of(),
@@ -30,8 +37,22 @@ public class RuntimeWorld extends ServerWorld {
                 null
         );
         this.style = style;
-        this.flat = false; //TODO // config.isFlat().orElse(super.isFlat());
+        
+        // Multiworld: We don't have Fabric-API TriState on NeoForge
+        if (config.mw$isFlatValueChanged()) {
+        	this.flat = config.isFlat();
+        } else {
+        	this.flat = super.isFlat();
+        }
+        
+        // this.flat = config.isFlat().orElse(super.isFlat());
     }
+
+    protected RuntimeWorld(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, ServerWorldProperties properties, RegistryKey<World> worldKey, DimensionOptions dimensionOptions, boolean debugWorld, long seed, List<SpecialSpawner> spawners, boolean shouldTickTime, @Nullable RandomSequencesState randomSequencesState, Style style) {
+        super(server, workerExecutor, session, properties, worldKey, dimensionOptions, debugWorld, seed, spawners, shouldTickTime, randomSequencesState);
+        this.style = style;
+    }
+
 
     @Override
     public long getSeed() {
@@ -45,6 +66,18 @@ public class RuntimeWorld extends ServerWorld {
         }
     }
 
+    /**
+    * Only use the time update code from super as the immutable world proerties runtime dimensions breaks scheduled functions
+    */
+    @Override
+    protected void tickTime() {
+        // if (this.shouldTickTime) {
+            if (this.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) {
+                this.setTimeOfDay(this.properties.getTimeOfDay() + 1L);
+            }
+        // }
+    }
+
     @Override
     public boolean isFlat() {
         return this.flat;
@@ -53,5 +86,9 @@ public class RuntimeWorld extends ServerWorld {
     public enum Style {
         PERSISTENT,
         TEMPORARY
+    }
+
+    public interface Constructor {
+        RuntimeWorld createWorld(MinecraftServer server, RegistryKey<World> registryKey, RuntimeWorldConfig config, Style style);
     }
 }
