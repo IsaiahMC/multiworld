@@ -1,4 +1,4 @@
-package multiworld.mixin;
+package xyz.nucleoid.fantasy.mixin.multiworld;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,79 +29,32 @@ import net.minecraft.world.level.storage.LevelStorage.Session;
  */
 @Mixin(Session.class)
 public class MixinLevelStorageSession {
-
+	
 	@Shadow
 	@Mutable
-	private String directoryName;
+	public LevelStorage.LevelSave directory;
+
+	@Inject(at = @At("TAIL"), method = "Lnet/minecraft/world/level/storage/LevelStorage$Session;<init>(Lnet/minecraft/world/level/storage/LevelStorage;Ljava/lang/String;Ljava/nio/file/Path;)V")
+	public void mw$init_test(LevelStorage s, String b, Path p, CallbackInfo ci) {
+		System.out.println("DEBUG DIRNAME: " + b);
+		System.out.println("DEBUG PATH: " + p.toString());
+		
+		Session thiz = (Session) (Object) this;
+		
+		System.out.println("LEVELSTORAGE.dat PATH: " + directory.getLevelDatPath() + " / "  + thiz.getDirectoryName() + " / " + thiz.getDirectory());
+	}
 	
+	/*
 	@Inject(at = @At("HEAD"), method = "getWorldDirectory", cancellable = true)
 	public void multiworld$getWorldDirectory(RegistryKey<World> key, CallbackInfoReturnable<Path> ci) {
-		Identifier id = key.getValue();
-
-		System.out.println("Debug: " + id.toString());
 		
-		if (id.getNamespace().equalsIgnoreCase("minecraft")) {
-			return;
-		}
-		
-		if (Utils.isForge()) {
-			// TODO: Add seperate directory support to NeoForge.
-			return;
-		}
-
-		// createConfigAndWorld creates the Config first
-		if (Utils.shouldUseNewWorldFormat(MultiworldMod.mc, id)) {
-			Identifier dim = Utils.getEnvironment(MultiworldMod.mc, id);
-
-			if (null == dim) {
-				System.out.println("Debug: Null DIM: " + id);
-				return;
-			}
-
-			String dirName = ((Session) (Object) this).getDirectoryName();
-			Path path = mw$getStorageFolder( Utils.getWorldStoragePath(MultiworldMod.mc).resolve( dirName ), id, dim);
-			
-			String s = Utils.getConfigValue(id, "worldDirectoryPath", "none");
-			if (null != s && !s.equalsIgnoreCase("none")) {
-				Path pat = new File(s).toPath();
-				ci.setReturnValue(pat);
-			}
-			
-			try {
-				FileConfiguration config = Utils.getConfigOrNull(id);
-				if (null != config) {
-					config.set("worldDirectoryPath", path.toString());
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			// Path path = mw$getStorageFolder( ((Session) (Object) this).getDirectory().comp_732(), id, dim);
-			ci.setReturnValue(path);
-			return;
-		}
 	}
+	*/
 
 	/**
 	 * 
 	 */
-	public Path mw$getStorageFolder(Path path, Identifier worldId, Identifier dimensionType) {
-		
-		Session thiz = (Session) (Object) this;
-		String name = thiz.getDirectoryName();
-		
-		String name1 =Utils.getWorldName(worldId);
-		
-		if (!name.equalsIgnoreCase(name1)) {
-			this.directoryName = name1;
-		}
-		
-		name = thiz.getDirectoryName();
-		
-		
-		System.out.println("mw$getStorageFolder: " + worldId.toString() + " / " + dimensionType.toString() + " / " + name );
-		
+	public Path mw1$getStorageFolder(Path path, Identifier worldId, Identifier dimensionType) {
 		if (dimensionType == Util.OVERWORLD_ID) {
 			return path;
 		} else if (dimensionType == Util.THE_NETHER_ID) {
@@ -116,7 +69,7 @@ public class MixinLevelStorageSession {
 		}
 	}
 
-	public Path mw$getStorageFolder1(Path path, RegistryKey<DimensionOptions> dimensionType) {
+	public Path mw1$getStorageFolder(Path path, RegistryKey<DimensionOptions> dimensionType) {
 		if (dimensionType == DimensionOptions.OVERWORLD) {
 			return path;
 		} else if (dimensionType == DimensionOptions.NETHER) {

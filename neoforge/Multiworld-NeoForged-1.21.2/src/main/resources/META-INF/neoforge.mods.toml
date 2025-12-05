@@ -26,3 +26,6 @@ description="This is an example description! Tell everyone what your mod is abou
 
 [[mixins]]
     config="fantasy.mixins.json"
+
+[[mixins]]
+    config="multiworld.mixins.json"

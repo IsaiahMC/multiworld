@@ -24,6 +24,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 
@@ -43,9 +44,17 @@ public class MultiworldModNeoForge {
 
 	public void commonSetup(final FMLCommonSetupEvent event) {
 	}
+	
+	@SubscribeEvent
+	public void onServerRealStarting(ServerAboutToStartEvent event) {
+		System.out.println("Debug: on Server real starting");
+		MultiworldMod.mc = event.getServer();
+		// MultiworldMod.on_server_started(event.getServer());
+	}
 
 	@SubscribeEvent
 	public void onServerStarting(ServerStartingEvent event) {
+		System.out.println("Debug: on Server starting");
 		MultiworldMod.on_server_started(event.getServer());
 	}
 

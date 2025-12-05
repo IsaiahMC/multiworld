@@ -4,7 +4,7 @@ license="gpl"
 
 [[mods]] #mandatory
 modId="multiworld"
-version="1.21.2"
+version="1.21.10"
 displayName="Multiworld"
 authors="isaiah"
 description="This is an example description! Tell everyone what your mod is about!"
@@ -20,9 +20,12 @@ description="This is an example description! Tell everyone what your mod is abou
 [[dependencies.multiworld]]
     modId="minecraft"
     type="required"
-    versionRange="[1.21.2,)"
+    versionRange="[1.21.9,)"
     ordering="NONE"
     side="BOTH"
 
 [[mixins]]
     config="fantasy.mixins.json"
+
+[[mixins]]
+    config="multiworld.mixins.json"

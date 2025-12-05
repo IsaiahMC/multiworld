@@ -11,7 +11,8 @@
     "registry.DimensionOptionsMixin",
     "registry.SimpleRegistryMixin",
     "registry.RegistryCodecsMixin",
-    "multiworld.MixinServerPlayerEntity"
+    "multiworld.MixinServerPlayerEntity",
+    "multiworld.MixinLevelStorageSession"
   ],
   "injectors": {
     "defaultRequire": 1

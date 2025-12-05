@@ -10,6 +10,8 @@ import java.util.Optional;
 import me.isaiah.multiworld.command.CreateCommand;
 import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.config.FileConfiguration;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
@@ -57,6 +59,25 @@ public class Utils {
     	return null;
     }
     
+	public static boolean isForge() {
+		try {
+			Class.forName("net.neoforged.neoforge.common.NeoForge");
+			return true;
+		} catch (ClassNotFoundException e) {
+			return isOldForge();
+		}
+	}
+	
+	public static boolean isOldForge() {
+		try {
+			Class.forName("net.minecraftforge.common.MinecraftForge");
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+	}
+	
+	
     public static boolean shouldUseNewWorldFormat(MinecraftServer server, Identifier id) {
     	
     	if (id.getNamespace().equalsIgnoreCase("minecraft")) {
@@ -71,6 +92,12 @@ public class Utils {
 				return false;
 			}
 
+			// TODO: Add world change directory support for NeoForge
+			if (isForge()) {
+				config.set("letForgeHandleWorldStorage", true);
+				return false;
+			}
+			
 			// Check if override set
 			if (config.is_set("letVanillaHandleDirectory")) {
 				if (config.getBoolean("letVanillaHandleDirectory")) {
@@ -177,6 +204,13 @@ public class Utils {
  	}
  	
  	public static Path getWorldDirectory(Identifier id) {
+ 		
+ 		// TODO: Add proper Multiworld support to Forge
+ 		if (isForge()) {
+ 			System.out.println("Note: Using Vanilla Directory for World: " + id);
+ 			return ((MinecraftServerAccess) MultiworldMod.mc).getSession().getWorldDirectory(RegistryKey.of(RegistryKeys.WORLD, id));
+ 		}
+ 		
  		return getWorldStoragePath().resolve( getWorldName(id) );
  	}
  	
