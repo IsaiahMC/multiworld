@@ -10,6 +10,7 @@ import java.util.Optional;
 import me.isaiah.multiworld.command.CreateCommand;
 import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.config.FileConfiguration;
+import multiworld.api.WorldFolderMode;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
@@ -77,12 +78,51 @@ public class Utils {
 		}
 	}
 	
+	public static Optional<WorldFolderMode> getFolderMode(Identifier id) {
+		
+		if (id.getNamespace().equalsIgnoreCase("minecraft")) {
+			return Optional.of(WorldFolderMode.VANILLA);
+		}
+		
+		File cf = new File(me.isaiah.multiworld.command.Util.get_platform_config_dir(), "multiworld"); 
+        File worlds = new File(cf, "worlds");
+        File namespace = new File(worlds, id.getNamespace());
+        File val = new File(namespace, id.getPath() + ".yml");
+        
+        if (val.exists()) {
+        	return Optional.of(WorldFolderMode.VANILLA);
+        }
+        
+        Path buk = getWorldPath(id, WorldFolderMode.BUKKIT);
+        Path van = getWorldPath(id, WorldFolderMode.VANILLA);
+        
+        if (buk.toFile().isDirectory()) {
+        	return Optional.of(WorldFolderMode.BUKKIT);
+        }
+
+        if (van.toFile().isDirectory()) {
+        	return Optional.of(WorldFolderMode.VANILLA);
+        }
+		
+        return Optional.empty();
+	}
+	
 	
     public static boolean shouldUseNewWorldFormat(MinecraftServer server, Identifier id) {
     	
     	if (id.getNamespace().equalsIgnoreCase("minecraft")) {
 			return false;
 		}
+    	
+    	Optional<WorldFolderMode> mode = Utils.getFolderMode(id);
+    	if (mode.isPresent()) {
+    		if (mode.get() == WorldFolderMode.VANILLA) {
+    			return false;
+    		}
+    		if (mode.get() == WorldFolderMode.BUKKIT) {
+    			return true;
+    		}
+    	}
     	
     	try {
 			FileConfiguration config = getConfigOrNull(id);
@@ -102,6 +142,22 @@ public class Utils {
 			if (config.is_set("letVanillaHandleDirectory")) {
 				if (config.getBoolean("letVanillaHandleDirectory")) {
 					return false;
+				}
+			}
+			
+			// All newer Multiworld worlds
+			if (config.is_set("worldFolderSaveMode")) {
+				String str = config.getString("worldFolderSaveMode");
+				try {
+					WorldFolderMode m = WorldFolderMode.valueOf(str);
+					if (m == WorldFolderMode.BUKKIT) {
+						return true;
+					}
+					if (m == WorldFolderMode.VANILLA) {
+						return false;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 
@@ -154,6 +210,8 @@ public class Utils {
         
         cf.mkdirs();
         
+        Optional<WorldFolderMode> mode = Utils.getFolderMode(id);
+        
         Path pDir = Utils.getWorldDirectory(id);
     	Path pYml = pDir.resolve(WORLD_YML_NAME);
     	
@@ -165,8 +223,8 @@ public class Utils {
     	File wc = new File(namespace, id.getPath() + ".yml");
         if (!wc.exists()) {
         	
-        	pDir.toFile().mkdirs();
-        	pYml.toFile().createNewFile();
+        	// pDir.toFile().mkdirs();
+        	// pYml.toFile().createNewFile();
         	
         	return null;
         }
@@ -191,6 +249,38 @@ public class Utils {
  		return getWorldStoragePath(MultiworldMod.mc);
  	}
  	
+ 	public static Path getWorldStoragePath(MinecraftServer server, WorldFolderMode mode) {
+ 		Path overworld = ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD); 
+ 		
+ 		if (mode == WorldFolderMode.VANILLA) {
+ 			return overworld.resolve("dimensions");
+ 		}
+ 		
+ 		// Client side
+ 		if (!MultiworldMod.mc.isDedicated()) {
+ 			Path mw = overworld.resolve("multiworlds");
+ 			return mw;
+ 		}
+ 		
+ 		return overworld.getParent();
+ 	}
+ 	
+ 	public static Path getWorldPath(Identifier id, WorldFolderMode mode) {
+ 		Path overworld = ((MinecraftServerAccess) MultiworldMod.mc).getSession().getWorldDirectory(World.OVERWORLD); 
+ 		
+ 		if (mode == WorldFolderMode.VANILLA) {
+ 			return overworld.resolve("dimensions").resolve(id.getNamespace()).resolve(id.getPath());
+ 		}
+ 		
+ 		// Client side
+ 		if (!MultiworldMod.mc.isDedicated()) {
+ 			Path mw = overworld.resolve("multiworlds");
+ 			return mw.resolve(getWorldName(id));
+ 		}
+ 		
+ 		return overworld.getParent().resolve(getWorldName(id));
+ 	}
+ 	
  	public static Path getWorldStoragePath(MinecraftServer server) {
  		Path overworld = ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD); 
  		
@@ -211,7 +301,24 @@ public class Utils {
  			return ((MinecraftServerAccess) MultiworldMod.mc).getSession().getWorldDirectory(RegistryKey.of(RegistryKeys.WORLD, id));
  		}
  		
- 		return getWorldStoragePath().resolve( getWorldName(id) );
+ 		Path storage = getWorldStoragePath();
+ 		Path bukkit = storage.resolve( getWorldName(id) ); 
+ 		
+ 		return bukkit;
+ 	}
+ 	
+ 	public static Path getWorldDirectory(Identifier id, WorldFolderMode mode) {
+ 		
+ 		// TODO: Add proper Multiworld support to Forge
+ 		if (isForge() || mode == WorldFolderMode.VANILLA) {
+ 			System.out.println("Note: Using Vanilla Directory for World: " + id);
+ 			return ((MinecraftServerAccess) MultiworldMod.mc).getSession().getWorldDirectory(RegistryKey.of(RegistryKeys.WORLD, id));
+ 		}
+ 		
+ 		Path storage = getWorldStoragePath();
+ 		Path bukkit = storage.resolve( getWorldName(id) ); 
+ 		
+ 		return bukkit;
  	}
  	
  	public static List<Path> searchForWorlds() {

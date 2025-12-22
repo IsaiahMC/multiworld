@@ -124,6 +124,7 @@ public class FabricWorldCreator implements ICreator {
      */
     public static GameRules readGameRules(Identifier id) throws IOException {
 
+    	/*
         try (Session session = MultiworldWorld.mw$getSession(MultiworldMod.mc, id)) {
             Dynamic<?> dynamic = session.readLevelProperties();
             
@@ -148,6 +149,14 @@ public class FabricWorldCreator implements ICreator {
             // Return the gamerules object
             return levelProps.getGameRules();
         }
+        */
+    	try {
+			return MultiworldWorld.mw$readGameRules(MultiworldMod.mc, id);
+		} catch (IOException | SymlinkValidationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new IOException(e);
+		}
     }
     
     @Override

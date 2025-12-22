@@ -29,8 +29,8 @@ dependencies {
 	compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	
 	// 1.21.9
-    minecraft("com.mojang:minecraft:1.21.11-pre2") 
-    mappings("net.fabricmc:yarn:1.21.11-pre2+build.1")
+    minecraft("com.mojang:minecraft:1.21.11-rc1") 
+    mappings("net.fabricmc:yarn:1.21.11-rc1+build.1")
     modImplementation("net.fabricmc:fabric-loader:0.18.1")
 	
 	// fantasy snapshot: https://pisaiah.com/maven-repo/

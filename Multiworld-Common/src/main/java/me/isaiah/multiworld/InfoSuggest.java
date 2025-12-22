@@ -17,6 +17,7 @@ import me.isaiah.multiworld.command.IGameruleCommand;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.perm.Perm;
+import multiworld.api.WorldFolderMode;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.world.World;
@@ -201,6 +202,7 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
         	if (cmds.length <= 4) {
         		builder.suggest("-g=<GENERATOR>");
         		builder.suggest("-s=<SEED>");
+        		builder.suggest("-m=<WorldSaveMode>");
         		return;
         	}
 
@@ -220,10 +222,18 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
 	        	for (String key : CreateCommand.customs.keySet()) {
 	        		builder.suggest("-g=" + key.toUpperCase(Locale.ROOT));
 	        	}
+        	} else if (current.startsWith("-m=")) {
+        		// builder.suggest("-m=VANILLA");
+        		
+        		for (WorldFolderMode mode : WorldFolderMode.values()) {
+        			builder.suggest("-m=" + mode);
+        		}
+        		
 	        } else {
 	        	if (current.startsWith("-")) {
 	        		if (!beforeStr.contains("-g=")) builder.suggest("-g=<GENERATOR>");
 	        		if (!beforeStr.contains("-s=")) builder.suggest("-s=<SEED>");
+	        		if (!beforeStr.contains("-m=")) builder.suggest("-m=<WorldSaveMode>");
 	        	}
 	        }
         }

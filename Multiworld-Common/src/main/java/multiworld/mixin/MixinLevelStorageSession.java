@@ -38,7 +38,7 @@ public class MixinLevelStorageSession {
 	public void multiworld$getWorldDirectory(RegistryKey<World> key, CallbackInfoReturnable<Path> ci) {
 		Identifier id = key.getValue();
 
-		System.out.println("Debug: " + id.toString());
+		// System.out.println("Debug: " + id.toString());
 		
 		if (id.getNamespace().equalsIgnoreCase("minecraft")) {
 			return;
@@ -71,6 +71,7 @@ public class MixinLevelStorageSession {
 				FileConfiguration config = Utils.getConfigOrNull(id);
 				if (null != config) {
 					config.set("worldDirectoryPath", path.toString());
+					config.save();
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -100,7 +101,7 @@ public class MixinLevelStorageSession {
 		name = thiz.getDirectoryName();
 		
 		
-		System.out.println("mw$getStorageFolder: " + worldId.toString() + " / " + dimensionType.toString() + " / " + name );
+		// System.out.println("mw$getStorageFolder: " + worldId.toString() + " / " + dimensionType.toString() + " / " + name );
 		
 		if (dimensionType == Util.OVERWORLD_ID) {
 			return path;

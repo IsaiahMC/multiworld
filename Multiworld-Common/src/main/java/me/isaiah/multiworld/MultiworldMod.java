@@ -32,6 +32,7 @@ import me.isaiah.multiworld.command.TpCommand;
 import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
+import multiworld.api.WorldFolderMode;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -89,9 +90,9 @@ public class MultiworldMod {
     	return world_creator;
     }
 
-    public static ServerWorld createConfigAndWorld(String id, String dimStr, Identifier dimId, ChunkGenerator gen, Difficulty dif, long seed, String cgen) {
+    public static ServerWorld createConfigAndWorld(String id, String dimStr, Identifier dimId, ChunkGenerator gen, Difficulty dif, long seed, String cgen, WorldFolderMode dirMode) {
     	// CreateCommand.make_config(new_id(id), dimStr, seed, cgen);
-    	CreateCommand.makeConfigFile(new_id(id), dimStr, seed, cgen);
+    	CreateCommand.makeConfigFile(new_id(id), dimStr, seed, cgen, dirMode);
     	return world_creator.create_world(id, dimId, gen, dif, seed);
     }
     

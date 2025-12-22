@@ -16,6 +16,7 @@ import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.config.FileConfiguration;
+import multiworld.api.WorldFolderMode;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -92,6 +93,25 @@ public class CreateCommand implements Command {
 		}
 		return Optional.empty();
 	}
+	
+	/**
+	 * Parse WorldFolderMode from Arguments
+	 * 
+	 * @param mc - MinecraftServer
+	 * @param arg - The argument from the command
+	 */
+	private static WorldFolderMode checkArgForMode(MinecraftServer mc, String arg) {
+    	if (arg.startsWith("-m ") || arg.startsWith("-m=")) {
+    		String ab = arg.substring("-m=".length());
+
+    		try {
+    			return WorldFolderMode.valueOf(ab.toUpperCase(Util.AMERICAN_STANDARD));
+    		} catch (Exception ex) {
+    			return WorldFolderMode.VANILLA;
+    		}
+    	}
+    	return null;
+	}
 
 	/**
 	 * Run Command
@@ -122,6 +142,8 @@ public class CreateCommand implements Command {
 
         String customGen = "";
         
+        WorldFolderMode dirMode = WorldFolderMode.BUKKIT;
+        
         if (args.length > 3) {
         	for (int i = 3; i < args.length; i++) {
         		String arg = args[i];
@@ -144,13 +166,17 @@ public class CreateCommand implements Command {
 	        		message(plr, "Using seed \"" + resultB.get() + "\".");
 	        		seed = resultB.get();
 	        	}
+	        	
+	        	WorldFolderMode m = checkArgForMode(mc, arg);
+	        	if (null != m) {
+	        		dirMode = m;
+	        	}
         	}
         	
         }
         
-        
         // createConfigAndWorld(String id, String dimStr, Identifier dimId, ChunkGenerator gen, Difficulty dif, long seed, String cgen) {
-        ServerWorld world = MultiworldMod.createConfigAndWorld(arg1, args[2], dim, gen, Difficulty.NORMAL, seed, customGen);
+        ServerWorld world = MultiworldMod.createConfigAndWorld(arg1, args[2], dim, gen, Difficulty.NORMAL, seed, customGen, dirMode);
         
         // make_config(MultiworldMod.new_id(arg1), args[2], seed, customGen);
         // ServerWorld world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.NORMAL, seed);
@@ -363,7 +389,7 @@ public class CreateCommand implements Command {
 	 * {@link #reinit_world_from_config(MinecraftServer, String)}
 	 * on next server start.
 	 */
-	public static void make_config(Identifier id, String dim, long seed, String cgen) {
+	private static void make_config(Identifier id, String dim, long seed, String cgen) {
         File config_dir = new File("config");
         config_dir.mkdirs();
         
@@ -406,14 +432,14 @@ public class CreateCommand implements Command {
 	 * {@link Utils#loadSavedMultiworldWorld(MinecraftServer, Path, Optional)}
 	 * on next server start.
 	 */
-	public static void makeConfigFile(Identifier id, String dim, long seed, String cgen) {
+	public static void makeConfigFile(Identifier id, String dim, long seed, String cgen, WorldFolderMode dirMode) {
         File config_dir = new File("config");
         config_dir.mkdirs();
         
         File cf = new File(config_dir, "multiworld"); 
         cf.mkdirs();
         
-        Path pDir = Utils.getWorldDirectory(id);
+        Path pDir = Utils.getWorldDirectory(id, dirMode);
         
         if (!pDir.toFile().exists()) {
         	pDir.toFile().mkdirs();
@@ -435,6 +461,8 @@ public class CreateCommand implements Command {
 			if (null != cgen && cgen.length() > 0) {
 				config.set("custom_generator", cgen);
 			}
+			
+			config.set("worldFolderSaveMode", dirMode);
 			
 			// New World Saver
 			config.set("isMultiworldWorld", true);

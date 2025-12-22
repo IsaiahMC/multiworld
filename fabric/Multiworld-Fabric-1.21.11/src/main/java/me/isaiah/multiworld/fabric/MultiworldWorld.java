@@ -5,10 +5,17 @@ import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.fantasy.RuntimeWorldProperties;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.serialization.Dynamic;
+
 import me.isaiah.multiworld.Utils;
 import multiworld.api.IMultiworldWorld;
+import multiworld.api.WorldFolderMode;
 import multiworld.mixin.MixinLevelInfo;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.resource.DataConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.ProgressListener;
@@ -25,6 +32,7 @@ import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.LevelStorage.Session;
+import net.minecraft.world.rule.GameRules;
 import net.minecraft.world.spawner.SpecialSpawner;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
@@ -33,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
 public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
@@ -93,6 +102,48 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
 			e.printStackTrace();
 			return ((MinecraftServerAccess) server).getSession();
 		}
+    }
+    
+    /**
+     * Reads gamerules from a world's level.dat
+     */
+    public static GameRules mw$readGameRules(MinecraftServer server, Identifier worldId)
+            throws IOException, SymlinkValidationException {
+
+        String name = Utils.getWorldName(worldId);
+        Path customWorldPath = Utils.getWorldStoragePath();
+
+        Optional<WorldFolderMode> mode = Utils.getFolderMode(worldId);
+        if (!mode.isEmpty()) {
+        	customWorldPath = Utils.getWorldPath(worldId, mode.get()).getParent();
+        
+	        if (mode.get() == WorldFolderMode.VANILLA) {
+	        	name = worldId.getPath();
+	        }
+        }
+        
+        LevelStorage storage = LevelStorage.create(customWorldPath);
+
+        try (Session session = storage.createSession(name)) {
+            Dynamic<?> dynamic = session.readLevelProperties();
+
+            Registry<DimensionOptions> dimensionRegistry = server.getRegistryManager().getOrThrow(RegistryKeys.DIMENSION);
+            DataConfiguration dataConfig = server.getSaveProperties().getDataConfiguration();
+
+            SaveProperties props = LevelStorage.parseSaveProperties(
+                dynamic,
+                dataConfig,
+                dimensionRegistry,
+                server.getRegistryManager()
+            ).properties();
+
+            if (!(props instanceof LevelProperties levelProps)) {
+                throw new IllegalStateException("SaveProperties is not a LevelProperties");
+            }
+
+            // Return the gamerules directly
+            return levelProps.getGameRules();
+        }
     }
     
     @Override

@@ -36,12 +36,10 @@ public class MixinLevelStorageSession {
 
 	@Inject(at = @At("TAIL"), method = "Lnet/minecraft/world/level/storage/LevelStorage$Session;<init>(Lnet/minecraft/world/level/storage/LevelStorage;Ljava/lang/String;Ljava/nio/file/Path;)V")
 	public void mw$init_test(LevelStorage s, String b, Path p, CallbackInfo ci) {
-		System.out.println("DEBUG DIRNAME: " + b);
-		System.out.println("DEBUG PATH: " + p.toString());
-		
-		Session thiz = (Session) (Object) this;
-		
-		System.out.println("LEVELSTORAGE.dat PATH: " + directory.getLevelDatPath() + " / "  + thiz.getDirectoryName() + " / " + thiz.getDirectory());
+		// System.out.println("DEBUG DIRNAME: " + b);
+		// System.out.println("DEBUG PATH: " + p.toString());
+		// Session thiz = (Session) (Object) this;
+		// System.out.println("LEVELSTORAGE.dat PATH: " + directory.getLevelDatPath() + " / "  + thiz.getDirectoryName() + " / " + thiz.getDirectory());
 	}
 	
 	/*
