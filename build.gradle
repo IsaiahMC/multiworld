@@ -4,7 +4,21 @@ plugins {
 	id "dev.architectury.loom" version "1.13-SNAPSHOT" apply false
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Check for updates every build
+        cacheChangingModulesFor(0, "seconds")
+    }
+}
+
+
 subprojects {
+
+	configurations.all {
+		// Check for updates every build
+		resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+	}
+
 
 	ext {
 		mod_version = project.mod_version
@@ -47,4 +61,10 @@ subprojects {
             }
         }
     })
+	
+	tasks.withType(JavaCompile) {
+		options.compilerArgs << "-Xlint:-unchecked"
+		options.compilerArgs << "-Xlint:-deprecation"
+		options.compilerArgs << "-Xlint:-varargs"
+	}
 }

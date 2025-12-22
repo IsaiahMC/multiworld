@@ -24,14 +24,22 @@ repositories {
 	mavenLocal()
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Check for updates every build
+        cacheChangingModulesFor(0, "seconds")
+    }
+}
+
+
 dependencies {
 	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	
-	// 1.21.9
+	// 1.21.11
     minecraft("com.mojang:minecraft:1.21.11-rc1") 
     mappings("net.fabricmc:yarn:1.21.11-rc1+build.1")
-    modImplementation("net.fabricmc:fabric-loader:0.18.1")
+    modImplementation("net.fabricmc:fabric-loader:0.18.3")
 	
 	// fantasy snapshot: https://pisaiah.com/maven-repo/
 	include("xyz.nucleoid:fantasy:0.6.8+1.21.11-pre2")
@@ -44,7 +52,7 @@ dependencies {
 	
 	
 	modImplementation("net.fabricmc.fabric-api:fabric-api:0.139.1+1.21.11")
-	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.139.1+1.21.11")
+	// modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.139.1+1.21.11")
 	
 	setOf(
 		"fabric-api-base",

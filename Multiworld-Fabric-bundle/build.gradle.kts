@@ -19,6 +19,14 @@ base {
     group = "me.isaiah.mods"
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Check for updates every build
+        cacheChangingModulesFor(0, "seconds")
+    }
+}
+
+
 dependencies {
 
 	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
@@ -27,7 +35,7 @@ dependencies {
 	// 1.20
     minecraft("com.mojang:minecraft:1.20.1") 
     mappings("net.fabricmc:yarn:1.20.1+build.10")
-    modImplementation("net.fabricmc:fabric-loader:0.16.9")
+    modImplementation("net.fabricmc:fabric-loader:0.18.3")
 	
 	// bundle jars
 	// include(project(":Multiworld-Fabric-1.18.2"))
@@ -39,7 +47,7 @@ dependencies {
 	include(project(":Multiworld-Fabric-1.21.1"))
 	include(project(":Multiworld-Fabric-1.21.4"))
 	include(project(":Multiworld-Fabric-1.21.5"))
-	include(project(":Multiworld-Fabric-1.21.9"))
+	include(project(":Multiworld-Fabric-1.21.10"))
 	include(project(":Multiworld-Fabric-1.21.11"))
 }
 

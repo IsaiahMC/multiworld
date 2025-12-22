@@ -66,7 +66,18 @@ public class WandEventHandler {
         positions[index] = pos;
         playerPositions.put(uuid, positions);
         
-        positions[0] = (ServerWorld) player.getEntityWorld();
+        try {
+        	positions[0] = (ServerWorld) player.getEntityWorld();
+        } catch (NoSuchMethodError err) {
+        	
+        	// 1.21.8:
+        	try {
+        		positions[0] = (ServerWorld) me.isaiah.multiworld.fabric.ICommonHooks.getWorld(player);
+        	} catch (Exception e) {
+        		err.printStackTrace();
+        		e.printStackTrace();
+        	}
+        }
 
         // TODO: Make less annoying
         // message(player, "&9[MultiworldPortals]&a📍&r Position " + index + " set to: " + pos.toShortString());

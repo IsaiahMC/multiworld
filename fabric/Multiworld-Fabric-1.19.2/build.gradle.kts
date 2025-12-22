@@ -19,6 +19,12 @@ base {
     group = "me.isaiah.mods"
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Check for updates every build
+        cacheChangingModulesFor(0, "seconds")
+    }
+}
 
 dependencies {
 
@@ -28,19 +34,20 @@ dependencies {
     // 1.19.2
     minecraft("com.mojang:minecraft:1.19.2") 
     mappings("net.fabricmc:yarn:1.19.2+build.28:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.16.9")
+    modImplementation("net.fabricmc:fabric-loader:0.18.3")
 	
 	include("xyz.nucleoid:fantasy:0.4.10+1.19.2")
 	modImplementation("xyz.nucleoid:fantasy:0.4.10+1.19.2")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
 	modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
-	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.76.0+1.19.2")
+	// modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.76.0+1.19.2")
 	
 	setOf(
 		"fabric-api-base",
-		//"fabric-command-api-v1",
 		"fabric-lifecycle-events-v1",
-		"fabric-networking-api-v1"
+		"fabric-networking-api-v1",
+		"fabric-events-interaction-v0",
+		"fabric-command-api-v2"
 	).forEach {
 		// Add each module as a dependency
 		modImplementation(fabricApi.module(it, "0.76.0+1.19.2"))

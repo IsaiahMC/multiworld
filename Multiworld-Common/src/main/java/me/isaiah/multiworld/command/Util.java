@@ -115,7 +115,7 @@ public class Util {
 		try {
 			Method m = hookClaz.getDeclaredMethod("hasICommon");
 			
-			Object o = m.invoke(hookClaz, null);
+			Object o = m.invoke(hookClaz, (Object[]) null);
 			boolean b = (boolean) o;
 			isForgeOrHasICommon = b;
 			hasValueCached = true;

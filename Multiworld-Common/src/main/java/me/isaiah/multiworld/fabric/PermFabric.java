@@ -1,6 +1,10 @@
 package me.isaiah.multiworld.fabric;
 
 import net.minecraft.server.network.ServerPlayerEntity;
+
+import java.util.NoSuchElementException;
+
+import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.perm.Perm;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -8,6 +12,13 @@ public class PermFabric extends Perm {
     
     public static void init() {
         Perm.setPerm(new PermFabric());
+        
+        try {
+        	String version = FabricLoader.getInstance().getModContainer("multiworld").get().getMetadata().getVersion().getFriendlyString();
+        	MultiworldMod.VERSION = version;
+        } catch (NoSuchElementException e) {
+        	// Error while getting version
+        }
         
         // TODO: move this
         ICommonHooks.register();

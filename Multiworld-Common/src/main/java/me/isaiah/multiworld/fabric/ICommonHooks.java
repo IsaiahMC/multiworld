@@ -2,6 +2,8 @@ package me.isaiah.multiworld.fabric;
 
 import java.util.Optional;
 
+import me.isaiah.common.ICommonMod;
+import me.isaiah.common.ICommonMod.SupportStatus;
 import me.isaiah.common.event.EventHandler;
 import me.isaiah.common.event.EventRegistery;
 import me.isaiah.common.event.entity.EntityPortalCollideEvent;
@@ -12,8 +14,11 @@ import me.isaiah.multiworld.portal.Portal;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class ICommonHooks {
 	
@@ -32,6 +37,16 @@ public class ICommonHooks {
 	}
 	*/
 	
+	public static World getWorld(PlayerEntity player) {
+		try {
+			World world = ((me.isaiah.common.cmixin.IMixinEntity) player).ic$getWorld();
+			return world;
+		} catch (Exception | NoSuchMethodError ex) {
+			// Older version of iCommonLib
+		}
+		return null;
+	}
+	
 	public static void register() {
 		new ICommonHooks().registerThis();
 	}
@@ -40,6 +55,12 @@ public class ICommonHooks {
 		if (!ICommonCheck.hasICommon()) {
 			MultiworldMod.LOGGER.info("Note: iCommonLib is required for full functionality of mod");
 			return;
+		}
+	
+		boolean isLower = ICommonMod.checkVersion(0.6, false, "multiworld", SupportStatus.SUGGEST);
+		
+		if (isLower) {
+			MultiworldMod.LOGGER.info("Note: iCommonLib #106 or higher is suggested.");
 		}
 		
 		int r = EventRegistery.registerAll(this);

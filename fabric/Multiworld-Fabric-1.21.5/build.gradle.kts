@@ -24,6 +24,13 @@ repositories {
 	mavenLocal()
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Check for updates every build
+        cacheChangingModulesFor(0, "seconds")
+    }
+}
+
 dependencies {
 
 	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
@@ -32,28 +39,29 @@ dependencies {
 	// 1.21.5
     minecraft("com.mojang:minecraft:1.21.5") 
     mappings("net.fabricmc:yarn:1.21.5+build.1")
-    modImplementation("net.fabricmc:fabric-loader:0.16.14")
+    modImplementation("net.fabricmc:fabric-loader:0.18.3")
 
 	include("xyz.nucleoid:fantasy:0.6.7+1.21.5")
 	modImplementation("xyz.nucleoid:fantasy:0.6.7+1.21.5")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
 	modImplementation("me.lucko:fabric-permissions-api:0.3.3")
-	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.127.0+1.21.5")
+	// modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.127.0+1.21.5")
 	
 	
 	setOf(
 		"fabric-api-base",
 		"fabric-lifecycle-events-v1",
 		"fabric-networking-api-v1",
-		"fabric-events-interaction-v0"
+		"fabric-events-interaction-v0",
+		"fabric-command-api-v2"
 	).forEach {
 		modImplementation(fabricApi.module(it, "0.127.0+1.21.5"))
 	}
 	
 	val ic = DefaultExternalModuleDependency(
 		"com.javazilla.mods",
-		"icommon-fabric-1.21.4",
-		"1.21.4",
+		"icommon-fabric-1.21.8",
+		"1.21.8",
 		null
 	).apply {
 		isChanging = true // Make sure we get the latest version of iCommon

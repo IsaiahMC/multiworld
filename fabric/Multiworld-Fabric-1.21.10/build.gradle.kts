@@ -15,7 +15,7 @@ java {
 
 base {
     archivesBaseName = "Multiworld-Fabric"
-    version = "1.21.9"
+    version = "1.21.10"
     group = "me.isaiah.mods"
 }
 
@@ -28,18 +28,17 @@ dependencies {
 	annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	
-	// 1.21.9
-    minecraft("com.mojang:minecraft:1.21.9") 
-    mappings("net.fabricmc:yarn:1.21.9+build.1")
-    modImplementation("net.fabricmc:fabric-loader:0.17.2")
+	// 1.21.10
+    minecraft("com.mojang:minecraft:1.21.10") 
+    mappings("net.fabricmc:yarn:1.21.10+build.3")
+    modImplementation("net.fabricmc:fabric-loader:0.18.3")
 	
 	include("xyz.nucleoid:fantasy:0.6.8+1.21.9")
 	modImplementation("xyz.nucleoid:fantasy:0.6.8+1.21.9")
 	modImplementation("curse.maven:cyber-permissions-407695:7068279")
 	modImplementation("me.lucko:fabric-permissions-api:0.5.0")
 
-	modImplementation("net.fabricmc.fabric-api:fabric-api:0.134.0+1.21.9")
-	modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.134.0+1.21.9")
+	modImplementation("net.fabricmc.fabric-api:fabric-api:0.138.4+1.21.10")
 	
 	setOf(
 		"fabric-api-base",
@@ -48,7 +47,7 @@ dependencies {
 		"fabric-events-interaction-v0",
 		"fabric-command-api-v2"
 	).forEach {
-		modImplementation(fabricApi.module(it, "0.134.0+1.21.9"))
+		modImplementation(fabricApi.module(it, "0.138.4+1.21.10"))
 	}
 	
 	val ic = DefaultExternalModuleDependency(
