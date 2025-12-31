@@ -57,11 +57,10 @@ public class I18n {
         try {
 			if (!wc.exists()) {
 				wc.createNewFile();
+				save();
 			}
             config = new FileConfiguration(wc);
-            
-            TELEPORTING = config.getOrDefault("", DEF_TELEPORTING);
-            
+ 
             TELEPORTING = config.getOrDefault("messages.teleport", DEF_TELEPORTING);
             NULL_SPAWN = config.getOrDefault("messages.nullSpawn", DEF_NULL_SPAWN);
             USAGE_CREATE = config.getOrDefault("messages.usageCreate", DEF_USAGE_CREATE);

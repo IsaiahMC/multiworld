@@ -54,7 +54,7 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
 	protected MultiworldWorld(MinecraftServer server, RegistryKey<World> registryKey, RuntimeWorldConfig config, Style style) {
         this(
                 server, Util.getMainWorkerExecutor(), mw$session(server, registryKey.getValue()),
-                new RuntimeWorldProperties(new SaveProperties2((LevelProperties) server.getSaveProperties()).withName(registryKey.getValue().toUnderscoreSeparatedString().replace("multiworld_", "")), config),
+                new RuntimeWorldProperties(new MySaveProperties((LevelProperties) server.getSaveProperties()).withName(registryKey.getValue().toUnderscoreSeparatedString().replace("multiworld_", "")), config),
                 registryKey,
                 config.createDimensionOptions(server),
                 false,
@@ -163,7 +163,7 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
     
     public SaveProperties getSaveProperties() {
     	SaveProperties serverSave = this.getServer().getSaveProperties();
-    	SaveProperties2 props = new SaveProperties2((LevelProperties) serverSave).withName(
+    	MySaveProperties props = new MySaveProperties((LevelProperties) serverSave).withName(
     			multiworld$getLevelName()
     			);
 

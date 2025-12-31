@@ -51,7 +51,7 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
 	
 	public final LevelStorage.Session mw$levelStorageAccess;
 	
-	private static DimensionOptions config_createDimensionOptions(MinecraftServer server) {
+	private static DimensionOptions config_createDimensionOptions1(MinecraftServer server) {
 
 		DimensionOptions dimensionOptions = server.getRegistryManager()
 			    .getOrThrow(RegistryKeys.DIMENSION)
@@ -63,9 +63,9 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
 	protected MultiworldWorld(MinecraftServer server, RegistryKey<World> registryKey, RuntimeWorldConfig config, Style style) {
         this(
                 server, Util.getMainWorkerExecutor(), mw$session(server, registryKey.getValue()),
-                new RuntimeWorldProperties(new SaveProperties2((LevelProperties) server.getSaveProperties()).withName(registryKey.getValue().toUnderscoreSeparatedString().replace("multiworld_", "")), config),
+                new RuntimeWorldProperties(new MySaveProperties((LevelProperties) server.getSaveProperties()).withName(registryKey.getValue().toUnderscoreSeparatedString().replace("multiworld_", "")), config),
                 registryKey,
-                config_createDimensionOptions(server),
+                config.createDimensionOptions(server),
                 false,
                 BiomeAccess.hashSeed(config.getSeed()),
                 ImmutableList.of(),
@@ -86,11 +86,6 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
         this.style = style;
     }
     
-    // Exerpt from CraftServer: getWorldContainer
-	public static File getWorldContainer1(MinecraftServer server) {
-		return Utils.getWorldStoragePath(server).toFile();
-	}
-	
     private static Session mw$session(MinecraftServer server, Identifier id) {
     	boolean useUs = Utils.shouldUseNewWorldFormat(server, id);
     	if (!useUs) { return ((MinecraftServerAccess) server).getSession(); }
@@ -137,7 +132,7 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
     
     public SaveProperties getSaveProperties() {
     	SaveProperties serverSave = this.getServer().getSaveProperties();
-    	SaveProperties2 props = new SaveProperties2((LevelProperties) serverSave).withName(
+    	MySaveProperties props = new MySaveProperties((LevelProperties) serverSave).withName(
     			multiworld$getLevelName()
     			);
 

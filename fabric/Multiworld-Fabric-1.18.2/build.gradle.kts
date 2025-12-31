@@ -13,6 +13,15 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+// Preprocess
+extensions.extraProperties["targetVersion"] = "mc182"
+extensions.extraProperties["inputSourceDir"] = "${rootProject.projectDir}/Multiworld-Common/src/main/java"
+extensions.extraProperties["excludedFiles"] =
+    listOf("java/multiworld/mixin/MixinLevelStorageSession.java")
+
+val createPreprocessor = rootProject.extra["createPreprocessor"] as groovy.lang.Closure<*>
+createPreprocessor.call(project)
+
 base {
     archivesBaseName = "Multiworld-Fabric"
     version = "1.18.2"

@@ -13,6 +13,12 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+// Preprocess
+extensions.extraProperties["targetVersion"] = "mc194"
+extensions.extraProperties["inputSourceDir"] = "${rootProject.projectDir}/Multiworld-Common/src/main/java"
+val createPreprocessor = rootProject.extra["createPreprocessor"] as groovy.lang.Closure<*>
+createPreprocessor.call(project)
+
 base {
     archivesBaseName = "Multiworld-Fabric"
     version = "1.19.4"

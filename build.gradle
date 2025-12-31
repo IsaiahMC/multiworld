@@ -175,7 +175,12 @@ subprojects {
                     srcDir("src/main/java")
                     
 					if (project.version != "1.21.11") {
+						if (project.version == "1.18.2" || project.version == "1.19.2") {
+							srcDir("${rootProject.projectDir}/Multiworld-Common/src/main/java").exclude("multiworld/mixin/MixinLevelStorageSession.java")
+						} else {
+					
 						srcDir("${rootProject.projectDir}/Multiworld-Common/src/main/java")
+						}
 					} else {
 						srcDir("${rootProject.projectDir}/Multiworld-Common/src/main/java").exclude("me/isaiah/multiworld/command/GameruleCommand.java")
 					}

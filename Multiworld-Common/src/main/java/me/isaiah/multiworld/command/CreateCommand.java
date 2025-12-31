@@ -142,7 +142,9 @@ public class CreateCommand implements Command {
 
         String customGen = "";
         
-        WorldFolderMode dirMode = WorldFolderMode.BUKKIT;
+        // WorldFolderMode dirMode = WorldFolderMode.BUKKIT;
+
+        WorldFolderMode dirMode = WorldFolderMode.VANILLA;
         
         if (args.length > 3) {
         	for (int i = 3; i < args.length; i++) {

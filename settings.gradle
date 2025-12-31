@@ -35,7 +35,7 @@ include 'Multiworld-Common'
 // include 'Multiworld-NeoForged-1.21.2'
 
 // Mod Platform Versions
-def versions_fabric   = ['1.20.1', '1.20.4', '1.20.6', '1.21.1', '1.21.4', '1.21.8', '1.21.10', '1.21.11'] // TODO: Should keep 1.18/1.19?
+def versions_fabric   = ['1.18.2', '1.19.2', '1.19.4', '1.20.1', '1.20.4', '1.20.6', '1.21.1', '1.21.4', '1.21.8', '1.21.10', '1.21.11'] // TODO: Should keep 1.18/1.19?
 def versions_forge    = ['1.20.1'] // ['1.18.2', '1.19.4', '1.20.1']
 def versions_neoforge = ['1.21.1', '1.21.2', '1.21.10']
 

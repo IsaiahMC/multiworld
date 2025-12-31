@@ -11,12 +11,12 @@ import me.isaiah.multiworld.command.CreateCommand;
 import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.config.FileConfiguration;
 import multiworld.api.WorldFolderMode;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+// import net.minecraft.registry.RegistryKey;
+// import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.path.SymlinkValidationException;
+// import net.minecraft.util.path.SymlinkValidationException;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -80,6 +80,7 @@ public class Utils {
 	
 	public static Optional<WorldFolderMode> getFolderMode(Identifier id) {
 		
+		/*
 		if (id.getNamespace().equalsIgnoreCase("minecraft")) {
 			return Optional.of(WorldFolderMode.VANILLA);
 		}
@@ -105,6 +106,8 @@ public class Utils {
         }
 		
         return Optional.empty();
+        */
+		return Optional.of(WorldFolderMode.VANILLA);
 	}
 	
 	
@@ -114,6 +117,7 @@ public class Utils {
 			return false;
 		}
     	
+    	/*
     	Optional<WorldFolderMode> mode = Utils.getFolderMode(id);
     	if (mode.isPresent()) {
     		if (mode.get() == WorldFolderMode.VANILLA) {
@@ -178,6 +182,7 @@ public class Utils {
     	if (id.getNamespace().contains("minecraft")) {
     		return false;
     	}
+    	*/
     	
     	return false;
     }
@@ -252,33 +257,37 @@ public class Utils {
  	public static Path getWorldStoragePath(MinecraftServer server, WorldFolderMode mode) {
  		Path overworld = ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD); 
  		
- 		if (mode == WorldFolderMode.VANILLA) {
+ 		// if (mode == WorldFolderMode.VANILLA) {
  			return overworld.resolve("dimensions");
- 		}
+ 		// }
  		
  		// Client side
+ 		/*
  		if (!MultiworldMod.mc.isDedicated()) {
  			Path mw = overworld.resolve("multiworlds");
  			return mw;
  		}
  		
  		return overworld.getParent();
+ 		*/
  	}
  	
  	public static Path getWorldPath(Identifier id, WorldFolderMode mode) {
  		Path overworld = ((MinecraftServerAccess) MultiworldMod.mc).getSession().getWorldDirectory(World.OVERWORLD); 
  		
- 		if (mode == WorldFolderMode.VANILLA) {
+ 		// if (mode == WorldFolderMode.VANILLA) {
  			return overworld.resolve("dimensions").resolve(id.getNamespace()).resolve(id.getPath());
- 		}
+ 		//}
  		
  		// Client side
- 		if (!MultiworldMod.mc.isDedicated()) {
+ 		/*
+ 			if (!MultiworldMod.mc.isDedicated()) {
  			Path mw = overworld.resolve("multiworlds");
  			return mw.resolve(getWorldName(id));
  		}
  		
  		return overworld.getParent().resolve(getWorldName(id));
+ 		*/
  	}
  	
  	public static Path getWorldStoragePath(MinecraftServer server) {
@@ -294,7 +303,17 @@ public class Utils {
  	}
  	
  	public static Path getWorldDirectory(Identifier id) {
+ 		return getWorldPath(id, WorldFolderMode.VANILLA);
+ 	}
+ 	
+ 	public static Path getWorldDirectory(Identifier id, WorldFolderMode mode) {
+ 		return getWorldPath(id, WorldFolderMode.VANILLA);
+ 	}
+ 	
+ 	/*
+ 	public static Path getWorldDirectory(Identifier id) {
  		
+ 		/*
  		// TODO: Add proper Multiworld support to Forge
  		if (isForge()) {
  			System.out.println("Note: Using Vanilla Directory for World: " + id);
@@ -305,11 +324,15 @@ public class Utils {
  		Path bukkit = storage.resolve( getWorldName(id) ); 
  		
  		return bukkit;
+ 		*
+		return ((MinecraftServerAccess) MultiworldMod.mc).getSession().getWorldDirectory(RegistryKey.of(RegistryKeys.WORLD, id));
+
  	}
  	
  	public static Path getWorldDirectory(Identifier id, WorldFolderMode mode) {
  		
  		// TODO: Add proper Multiworld support to Forge
+ 		/*
  		if (isForge() || mode == WorldFolderMode.VANILLA) {
  			System.out.println("Note: Using Vanilla Directory for World: " + id);
  			return ((MinecraftServerAccess) MultiworldMod.mc).getSession().getWorldDirectory(RegistryKey.of(RegistryKeys.WORLD, id));
@@ -319,7 +342,10 @@ public class Utils {
  		Path bukkit = storage.resolve( getWorldName(id) ); 
  		
  		return bukkit;
+ 		*
+ 		return ((MinecraftServerAccess) MultiworldMod.mc).getSession().getWorldDirectory(RegistryKey.of(RegistryKeys.WORLD, id));
  	}
+ 	*/
  	
  	public static List<Path> searchForWorlds() {
  		Path storage = getWorldStoragePath();
