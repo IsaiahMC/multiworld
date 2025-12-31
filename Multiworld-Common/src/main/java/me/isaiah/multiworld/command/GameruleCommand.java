@@ -46,7 +46,7 @@ public class GameruleCommand implements Command, IGameruleCommand {
 	
     @SuppressWarnings("unchecked")
     public int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
-        ServerWorld w = (ServerWorld) plr.getEntityWorld();
+        ServerWorld w = Command.getWorldFor(plr);
 
 		if (keys.isEmpty()) {
 			setup(w);

@@ -184,7 +184,7 @@ public class PortalCommand implements Command {
 		BlockPos pos2 = (BlockPos) poss[2];
 		
 		if (null == world) {
-			world = (ServerWorld) plr.getEntityWorld();
+			world = Command.getWorldFor(plr);
 		}
 		
 		if (null == pos1 || null == pos2) {

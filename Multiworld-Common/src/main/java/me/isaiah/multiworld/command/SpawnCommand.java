@@ -1,6 +1,5 @@
 package me.isaiah.multiworld.command;
 
-import java.io.File;
 import java.io.IOException;
 
 import me.isaiah.multiworld.MultiworldMod;
@@ -11,13 +10,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldProperties;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.WorldProperties;
 
 public class SpawnCommand implements Command {
 
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
-        ServerWorld w = (ServerWorld) plr.getEntityWorld();
+        ServerWorld w = Command.getWorldFor(plr);
         BlockPos sp = getSpawn(w);
 
         // Don't use FabricDimensionInternals here as

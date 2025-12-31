@@ -13,9 +13,15 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+// Preprocess
+extensions.extraProperties["targetVersion"] = "mc218"
+extensions.extraProperties["inputSourceDir"] = "${rootProject.projectDir}/Multiworld-Common/src/main/java"
+val createPreprocessor = rootProject.extra["createPreprocessor"] as groovy.lang.Closure<*>
+createPreprocessor.call(project)
+
 base {
     archivesBaseName = "Multiworld-Fabric"
-    version = "1.21.5"
+    version = "1.21.8"
     group = "me.isaiah.mods"
 }
 
@@ -37,15 +43,14 @@ dependencies {
 	compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	
 	// 1.21.5
-    minecraft("com.mojang:minecraft:1.21.5") 
-    mappings("net.fabricmc:yarn:1.21.5+build.1")
+    minecraft("com.mojang:minecraft:1.21.8") 
+    mappings("net.fabricmc:yarn:1.21.8+build.1")
     modImplementation("net.fabricmc:fabric-loader:0.18.3")
 
 	include("xyz.nucleoid:fantasy:0.6.7+1.21.5")
 	modImplementation("xyz.nucleoid:fantasy:0.6.7+1.21.5")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
-	modImplementation("me.lucko:fabric-permissions-api:0.3.3")
-	// modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.127.0+1.21.5")
+	modImplementation("me.lucko:fabric-permissions-api:0.4.0")
 
 	setOf(
 		"fabric-api-base",
@@ -54,7 +59,7 @@ dependencies {
 		"fabric-events-interaction-v0",
 		"fabric-command-api-v2"
 	).forEach {
-		modImplementation(fabricApi.module(it, "0.127.0+1.21.5"))
+		modImplementation(fabricApi.module(it, "0.136.1+1.21.8"))
 	}
 	
 	val ic = DefaultExternalModuleDependency(

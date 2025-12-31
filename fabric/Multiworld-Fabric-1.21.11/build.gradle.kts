@@ -13,6 +13,17 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+// Preprocess
+extensions.extraProperties["targetVersion"] = "mc2111"
+extensions.extraProperties["inputSourceDir"] = "${rootProject.projectDir}/Multiworld-Common/src/main/java"
+extensions.extraProperties["excludedFiles"] =
+    listOf("java/me/isaiah/multiworld/command/GameruleCommand.java")
+    //      java/me/isaiah/multiworld/command/GameruleCommand.java
+
+
+val createPreprocessor = rootProject.extra["createPreprocessor"] as groovy.lang.Closure<*>
+createPreprocessor.call(project)
+
 base {
     archivesBaseName = "Multiworld-Fabric"
     version = "1.21.11"
@@ -81,7 +92,7 @@ sourceSets {
     main {
         java {
             srcDir("${rootProject.projectDir}/Multiworld-Common/src/main/java/com")
-            srcDir("${rootProject.projectDir}/Multiworld-Common/src/main/java").exclude("me/isaiah/multiworld/command/GameruleCommand.java")
+            // srcDir("${rootProject.projectDir}/Multiworld-Common/src/main/java").exclude("me/isaiah/multiworld/command/GameruleCommand.java")
 
             srcDir("src/main/java")
 			exclude("**/dimapi/*.java")

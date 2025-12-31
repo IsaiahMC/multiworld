@@ -10,6 +10,12 @@ plugins {
 	// id ("com.replaymod.preprocess") version "fad42fb94c"
 }
 
+// Preprocess
+extensions.extraProperties["targetVersion"] = "mc201"
+extensions.extraProperties["inputSourceDir"] = "${rootProject.projectDir}/Multiworld-Common/src/main/java"
+val createPreprocessor = rootProject.extra["createPreprocessor"] as groovy.lang.Closure<*>
+createPreprocessor.call(project)
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17

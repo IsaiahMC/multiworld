@@ -14,7 +14,7 @@ import net.minecraft.world.Difficulty;
 public class DifficultyCommand implements Command {
 
     public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
-        ServerWorld w = (ServerWorld) plr.getEntityWorld();
+        ServerWorld w = Command.getWorldFor(plr);
 
 		if (args.length < 2) {
 			MultiworldMod.message(plr, I18n.CMD_DIFF_USAGE);

@@ -38,15 +38,21 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:0.18.3")
 	
 	// bundle jars
+	
+	// Legacy 1.18/1.19
 	// include(project(":Multiworld-Fabric-1.18.2"))
 	// include(project(":Multiworld-Fabric-1.19.2"))
 	// include(project(":Multiworld-Fabric-1.19.4"))
+	
+	// 1.20.x
 	include(project(":Multiworld-Fabric-1.20.1"))
 	// include(project(":Multiworld-Fabric-1.20.4"))
 	include(project(":Multiworld-Fabric-1.20.6"))
+	
+	// 1.21.x
 	include(project(":Multiworld-Fabric-1.21.1"))
 	include(project(":Multiworld-Fabric-1.21.4"))
-	include(project(":Multiworld-Fabric-1.21.5"))
+	include(project(":Multiworld-Fabric-1.21.8"))
 	include(project(":Multiworld-Fabric-1.21.10"))
 	include(project(":Multiworld-Fabric-1.21.11"))
 }

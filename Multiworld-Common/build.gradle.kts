@@ -10,6 +10,14 @@ plugins {
 	id ("architectury-plugin") version "3.4-SNAPSHOT"
 }
 
+// Preprocess
+extensions.extraProperties["targetVersion"] = "mcCommon"
+extensions.extraProperties["inputSourceDir"] = "src/main/java"
+
+val createPreprocessor = rootProject.extra["createPreprocessor"] as groovy.lang.Closure<*>
+createPreprocessor.call(project)
+
+
 architectury {
     common("fabric", "forge", "neoforge")
 }

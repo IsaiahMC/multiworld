@@ -6,6 +6,7 @@ package me.isaiah.multiworld.portal;
 import java.util.HashMap;
 import java.util.UUID;
 
+import me.isaiah.multiworld.MultiworldMod;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -67,7 +68,7 @@ public class WandEventHandler {
         playerPositions.put(uuid, positions);
         
         try {
-        	positions[0] = (ServerWorld) player.getEntityWorld();
+        	positions[0] = MultiworldMod.getWorldFor(player);
         } catch (NoSuchMethodError err) {
         	
         	// 1.21.8:
