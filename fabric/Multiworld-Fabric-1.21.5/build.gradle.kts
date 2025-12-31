@@ -46,8 +46,7 @@ dependencies {
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")
 	modImplementation("me.lucko:fabric-permissions-api:0.3.3")
 	// modImplementation("net.fabricmc.fabric-api:fabric-api-deprecated:0.127.0+1.21.5")
-	
-	
+
 	setOf(
 		"fabric-api-base",
 		"fabric-lifecycle-events-v1",

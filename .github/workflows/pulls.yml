@@ -1,7 +1,7 @@
 name: Java CI with Gradle
 
 on:
-  push:
+  pull_request:
     branches: [ "master" ]
 
 permissions:
@@ -23,4 +23,4 @@ jobs:
       with:
         cache-disabled: false
     - name: Build with Gradle
-      run: ./gradlew build --parallel --daemon
+      run: ./gradlew :Multiworld-Fabric-1.21.11:build
