@@ -9,8 +9,8 @@ import java.util.Optional;
 
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.FileConfiguration;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
 
 public class Util {
 
@@ -38,14 +38,14 @@ public class Util {
     /**
      * 
      */
-    public static FileConfiguration get_config(World w) throws IOException {
+    public static FileConfiguration get_config(Level w) throws IOException {
         File cf = new File(get_platform_config_dir(), "multiworld"); 
         cf.mkdirs();
 
         File worlds = new File(cf, "worlds");
         worlds.mkdirs();
 
-        Identifier id = w.getRegistryKey().getValue();
+        Identifier id = w.dimension().identifier();
         File namespace = new File(worlds, id.getNamespace());
         namespace.mkdirs();
 

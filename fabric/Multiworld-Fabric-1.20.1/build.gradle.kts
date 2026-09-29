@@ -22,7 +22,7 @@ java {
 }
 
 base {
-    archivesBaseName = "Multiworld-Fabric"
+    archivesName = "Multiworld-Fabric"
     version = "1.20.1"
     group = "me.isaiah.mods"
 }
@@ -42,8 +42,14 @@ dependencies {
 
 	// 1.20.1
     minecraft("com.mojang:minecraft:1.20.1") 
-    mappings("net.fabricmc:yarn:1.20.1+build.10")
-    modImplementation("net.fabricmc:fabric-loader:0.18.3")
+    // mappings("net.fabricmc:yarn:1.20.1+build.10")
+    
+	mappings(loom.layered {
+        mappings(file("../../Multiworld-Common/mappings-yay-identifier.jar"))
+
+    })
+	
+	modImplementation("net.fabricmc:fabric-loader:0.18.3")
 	
 	include("xyz.nucleoid:fantasy:0.4.11+1.20-rc1")
 	modImplementation("xyz.nucleoid:fantasy:0.4.11+1.20-rc1")

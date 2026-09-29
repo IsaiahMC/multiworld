@@ -1,12 +1,12 @@
 package me.isaiah.multiworld.command;
 
 import me.isaiah.multiworld.MultiworldMod;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 public interface Command {
 	
-	public static ServerWorld getWorldFor(ServerPlayerEntity plr) {
+	public static ServerLevel getWorldFor(ServerPlayer plr) {
 		 return MultiworldMod.getWorldFor(plr);
 	}
 	

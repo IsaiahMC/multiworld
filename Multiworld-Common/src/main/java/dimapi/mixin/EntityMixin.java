@@ -20,25 +20,23 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.TeleportTarget;
-
 import dimapi.FabricDimensionInternals;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.portal.PortalInfo;
 
 /**
- * This mixin implements {@link Entity#getTeleportTarget(ServerWorld)} for modded dimensions, as Vanilla will
+ * This mixin implements {@link Entity#findDimensionEntryPoint(ServerLevel)} for modded dimensions, as Vanilla will
  * not return a teleport target for anything but Vanilla dimensions.
  */
 @Mixin(Entity.class)
 public class EntityMixin {
 
-	@Inject(method = "getTeleportTarget", at = @At("HEAD"), cancellable = true, allow = 1)
-	public void getTeleportTarget(ServerWorld destination, CallbackInfoReturnable<TeleportTarget> cri) {
+	@Inject(method = "findDimensionEntryPoint", at = @At("HEAD"), cancellable = true, allow = 1)
+	public void getTeleportTarget(ServerLevel destination, CallbackInfoReturnable<PortalInfo> cri) {
 		Entity self = (Entity) (Object) this;
 		// Check if a destination has been set for the entity currently being teleported
-		TeleportTarget customTarget = FabricDimensionInternals.getCustomTarget();
+		PortalInfo customTarget = FabricDimensionInternals.getCustomTarget();
 
 		if (customTarget != null) cri.setReturnValue(customTarget);
 	}

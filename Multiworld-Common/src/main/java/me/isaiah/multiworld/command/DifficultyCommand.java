@@ -7,14 +7,14 @@ import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 
 public class DifficultyCommand implements Command {
 
-    public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
-        ServerWorld w = Command.getWorldFor(plr);
+    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+        ServerLevel w = Command.getWorldFor(plr);
 
 		if (args.length < 2) {
 			MultiworldMod.message(plr, I18n.CMD_DIFF_USAGE);
@@ -27,10 +27,10 @@ public class DifficultyCommand implements Command {
         if (args.length >= 3) {
         	String a2 = args[2];
         	
-        	HashMap<String,ServerWorld> worlds = new HashMap<>();
-            mc.getWorldRegistryKeys().forEach(r -> {
-                ServerWorld world = mc.getWorld(r);
-                worlds.put(r.getValue().toString(), world);
+        	HashMap<String,ServerLevel> worlds = new HashMap<>();
+            mc.levelKeys().forEach(r -> {
+                ServerLevel world = mc.getLevel(r);
+                worlds.put(r.identifier().toString(), world);
             });
 
             if (a2.indexOf(':') == -1) a2 = "multiworld:" + a2;
@@ -52,7 +52,7 @@ public class DifficultyCommand implements Command {
 			return 1;
 		}
 
-        MultiworldMod.get_world_creator().set_difficulty(w.getRegistryKey().getValue().toString(), d);
+        MultiworldMod.get_world_creator().set_difficulty(w.dimension().identifier().toString(), d);
 
         try {
 			FileConfiguration config = Util.get_config(w);
@@ -62,7 +62,7 @@ public class DifficultyCommand implements Command {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        MultiworldMod.message(plr, "[&cMultiworld&r]: Difficulty of world '" + w.getRegistryKey().getValue().toString() + "' is now set to: " + a1);
+        MultiworldMod.message(plr, "[&cMultiworld&r]: Difficulty of world '" + w.dimension().identifier().toString() + "' is now set to: " + a1);
         return 1;
     }
 

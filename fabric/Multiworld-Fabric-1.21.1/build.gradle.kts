@@ -20,7 +20,7 @@ val createPreprocessor = rootProject.extra["createPreprocessor"] as groovy.lang.
 createPreprocessor.call(project)
 
 base {
-    archivesBaseName = "Multiworld-Fabric"
+    archivesName = "Multiworld-Fabric"
     version = "1.21.1"
     group = "me.isaiah.mods"
 }
@@ -44,8 +44,13 @@ dependencies {
 
 	// 1.21.1
     minecraft("com.mojang:minecraft:1.21.1") 
-    mappings("net.fabricmc:yarn:1.21.1+build.3:v2")
+    // mappings("net.fabricmc:yarn:1.21.1+build.3:v2")
     modImplementation("net.fabricmc:fabric-loader:0.18.3")
+
+	mappings(loom.layered {
+        mappings(file("mappings-identifier.jar"))
+
+    })
 
 	include("xyz.nucleoid:fantasy:0.6.3+1.21")
 	modImplementation("xyz.nucleoid:fantasy:0.6.3+1.21")

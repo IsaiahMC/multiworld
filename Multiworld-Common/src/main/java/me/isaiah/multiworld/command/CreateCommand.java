@@ -17,12 +17,12 @@ import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.config.FileConfiguration;
 import multiworld.api.WorldFolderMode;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 
 /**
  * The "/mw create" Command
@@ -116,7 +116,7 @@ public class CreateCommand implements Command {
 	/**
 	 * Run Command
 	 */
-    public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
+    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
         if (args.length == 1 || args.length == 2) {
             // Command Usage Message
             I18n.message(plr, I18n.USAGE_CREATE);
@@ -178,13 +178,13 @@ public class CreateCommand implements Command {
         }
         
         // createConfigAndWorld(String id, String dimStr, Identifier dimId, ChunkGenerator gen, Difficulty dif, long seed, String cgen) {
-        ServerWorld world = MultiworldMod.createConfigAndWorld(arg1, args[2], dim, gen, Difficulty.NORMAL, seed, customGen, dirMode);
+        ServerLevel world = MultiworldMod.createConfigAndWorld(arg1, args[2], dim, gen, Difficulty.NORMAL, seed, customGen, dirMode);
         
         // make_config(MultiworldMod.new_id(arg1), args[2], seed, customGen);
         // ServerWorld world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.NORMAL, seed);
 		// make_config(world, args[2], seed, customGen);
 
-		message(plr, I18n.CREATED_WORLD + args[1] + " (" + world.getRegistryKey().getValue() + ")");
+		message(plr, I18n.CREATED_WORLD + args[1] + " (" + world.dimension().identifier() + ")");
         
         return 1;
     }
@@ -251,7 +251,7 @@ public class CreateCommand implements Command {
     	Path path = Utils.getWorldDirectory(MultiworldMod.new_id(id));
 		
 		if (!path.toFile().isDirectory()) {
-			if (MultiworldMod.mc.isDedicated()) {
+			if (MultiworldMod.mc.isDedicatedServer()) {
 				MultiworldMod.LOGGER.info("Error loading World \"" + id + "\" could not find world folder: " + path);
 			}
 			// Singleplayer
@@ -331,7 +331,7 @@ public class CreateCommand implements Command {
         		}
 			}
 
-			ServerWorld world = MultiworldMod.create_world(id, dim, gen, d, seed);
+			ServerLevel world = MultiworldMod.create_world(id, dim, gen, d, seed);
 
 			MultiworldMod.get_world_creator().set_difficulty(id, d);
 
@@ -342,7 +342,7 @@ public class CreateCommand implements Command {
         }
 	}
 	
-	public static void reinitWorldGamerules(FileConfiguration config, ServerWorld world) {
+	public static void reinitWorldGamerules(FileConfiguration config, ServerLevel world) {
 		IGameruleCommand gameruleCommand = Util.getGameruleCommand();
 		
 		if (null == gameruleCommand) {
@@ -381,8 +381,8 @@ public class CreateCommand implements Command {
 	 * {@link #reinit_world_from_config(MinecraftServer, String)}
 	 * on next server start.
 	 */
-	private static void make_config(ServerWorld w, String dim, long seed, String cgen) {
-		Identifier id = w.getRegistryKey().getValue();
+	private static void make_config(ServerLevel w, String dim, long seed, String cgen) {
+		Identifier id = w.dimension().identifier();
 		make_config(id, dim, seed, cgen);
 	}
 	

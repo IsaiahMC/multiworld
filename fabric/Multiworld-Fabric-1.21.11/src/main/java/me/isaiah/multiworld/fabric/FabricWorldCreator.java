@@ -11,39 +11,29 @@ import com.mojang.serialization.Dynamic;
 
 import me.isaiah.multiworld.ICreator;
 import me.isaiah.multiworld.MultiworldMod;
-import net.minecraft.command.DefaultPermissions;
-import net.minecraft.command.permission.Permission;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.Impl;
-import net.minecraft.resource.DataConfiguration;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.path.SymlinkFinder;
-import net.minecraft.util.path.SymlinkValidationException;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.SaveProperties;
-import net.minecraft.world.TeleportTarget;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.dimension.DimensionTypes;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.FlatChunkGenerator;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
-import net.minecraft.world.level.LevelProperties;
-import net.minecraft.world.level.storage.LevelStorage;
-import net.minecraft.world.level.storage.LevelStorage.Session;
-import net.minecraft.world.rule.GameRule;
-import net.minecraft.world.rule.GameRuleType;
-import net.minecraft.world.rule.GameRules;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRuleType;
+import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
+import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.level.validation.ContentValidationException;
+import net.minecraft.world.phys.Vec3;
 import xyz.nucleoid.fantasy.Fantasy;
 import xyz.nucleoid.fantasy.RuntimeWorld;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
@@ -53,7 +43,7 @@ import xyz.nucleoid.fantasy.util.VoidChunkGenerator;
 public class FabricWorldCreator implements ICreator {
 
     public Identifier new_id(String id) {
-    	return Identifier.of(id);
+    	return Identifier.parse(id);
     }
 
 	public HashMap<String, RuntimeWorldConfig> worldConfigs;
@@ -68,7 +58,7 @@ public class FabricWorldCreator implements ICreator {
     
     private RuntimeWorld.Constructor worldConstructor = MultiworldWorld::new;
 
-    public ServerWorld create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed) {
+    public ServerLevel create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed) {
         
     	Identifier idd = new_id(id);
     	GameRules rules = null;
@@ -94,17 +84,17 @@ public class FabricWorldCreator implements ICreator {
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(idd, config);
-        ServerWorld world = worldHandle.asWorld();
+        ServerLevel world = worldHandle.asWorld();
         
         if (null != rules) {
         	final GameRules rulesFinal = rules;
-	        rules.streamRules().forEach(rule -> {
-				if (rule.getType() == GameRuleType.BOOL) {
-					world.getGameRules().setValue( (GameRule<Boolean>) rule, rulesFinal.getValue((GameRule<Boolean>) rule), null);
+	        rules.availableRules().forEach(rule -> {
+				if (rule.gameRuleType() == GameRuleType.BOOL) {
+					world.getGameRules().set( (GameRule<Boolean>) rule, rulesFinal.get((GameRule<Boolean>) rule), null);
 				}
 	
-				if (rule.getType() == GameRuleType.INT) {
-					world.getGameRules().setValue( (GameRule<Integer>) rule, rulesFinal.getValue((GameRule<Integer>) rule), null);
+				if (rule.gameRuleType() == GameRuleType.INT) {
+					world.getGameRules().set( (GameRule<Integer>) rule, rulesFinal.get((GameRule<Integer>) rule), null);
 				}
 			});
         }
@@ -120,7 +110,7 @@ public class FabricWorldCreator implements ICreator {
      * @param dataFixer The server's DataFixer instance.
      * @return A GameRules object containing the rules from level.dat.
      * @throws IOException if the file cannot be read.
-     * @throws SymlinkValidationException 
+     * @throws ContentValidationException 
      */
     public static GameRules readGameRules(Identifier id) throws IOException {
 
@@ -152,7 +142,7 @@ public class FabricWorldCreator implements ICreator {
         */
     	try {
 			return MultiworldWorld.mw$readGameRules(MultiworldMod.mc, id);
-		} catch (IOException | SymlinkValidationException e) {
+		} catch (IOException | ContentValidationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new IOException(e);
@@ -164,8 +154,8 @@ public class FabricWorldCreator implements ICreator {
     	this.worldConfigs.get(id).setDifficulty(dif);
     }
     
-    private static RegistryKey<DimensionType> dim_of(Identifier id) {
-        return RegistryKey.of(RegistryKeys.DIMENSION_TYPE, id);
+    private static ResourceKey<DimensionType> dim_of(Identifier id) {
+        return ResourceKey.create(Registries.DIMENSION_TYPE, id);
     }
     
     public void delete_world(String id) {
@@ -175,60 +165,60 @@ public class FabricWorldCreator implements ICreator {
     }
 
 	@Override
-	public boolean is_the_end(ServerWorld world) {
-		return world.getDimensionEntry() == DimensionTypes.THE_END;
+	public boolean is_the_end(ServerLevel world) {
+		return world.dimensionTypeRegistration() == BuiltinDimensionTypes.END;
 	}
 
 	@Override
 	public BlockPos get_pos(double x, double y, double z) {
-		return BlockPos.ofFloored(x, y, z);
+		return BlockPos.containing(x, y, z);
 	}
 	
 	@Override
-	public BlockPos get_spawn(ServerWorld world) {
+	public BlockPos get_spawn(ServerLevel world) {
 		
-		return world.getSpawnPoint().getPos();
+		return world.getRespawnData().pos();
 		
 		// return world.getLevelProperties().getSpawnPos();
 	}
 
 	@Override
-	public void teleleport(ServerPlayerEntity player, ServerWorld world, double x, double y, double z) {
-        TeleportTarget target = new TeleportTarget(world, new Vec3d(x, y, z), new Vec3d(0, 0, 0), 0f, 0f, TeleportTarget.NO_OP);
+	public void teleleport(ServerPlayer player, ServerLevel world, double x, double y, double z) {
+        TeleportTransition target = new TeleportTransition(world, new Vec3(x, y, z), new Vec3(0, 0, 0), 0f, 0f, TeleportTransition.DO_NOTHING);
         
         // FabricDimensionInternals.changeDimension(player, world, target);
         
         // Per https://fabricmc.net/2024/05/31/121.html
         // for 1.21, FabricDimension API is replaced by teleportTo
-        player.teleportTo(target);
+        player.teleport(target);
 	}
 	
 	@Override
 	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc) {
-		var biome = mc.getRegistryManager().getOrThrow(RegistryKeys.BIOME).getOrThrow(BiomeKeys.THE_VOID);
+		var biome = mc.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.THE_VOID);
 		VoidChunkGenerator gen = new xyz.nucleoid.fantasy.util.VoidChunkGenerator(biome);
         return gen;
 	}
 
 	@Override
 	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc) {
-		var biome = mc.getRegistryManager().getOrThrow(RegistryKeys.BIOME).getOrThrow(BiomeKeys.PLAINS);
-        FlatChunkGeneratorConfig flat = new FlatChunkGeneratorConfig(Optional.empty(), biome, Collections.emptyList());
+		var biome = mc.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS);
+        FlatLevelGeneratorSettings flat = new FlatLevelGeneratorSettings(Optional.empty(), biome, Collections.emptyList());
 
-        flat.enableFeatures();
-        FlatChunkGenerator generator = new CustomFlatChunkGenerator(flat);
+        flat.setDecoration();
+        FlatLevelSource generator = new CustomFlatChunkGenerator(flat);
 
         return generator;
 	}
 	
 	// Custom Flat Gen
-	class CustomFlatChunkGenerator extends FlatChunkGenerator {
-		public CustomFlatChunkGenerator(FlatChunkGeneratorConfig config) {
+	class CustomFlatChunkGenerator extends FlatLevelSource {
+		public CustomFlatChunkGenerator(FlatLevelGeneratorSettings config) {
 			super(config);
 		}
 		
 		@Override
-		public int getMinimumY() {
+		public int getMinY() {
 			return 0;
 		}
 		
@@ -247,41 +237,41 @@ public class FabricWorldCreator implements ICreator {
 	 * Level 4 -> OWNER
 	 */
 	@Override
-	public boolean permissionLevel(ServerCommandSource source, int level) {
+	public boolean permissionLevel(CommandSourceStack source, int level) {
 		
 		if (level == 0) {
 			// Should not be 0
 			return true;
 		}
 		
-		Permission perm = DefaultPermissions.MODERATORS;
+		Permission perm = Permissions.COMMANDS_MODERATOR;
 
 		switch (level) {
 			case 1:
-				perm = DefaultPermissions.MODERATORS;
+				perm = Permissions.COMMANDS_MODERATOR;
 				break;
 			case 2:
-				perm = DefaultPermissions.GAMEMASTERS;
+				perm = Permissions.COMMANDS_GAMEMASTER;
 				break;
 			case 3:
-				perm = DefaultPermissions.ADMINS;
+				perm = Permissions.COMMANDS_ADMIN;
 				break;
 			case 4:
-				perm = DefaultPermissions.OWNERS;
+				perm = Permissions.COMMANDS_OWNER;
 				break;
 		}
 
-		return source.getPermissions().hasPermission(perm);
+		return source.permissions().hasPermission(perm);
 	}
 
 	@Override
-	public boolean permissionLevel(ServerPlayerEntity plr, int level) {
+	public boolean permissionLevel(ServerPlayer plr, int level) {
 
-		if (level == 1) { return plr.getPermissions().hasPermission(DefaultPermissions.MODERATORS); }
-		if (level == 2) { return plr.getPermissions().hasPermission(DefaultPermissions.GAMEMASTERS); }
-		if (level == 3) { return plr.getPermissions().hasPermission(DefaultPermissions.ADMINS); }
+		if (level == 1) { return plr.permissions().hasPermission(Permissions.COMMANDS_MODERATOR); }
+		if (level == 2) { return plr.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER); }
+		if (level == 3) { return plr.permissions().hasPermission(Permissions.COMMANDS_ADMIN); }
 		
-		return plr.isCreativeLevelTwoOp();
+		return plr.canUseGameMasterBlocks();
 		
 		//return plr.hasPermissionLevel(level);
 	}

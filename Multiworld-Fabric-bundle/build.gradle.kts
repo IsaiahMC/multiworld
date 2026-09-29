@@ -14,7 +14,7 @@ java {
 }
 
 base {
-    archivesBaseName = "Multiworld-Fabric"
+    archivesName = "Multiworld-Fabric"
     version = "bundle"
     group = "me.isaiah.mods"
 }
@@ -34,8 +34,16 @@ dependencies {
 
 	// 1.20
     minecraft("com.mojang:minecraft:1.20.1") 
-    mappings("net.fabricmc:yarn:1.20.1+build.10")
-    modImplementation("net.fabricmc:fabric-loader:0.18.3")
+    // mappings(loom.officialMojangMappings())
+    
+	mappings(loom.layered {
+        mappings(file("../Multiworld-Common/mappings-yay-identifier.jar"))
+
+    })
+	
+	modImplementation("net.fabricmc:fabric-loader:0.18.3")
+	
+	
 	
 	// bundle jars
 	
@@ -47,14 +55,15 @@ dependencies {
 	// 1.20.x
 	include(project(":Multiworld-Fabric-1.20.1"))
 	// include(project(":Multiworld-Fabric-1.20.4"))
-	include(project(":Multiworld-Fabric-1.20.6"))
+	// include(project(":Multiworld-Fabric-1.20.6"))
 	
 	// 1.21.x
 	include(project(":Multiworld-Fabric-1.21.1"))
-	include(project(":Multiworld-Fabric-1.21.4"))
-	include(project(":Multiworld-Fabric-1.21.8"))
-	include(project(":Multiworld-Fabric-1.21.10"))
+	// include(project(":Multiworld-Fabric-1.21.4"))
+	// include(project(":Multiworld-Fabric-1.21.8"))
+	// include(project(":Multiworld-Fabric-1.21.10"))
 	include(project(":Multiworld-Fabric-1.21.11"))
+	include(project(":Multiworld-Fabric-26.1"))
 }
 
 

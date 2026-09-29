@@ -1,12 +1,11 @@
 package me.isaiah.multiworld.fabric;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-
 import java.util.NoSuchElementException;
 
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.perm.Perm;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.server.level.ServerPlayer;
 
 public class PermFabric extends Perm {
     
@@ -26,7 +25,7 @@ public class PermFabric extends Perm {
     }
 
     @Override
-    public boolean has_impl(ServerPlayerEntity plr, String perm) {
+    public boolean has_impl(ServerPlayer plr, String perm) {
         
         // #if mc182
         // if (FabricLoader.getInstance().isDevelopmentEnvironment()) {

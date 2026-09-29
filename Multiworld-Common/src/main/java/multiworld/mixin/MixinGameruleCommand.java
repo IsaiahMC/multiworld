@@ -6,12 +6,11 @@ import com.llamalad7.mixinextras.injector.ModifyReceiver;
 // import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.brigadier.context.CommandContext;
-
-import net.minecraft.server.command.GameRuleCommand;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.GameRules;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.commands.GameRuleCommand;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.GameRules;
 
 import static me.isaiah.multiworld.MultiworldMod.message;
 
@@ -42,15 +41,15 @@ public class MixinGameruleCommand {
 	private static final String mw$target = "Lnet/minecraft/world/GameRules;get(Lnet/minecraft/world/GameRules$Key;)Lnet/minecraft/world/GameRules$Rule;";
 	
 
-	@ModifyReceiver(at = @At(value = "INVOKE", target = mw$target), method = "executeSet") // , locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private static GameRules multiworld$executeSet(GameRules rules, GameRules.Key<?> key, @Local CommandContext<ServerCommandSource> context) {
-		ServerWorld world = context.getSource().getWorld();
+	@ModifyReceiver(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getRule(Lnet/minecraft/world/level/GameRules$Key;)Lnet/minecraft/world/level/GameRules$Value;"), method = "setRule") // , locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	private static GameRules multiworld$executeSet(GameRules rules, GameRules.Key<?> key, @Local CommandContext<CommandSourceStack> context) {
+		ServerLevel world = context.getSource().getLevel();
 
 		if (null == world) {
 			return rules; 
 		}
 
-		Identifier id = world.getRegistryKey().getValue();
+		Identifier id = world.dimension().identifier();
 		
 		if (!id.getNamespace().equalsIgnoreCase("minecraft")) {
 			message(context.getSource(), "&a[Multiworld]: &rGamerules for world \"" + id + "\"");
@@ -60,15 +59,15 @@ public class MixinGameruleCommand {
 		return rules;
 	}
 	
-	@ModifyReceiver(at = @At(value = "INVOKE", target = mw$target), method = "executeQuery") // , locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private static GameRules multiworld$executeQuery(GameRules rules, GameRules.Key<?> key, @Local ServerCommandSource source) {
-		ServerWorld world = source.getWorld();
+	@ModifyReceiver(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getRule(Lnet/minecraft/world/level/GameRules$Key;)Lnet/minecraft/world/level/GameRules$Value;"), method = "queryRule") // , locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	private static GameRules multiworld$executeQuery(GameRules rules, GameRules.Key<?> key, @Local CommandSourceStack source) {
+		ServerLevel world = source.getLevel();
 
 		if (null == world) {
 			return rules; 
 		}
 
-		Identifier id = world.getRegistryKey().getValue();
+		Identifier id = world.dimension().identifier();
 		
 		if (!id.getNamespace().equalsIgnoreCase("minecraft")) {
 			message(source, "&a[Multiworld]: &rQuerying Gamerules for world \"" + id + "\"");

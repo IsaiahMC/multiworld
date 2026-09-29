@@ -16,27 +16,25 @@ import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.config.FileConfiguration;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.world.level.storage.LevelStorage;
-import net.minecraft.world.level.storage.LevelStorage.Session;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 
 /**
  * Multiworld Mixin for LevelStorage.Session
  */
-@Mixin(Session.class)
+@Mixin(LevelStorageAccess.class)
 public class MixinLevelStorageSession {
 
 	@Shadow
 	@Mutable
-	private String directoryName;
+	private String levelId;
 	
-	@Inject(at = @At("HEAD"), method = "getWorldDirectory", cancellable = true)
-	public void multiworld$getWorldDirectory(RegistryKey<World> key, CallbackInfoReturnable<Path> ci) {
-		Identifier id = key.getValue();
+	@Inject(at = @At("HEAD"), method = "getDimensionPath", cancellable = true)
+	public void multiworld$getWorldDirectory(ResourceKey<Level> key, CallbackInfoReturnable<Path> ci) {
+		Identifier id = key.identifier();
 
 		// System.out.println("Debug: " + id.toString());
 		
@@ -58,7 +56,7 @@ public class MixinLevelStorageSession {
 				return;
 			}
 
-			String dirName = ((Session) (Object) this).getDirectoryName();
+			String dirName = ((LevelStorageAccess) (Object) this).getLevelId();
 			Path path = mw$getStorageFolder( Utils.getWorldStoragePath(MultiworldMod.mc).resolve( dirName ), id, dim);
 			
 			String s = Utils.getConfigValue(id, "worldDirectoryPath", "none");
@@ -89,16 +87,16 @@ public class MixinLevelStorageSession {
 	 */
 	public Path mw$getStorageFolder(Path path, Identifier worldId, Identifier dimensionType) {
 		
-		Session thiz = (Session) (Object) this;
-		String name = thiz.getDirectoryName();
+		LevelStorageAccess thiz = (LevelStorageAccess) (Object) this;
+		String name = thiz.getLevelId();
 		
 		String name1 =Utils.getWorldName(worldId);
 		
 		if (!name.equalsIgnoreCase(name1)) {
-			this.directoryName = name1;
+			this.levelId = name1;
 		}
 		
-		name = thiz.getDirectoryName();
+		name = thiz.getLevelId();
 		
 		
 		// System.out.println("mw$getStorageFolder: " + worldId.toString() + " / " + dimensionType.toString() + " / " + name );
@@ -117,15 +115,15 @@ public class MixinLevelStorageSession {
 		}
 	}
 
-	public Path mw$getStorageFolder1(Path path, RegistryKey<DimensionOptions> dimensionType) {
-		if (dimensionType == DimensionOptions.OVERWORLD) {
+	public Path mw$getStorageFolder1(Path path, ResourceKey<LevelStem> dimensionType) {
+		if (dimensionType == LevelStem.OVERWORLD) {
 			return path;
-		} else if (dimensionType == DimensionOptions.NETHER) {
+		} else if (dimensionType == LevelStem.NETHER) {
 			return path.resolve("DIM-1");
 		} else {
-			return dimensionType == DimensionOptions.END
+			return dimensionType == LevelStem.END
 					? path.resolve("DIM1")
-							: path.resolve("dimensions").resolve(dimensionType.getValue().getNamespace()).resolve(dimensionType.getValue().getPath());
+							: path.resolve("dimensions").resolve(dimensionType.identifier().getNamespace()).resolve(dimensionType.identifier().getPath());
 		}
 	}
 

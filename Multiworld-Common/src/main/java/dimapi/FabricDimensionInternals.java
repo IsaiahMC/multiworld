@@ -1,10 +1,9 @@
 package dimapi;
 
 import com.google.common.base.Preconditions;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.TeleportTarget;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.portal.PortalInfo;
 
 /**
  * For 1.18.2 - 1.20.6
@@ -16,7 +15,7 @@ public final class FabricDimensionInternals {
 	/**
 	 * The target passed to the last call to {@link FabricDimensions#teleport(Entity, ServerWorld, TeleportTarget)}.
 	 */
-	private static TeleportTarget currentTarget;
+	private static PortalInfo currentTarget;
 
 	private FabricDimensionInternals() {
 		throw new AssertionError();
@@ -25,18 +24,18 @@ public final class FabricDimensionInternals {
 	/**
 	 * Returns the last target set when a user of the API requested teleportation, or null.
 	 */
-	public static TeleportTarget getCustomTarget() {
+	public static PortalInfo getCustomTarget() {
 		return currentTarget;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <E extends Entity> E changeDimension(E teleported, ServerWorld dimension, TeleportTarget target) {
-		Preconditions.checkArgument(!teleported.getWorld().isClient, "Entities can only be teleported on the server side");
-		Preconditions.checkArgument(Thread.currentThread() == ((ServerWorld) teleported.getWorld()).getServer().getThread(), "Entities must be teleported from the main server thread");
+	public static <E extends Entity> E changeDimension(E teleported, ServerLevel dimension, PortalInfo target) {
+		Preconditions.checkArgument(!teleported.level().isClientSide, "Entities can only be teleported on the server side");
+		Preconditions.checkArgument(Thread.currentThread() == ((ServerLevel) teleported.level()).getServer().getRunningThread(), "Entities must be teleported from the main server thread");
 
 		try {
 			currentTarget = target;
-			return (E) teleported.moveToWorld(dimension);
+			return (E) teleported.changeDimension(dimension);
 		} finally {
 			currentTarget = null;
 		}

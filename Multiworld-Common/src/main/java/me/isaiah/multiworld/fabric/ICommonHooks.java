@@ -1,7 +1,5 @@
 package me.isaiah.multiworld.fabric;
 
-import java.util.Optional;
-
 import me.isaiah.common.ICommonMod;
 import me.isaiah.common.ICommonMod.SupportStatus;
 import me.isaiah.common.event.EventHandler;
@@ -11,14 +9,11 @@ import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.portal.Portal;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 public class ICommonHooks {
 	
@@ -37,12 +32,14 @@ public class ICommonHooks {
 	}
 	*/
 	
-	public static World getWorld(PlayerEntity player) {
+	public static Level getWorld(Player player) {
 		try {
-			// #if mc182
+			// #if mc261
+			// // empty 
+			// #elif mc182
 			// // empty
 			// #else
-			World world = ((me.isaiah.common.cmixin.IMixinEntity) player).ic$getWorld();
+			Level world = ((me.isaiah.common.cmixin.IMixinEntity) player).ic$getWorld();
 			return world;
 			// #endif
 		} catch (Exception | NoSuchMethodError ex) {
@@ -71,12 +68,14 @@ public class ICommonHooks {
         MultiworldMod.LOGGER.info("Multiworld: Registered '" + r + "' iCommon events.");
 	}
 	
-	// #if mc182
+	// #if mc261
+	// // TODO: 26.1: Update iCommon EntityPortalCollideEvent
+	// #elif mc182
 	// // TODO: 1.18.2 icommon portal enter event
 	// #else
 	@EventHandler
 	public void onPortalEnter(EntityPortalCollideEvent ev) {
-		if (!(ev.getEntity() instanceof ServerPlayerEntity)) {
+		if (!(ev.getEntity() instanceof ServerPlayer)) {
 			return;
 		}
 		
@@ -98,12 +97,12 @@ public class ICommonHooks {
 
 				
 				if (isInside) {
-					I18n.message((ServerPlayerEntity) entity, I18n.TELEPORTING);
+					I18n.message((ServerPlayer) entity, I18n.TELEPORTING);
 					
 					BlockPos dest = p.getDestLocation();
 					
 					MultiworldMod.get_world_creator().teleleport(
-							(ServerPlayerEntity) entity,
+							(ServerPlayer) entity,
 							p.getDestWorld(),
 							dest.getX(),
 							dest.getY(),

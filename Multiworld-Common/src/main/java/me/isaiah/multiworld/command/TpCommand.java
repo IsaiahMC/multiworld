@@ -1,14 +1,12 @@
 package me.isaiah.multiworld.command;
 
 import java.util.HashMap;
-
-import net.minecraft.block.Blocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import java.io.File;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Blocks;
 
 import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
@@ -17,11 +15,11 @@ import me.isaiah.multiworld.config.*;
 
 public class TpCommand implements Command {
 
-    public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
-        HashMap<String,ServerWorld> worlds = new HashMap<>();
-        mc.getWorldRegistryKeys().forEach(r -> {
-            ServerWorld world = mc.getWorld(r);
-            worlds.put(r.getValue().toString(), world);
+    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+        HashMap<String,ServerLevel> worlds = new HashMap<>();
+        mc.levelKeys().forEach(r -> {
+            ServerLevel world = mc.getLevel(r);
+            worlds.put(r.identifier().toString(), world);
         });
         
         String arg1 = args[1];
@@ -34,11 +32,11 @@ public class TpCommand implements Command {
         	}
 
         	String target = args[2];
-        	plr = mc.getPlayerManager().getPlayer(target);
+        	plr = mc.getPlayerList().getPlayerByName(target);
         }
 
         if (worlds.containsKey(arg1)) {
-            ServerWorld w = worlds.get(arg1);
+            ServerLevel w = worlds.get(arg1);
             // BlockPos sp = multiworld_method_43126(w);
             BlockPos sp = SpawnCommand.getSpawn(w);
 
@@ -52,7 +50,7 @@ public class TpCommand implements Command {
 			} catch (NoSuchMethodError | Exception e) {
 			}
 			
-			String env = read_env_from_config(arg1, w.getRegistryKey().getValue());
+			String env = read_env_from_config(arg1, w.dimension().identifier());
 			if (null != env) {
 				if (env.equalsIgnoreCase("END")) {
 					isEnd = true;
@@ -62,7 +60,7 @@ public class TpCommand implements Command {
 			if (isEnd) {
 				//ServerWorld.createEndSpawnPlatform(w);
 				method_29200_createEndSpawnPlatform(w);
-				sp = ServerWorld.END_SPAWN_POS;
+				sp = ServerLevel.END_SPAWN_POINT;
 			}
 			
             if (null == sp) {
@@ -92,33 +90,33 @@ public class TpCommand implements Command {
      * 
      * TODO: check why method_29200 removed in 1.20.1
      */
-    public static void method_29200_createEndSpawnPlatform(ServerWorld world) {
-        BlockPos lv = ServerWorld.END_SPAWN_POS;
+    public static void method_29200_createEndSpawnPlatform(ServerLevel world) {
+        BlockPos lv = ServerLevel.END_SPAWN_POINT;
         int i = lv.getX();
         int j = lv.getY() - 2;
         int k = lv.getZ();
-        BlockPos.iterate(i - 2, j + 1, k - 2, i + 2, j + 3, k + 2).forEach(pos -> world.setBlockState(pos, Blocks.AIR.getDefaultState()));
-        BlockPos.iterate(i - 2, j, k - 2, i + 2, j, k + 2).forEach(pos -> world.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState()));
+        BlockPos.betweenClosed(i - 2, j + 1, k - 2, i + 2, j + 3, k + 2).forEach(pos -> world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState()));
+        BlockPos.betweenClosed(i - 2, j, k - 2, i + 2, j, k + 2).forEach(pos -> world.setBlockAndUpdate(pos, Blocks.OBSIDIAN.defaultBlockState()));
     }
 
-    private static BlockPos findSafePos(ServerWorld w, BlockPos sp) {
+    private static BlockPos findSafePos(ServerLevel w, BlockPos sp) {
         BlockPos pos = sp;
-        while (w.getBlockState(pos) != Blocks.AIR.getDefaultState()) {
-            pos = pos.add(0, 1, 0);
+        while (w.getBlockState(pos) != Blocks.AIR.defaultBlockState()) {
+            pos = pos.offset(0, 1, 0);
         }
         
-        BlockPos under = pos.add(0, -2, 0);
+        BlockPos under = pos.offset(0, -2, 0);
         
-        while (under.getY() > -60 && w.getBlockState(under) == Blocks.AIR.getDefaultState()) {
-        	pos = pos.add(0, -1, 0);
-        	under = pos.add(0, -1, 0);
+        while (under.getY() > -60 && w.getBlockState(under) == Blocks.AIR.defaultBlockState()) {
+        	pos = pos.offset(0, -1, 0);
+        	under = pos.offset(0, -1, 0);
         }
         
         return pos;
     }
 	
 	// getSpawnPos
-	public static BlockPos multiworld_method_43126(ServerWorld world) {
+	public static BlockPos multiworld_method_43126(ServerLevel world) {
         return SpawnCommand.multiworld_method_43126(world);
     }
 	

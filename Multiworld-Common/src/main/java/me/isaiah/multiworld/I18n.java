@@ -11,8 +11,7 @@ import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.config.FileConfiguration;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Messages for Internationalization (I18N)
@@ -21,7 +20,7 @@ import net.minecraft.util.Identifier;
  */
 public class I18n {
 
-	public static void message(ServerPlayerEntity plr, String text) {
+	public static void message(ServerPlayer plr, String text) {
 		MultiworldMod.message(plr, text);
 	}
 	

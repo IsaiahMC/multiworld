@@ -1,37 +1,36 @@
 package me.isaiah.multiworld.command;
 
 import static me.isaiah.multiworld.MultiworldMod.message;
-import static me.isaiah.multiworld.MultiworldMod.text_plain;
 
 import java.io.File;
 import java.io.IOException;
 
 import me.isaiah.multiworld.Utils;
 import me.isaiah.multiworld.config.FileConfiguration;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 
 public class SetspawnCommand implements Command {
 
-    public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
-        World w = Command.getWorldFor(plr);
-        BlockPos pos = plr.getBlockPos();
+    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+        Level w = Command.getWorldFor(plr);
+        BlockPos pos = plr.blockPosition();
         try {
             setSpawn(w, pos);
 			
-			String txt = "Spawn for world \"" + w.getRegistryKey().getValue() + "\" changed to " + pos.toShortString();
+			String txt = "Spawn for world \"" + w.dimension().identifier() + "\" changed to " + pos.toShortString();
             message(plr, "&6" + txt);
         } catch (IOException e) {
-            plr.sendMessage(text_plain("Error: " + e.getMessage()), false);
+            message(plr, "Error: " + e.getMessage());
             e.printStackTrace();
         }
         return 1;
     }
 
-    public static void setSpawn(World w, BlockPos spawn) throws IOException {
+    public static void setSpawn(Level w, BlockPos spawn) throws IOException {
         File cf = new File(Util.get_platform_config_dir(), "multiworld"); 
         cf.mkdirs();
 
@@ -47,7 +46,7 @@ public class SetspawnCommand implements Command {
         wc.createNewFile();
         FileConfiguration config = new FileConfiguration(wc);
         */
-        Identifier id = w.getRegistryKey().getValue();
+        Identifier id = w.dimension().identifier();
         FileConfiguration config = Utils.getConfigOrNull(id);
         
         if (null == config) {

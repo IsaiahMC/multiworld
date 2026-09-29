@@ -1,20 +1,20 @@
 package me.isaiah.multiworld;
 
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.FlatChunkGenerator;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.World;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Utility interface for cross-version development support
@@ -24,7 +24,7 @@ public interface ICreator {
 
 	/**
 	 */
-	public ServerWorld create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed);
+	public ServerLevel create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed);
 
 	/**
 	 */
@@ -33,19 +33,19 @@ public interface ICreator {
 	/**
 	 */
 	@Deprecated
-	public default Text colored_literal_(String txt, Formatting color) {
+	public default Component colored_literal_(String txt, ChatFormatting color) {
 		try {
-			return Text.of(txt).copy().formatted(color);
+			return Component.nullToEmpty(txt).copy().withStyle(color);
 		} catch (Exception | IncompatibleClassChangeError e) {
 			// MutableText interface was changed to a class in 1.19;
 			// Incase for 1.18:
-			return Text.of(txt);
+			return Component.nullToEmpty(txt);
 		}
 	}
 
 	/**
 	 */
-	void teleleport(ServerPlayerEntity player, ServerWorld world, double x, double y, double z);
+	void teleleport(ServerPlayer player, ServerLevel world, double x, double y, double z);
 
 	/**
 	 */
@@ -58,33 +58,33 @@ public interface ICreator {
     default ChunkGenerator get_chunk_gen(MinecraftServer mc, String env) {
     	ChunkGenerator gen = null;
     	if (env.contains("NORMAL") || env.contains("DEFAULT")) {
-			gen = mc.getWorld(World.OVERWORLD).getChunkManager().getChunkGenerator(); // .withSeed(seed);
+			gen = mc.getLevel(Level.OVERWORLD).getChunkSource().getGenerator(); // .withSeed(seed);
 		}
 
 		if (env.contains("NETHER")) {
-			gen = mc.getWorld(World.NETHER).getChunkManager().getChunkGenerator();
+			gen = mc.getLevel(Level.NETHER).getChunkSource().getGenerator();
 		}
 		
 		if (env.contains("END")) {
-			gen = mc.getWorld(World.END).getChunkManager().getChunkGenerator(); // .withSeed(seed);
+			gen = mc.getLevel(Level.END).getChunkSource().getGenerator(); // .withSeed(seed);
 		}
 		
 		if (env.contains("FLAT")) {
-			FlatChunkGenerator genn = (FlatChunkGenerator) this.get_flat_chunk_gen(mc);
+			FlatLevelSource genn = (FlatLevelSource) this.get_flat_chunk_gen(mc);
 
-			FlatChunkGeneratorConfig flat = genn.getConfig();
+			FlatLevelGeneratorSettings flat = genn.settings();
 			
-			FlatChunkGeneratorLayer[] layers = {
-					new FlatChunkGeneratorLayer(1, Blocks.GRASS_BLOCK),
-					new FlatChunkGeneratorLayer(5, Blocks.DIRT),
-					new FlatChunkGeneratorLayer(2, Blocks.BEDROCK)
+			FlatLayerInfo[] layers = {
+					new FlatLayerInfo(1, Blocks.GRASS_BLOCK),
+					new FlatLayerInfo(5, Blocks.DIRT),
+					new FlatLayerInfo(2, Blocks.BEDROCK)
 			};
 	        
 	        for (int i = layers.length - 1; i >= 0; --i) {
-	            flat.getLayers().add(layers[i]);
+	            flat.getLayersInfo().add(layers[i]);
 	        }
 
-	        flat.updateLayerBlocks();
+	        flat.updateLayers();
 
 			return genn;
 		}
@@ -97,14 +97,14 @@ public interface ICreator {
     } 
 
 	// TODO: move to icommonlib ?:
-	public BlockPos get_spawn(ServerWorld world);
-	public boolean is_the_end(ServerWorld world);
+	public BlockPos get_spawn(ServerLevel world);
+	public boolean is_the_end(ServerLevel world);
 	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc);
 	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc);
 
 	// Vanilla Permissions
-	public boolean permissionLevel(ServerCommandSource source, int level);
-	public boolean permissionLevel(ServerPlayerEntity plr, int level);
+	public boolean permissionLevel(CommandSourceStack source, int level);
+	public boolean permissionLevel(ServerPlayer plr, int level);
 
 	void delete_world(String id);
 	

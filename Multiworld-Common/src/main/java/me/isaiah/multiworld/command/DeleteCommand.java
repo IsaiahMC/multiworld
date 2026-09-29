@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 
 import me.isaiah.multiworld.ConsoleCommand;
 import me.isaiah.multiworld.MultiworldMod;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
 
 public class DeleteCommand implements Command {
 
@@ -20,7 +20,7 @@ public class DeleteCommand implements Command {
 	/**
 	 * Run Command
 	 */
-    public static int run(MinecraftServer mc, ServerCommandSource source, String[] args) {
+    public static int run(MinecraftServer mc, CommandSourceStack source, String[] args) {
         if (args.length == 1) {
         	LOGGER.error("Usage: /mw delete <id>");
             return 0;

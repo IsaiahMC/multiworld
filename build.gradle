@@ -1,7 +1,7 @@
 import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
 
 plugins {
-	id "dev.architectury.loom" version "1.13-SNAPSHOT" apply false
+	// id "dev.architectury.loom" version "1.13-SNAPSHOT" apply false
 }
 
 configurations.all {
@@ -51,7 +51,15 @@ ext.createPreprocessor = { Project proj ->
 					boolean branchTaken = false
 
                     lines.each { line ->
+						def line2 = line
                         def trimmed = line.trim()
+						
+						if (trimmed.contains("ResourceLocation") && version.contains("1.21.11")) {
+									System.out.println(line)
+									line2 = line.replaceAll("ResourceLocation", "Identifier")
+									trimmed line2.trim()
+								}
+						
 
 						/*
                         if (trimmed.startsWith("// #if")) {
@@ -66,9 +74,10 @@ ext.createPreprocessor = { Project proj ->
                             inBlock = false
                             include = true
                         } else {
-                            if (include) out.append(line).append("\n")
+                            if (include) out.append(line2).append("\n")
                         }
 						*/
+					
 						
 						if (trimmed.startsWith("// #if")) {
 							inBlock = true
@@ -107,7 +116,17 @@ ext.createPreprocessor = { Project proj ->
 								out.append(cleaned).append("\n")
 							
 							} else {
-								out.append(line).append("\n")
+							
+								if (line2.contains("ResourceLocation")) {
+									System.out.println(line2)
+								}
+							
+								if (trimmed.contains("ResourceLocation") && version.contains("1.21.11")) {
+									out.append(line2.replaceAll("ResourceLocation", "Identifier")).append("\n")
+								} else {
+							
+								out.append(line2).append("\n")
+								}
 							}
 						}
                     }
@@ -124,8 +143,23 @@ ext.createPreprocessor = { Project proj ->
             }
         }
     }
+	
+	println("Version: " + version);
+	println("SRC:" + proj.sourceSets.main.java.srcDirs);
 
-    proj.sourceSets.main.java.srcDirs = [ preprocessDir.get().asFile ]
+	if (version.contains("mc261")) {
+		// Huh.
+		println("Version: 26");
+		proj.sourceSets.main.java.srcDirs = [ proj.relativePath('src/main/java'), preprocessDir.get().asFile ]
+	} else {
+		if (version.contains("mcCommon")) {
+			// no modify source sets
+		} else { 
+			proj.sourceSets.main.java.srcDirs = [ preprocessDir.get().asFile ]
+		}
+	}
+	
+	println("SRC:" + proj.sourceSets.main.java.srcDirs);
     proj.tasks.compileJava.dependsOn proj.tasks.preprocess
 } as groovy.lang.Closure<org.gradle.api.Project>
  

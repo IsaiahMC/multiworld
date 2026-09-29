@@ -1,19 +1,21 @@
 package me.isaiah.multiworld.fabric;
 
-import net.minecraft.world.level.LevelProperties;
+import net.minecraft.world.level.storage.PrimaryLevelData;
 
-public class MySaveProperties extends LevelProperties {
+public class MySaveProperties extends PrimaryLevelData {
 
 	private String nameOverride;
-	private LevelProperties original;
+	private PrimaryLevelData original;
 	
-	public MySaveProperties(LevelProperties original) {
-		// #if mc192
+	public MySaveProperties(PrimaryLevelData original) {
+		// #if mc261
+		// super(original.getLevelSettings(), getSpecialProperty(original), original.worldGenSettingsLifecycle());
+		// #elif mc192
 		// super(original.getLevelInfo(), original.getGeneratorOptions(), original.getLifecycle());
 		// #elif mc182
 		// super(original.getLevelInfo(), original.getGeneratorOptions(), original.getLifecycle());
 		// #else
-		super(original.getLevelInfo(), original.getGeneratorOptions(), getSpecialProperty(original), original.getLifecycle());
+		super(original.getLevelSettings(), original.worldGenOptions(), getSpecialProperty(original), original.worldGenSettingsLifecycle());
 		// #endif
 		this.original = original;
 	}
@@ -28,8 +30,8 @@ public class MySaveProperties extends LevelProperties {
 	// #elif mc182
 	// // Skip: getSpecialProperty
 	// #else
-	private static SpecialProperty getSpecialProperty(LevelProperties input) {
-		return input.isFlatWorld() ? SpecialProperty.FLAT : SpecialProperty.NONE;
+	private static SpecialWorldProperty getSpecialProperty(PrimaryLevelData input) {
+		return input.isFlatWorld() ? SpecialWorldProperty.FLAT : SpecialWorldProperty.NONE;
 	}
 	// #endif
 	
@@ -43,8 +45,8 @@ public class MySaveProperties extends LevelProperties {
 	}
 	
 	@Override
-	public long getTime() {
-		return original.getTime();
+	public long getGameTime() {
+		return original.getGameTime();
 	}
 
 }

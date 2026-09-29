@@ -18,15 +18,15 @@ import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.perm.Perm;
 import multiworld.api.WorldFolderMode;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.world.World;
-import net.minecraft.world.level.ServerWorldProperties;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ServerLevelData;
 
 /**
  * Our Implementation of a command SuggestionProvider.
  */
-public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
+public class InfoSuggest implements SuggestionProvider<CommandSourceStack> {
 
 	/**
 	 * Valid Difficulty Arguments
@@ -47,13 +47,13 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
 	 * Build our Suggestion list
 	 */
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ') + 1);
 
         String input = builder.getInput();
         String[] cmds = input.trim().split(" ");
 
-        ServerCommandSource plr = context.getSource();
+        CommandSourceStack plr = context.getSource();
         boolean ALL = Perm.has(plr, "multiworld.admin");
 
         if (cmds.length <= 1 || (cmds.length <= 2 && !input.endsWith(" "))) {
@@ -67,15 +67,15 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
             if (cmds[1].equalsIgnoreCase("tp") && (ALL || Perm.has(plr, "multiworld.tp"))) {
                 MinecraftServer mc = MultiworldMod.mc;
                 List<String> names = new ArrayList<>();
-                mc.getWorlds().forEach(world -> {
-                    String name = ((ServerWorldProperties) world.getLevelProperties()).getLevelName();
+                mc.getAllLevels().forEach(world -> {
+                    String name = ((ServerLevelData) world.getLevelData()).getLevelName();
                     if (names.contains(name)) {
-                        if (world.getRegistryKey() == World.NETHER) name = name + "_nether";
-                        if (world.getRegistryKey() == World.END) name = name + "_the_end";
+                        if (world.dimension() == Level.NETHER) name = name + "_nether";
+                        if (world.dimension() == Level.END) name = name + "_the_end";
                     }
                 });
-                mc.getWorldRegistryKeys().forEach(r -> {
-                    String val = r.getValue().toString();
+                mc.levelKeys().forEach(r -> {
+                    String val = r.identifier().toString();
                     if (val.startsWith("multiworld:"))
                         val = val.replace("multiworld:", "");
                     names.add(val);
@@ -131,8 +131,8 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
             
             if (cmds[1].equalsIgnoreCase("difficulty") && (ALL || Perm.has(plr, "multiworld.difficulty")) ) {
             	ArrayList<String> names = new ArrayList<>();
-            	MultiworldMod.mc.getWorldRegistryKeys().forEach(r -> {
-                    String val = r.getValue().toString();
+            	MultiworldMod.mc.levelKeys().forEach(r -> {
+                    String val = r.identifier().toString();
                     if (val.startsWith("multiworld:")) {
                         val = val.replace("multiworld:", "");
                     }
@@ -158,15 +158,15 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
     public static List<String> getWorldNames() {
     	 MinecraftServer mc = MultiworldMod.mc;
          List<String> names = new ArrayList<>();
-         mc.getWorlds().forEach(world -> {
-             String name = ((ServerWorldProperties) world.getLevelProperties()).getLevelName();
+         mc.getAllLevels().forEach(world -> {
+             String name = ((ServerLevelData) world.getLevelData()).getLevelName();
              if (names.contains(name)) {
-                 if (world.getRegistryKey() == World.NETHER) name = name + "_nether";
-                 if (world.getRegistryKey() == World.END) name = name + "_the_end";
+                 if (world.dimension() == Level.NETHER) name = name + "_nether";
+                 if (world.dimension() == Level.END) name = name + "_the_end";
              }
          });
-         mc.getWorldRegistryKeys().forEach(r -> {
-             String val = r.getValue().toString();
+         mc.levelKeys().forEach(r -> {
+             String val = r.identifier().toString();
              if (val.startsWith("multiworld:"))
                  val = val.replace("multiworld:", "");
              names.add(val);
@@ -179,7 +179,7 @@ public class InfoSuggest implements SuggestionProvider<ServerCommandSource> {
      * 
      * "/mw create <id> <env> [-g=<generator> -s=<seed>]"
      */
-    public void getSuggestions_CreateCommand(SuggestionsBuilder builder, String input, String[] cmds, ServerCommandSource plr, boolean ALL) {
+    public void getSuggestions_CreateCommand(SuggestionsBuilder builder, String input, String[] cmds, CommandSourceStack plr, boolean ALL) {
     	if ( !(ALL || Perm.has(plr, "multiworld.create")) ) return; // No Permission
 
     	// Argument 1: <id>

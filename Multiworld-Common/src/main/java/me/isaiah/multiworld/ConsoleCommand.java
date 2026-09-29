@@ -8,19 +8,16 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.isaiah.multiworld.command.DeleteCommand;
 import me.isaiah.multiworld.command.TpCommand;
 import me.isaiah.multiworld.perm.Perm;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 public class ConsoleCommand {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger("multiworld");
 
-	public static int broadcast_console(MinecraftServer mc, ServerCommandSource source, String message) throws CommandSyntaxException {
+	public static int broadcast_console(MinecraftServer mc, CommandSourceStack source, String message) throws CommandSyntaxException {
 		if (null == message) {
-			LOGGER.info("Multiworld Mod for Minecraft " + mc.getVersion());
+			LOGGER.info("Multiworld Mod for Minecraft " + mc.getServerVersion());
 			LOGGER.info("(Console Commands are experimental)");
 			return 1;
 		}
@@ -50,7 +47,7 @@ public class ConsoleCommand {
 		// List Command
         if (args[0].equalsIgnoreCase("list") ) {
             LOGGER.info("All Worlds:");
-            mc.getWorlds().forEach(world -> LOGGER.info("- " + world.getRegistryKey().getValue().toString()));
+            mc.getAllLevels().forEach(world -> LOGGER.info("- " + world.dimension().identifier().toString()));
             return 1;
         }
 
@@ -60,6 +57,6 @@ public class ConsoleCommand {
             return 1;
         }
 
-		throw ServerCommandSource.REQUIRES_PLAYER_EXCEPTION.create();
+		throw CommandSourceStack.ERROR_NOT_PLAYER.create();
 	}
 }

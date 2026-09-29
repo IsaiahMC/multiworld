@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import me.isaiah.multiworld.MultiworldMod;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 
 import static me.isaiah.multiworld.MultiworldMod.message;
 
@@ -33,36 +33,36 @@ public class WandEventHandler {
     /**
      * Left-click = Position 1
      */
-    public static ActionResult leftClickBlock(PlayerEntity player, World world, BlockPos pos) {
-    	 if (!world.isClient() && isHoldingWand(player)) {
+    public static InteractionResult leftClickBlock(Player player, Level world, BlockPos pos) {
+    	 if (!world.isClientSide() && isHoldingWand(player)) {
              setPosition(player, pos, 1);
-             return ActionResult.PASS;
+             return InteractionResult.PASS;
          }
-         return ActionResult.PASS;
+         return InteractionResult.PASS;
     }
     
     /**
      * Right-click = Position 2
      */
-    public static ActionResult rightClickBlock(PlayerEntity player, World world, BlockHitResult hitResult) {
-    	if (!world.isClient() && isHoldingWand(player)) {
+    public static InteractionResult rightClickBlock(Player player, Level world, BlockHitResult hitResult) {
+    	if (!world.isClientSide() && isHoldingWand(player)) {
             setPosition(player, hitResult.getBlockPos(), 2);
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
     
     public static ItemStack getItemStack() {
     	return wand;
     }
 
-    private static boolean isHoldingWand(PlayerEntity player) {
-        ItemStack held = player.getMainHandStack();
+    private static boolean isHoldingWand(Player player) {
+        ItemStack held = player.getMainHandItem();
         return held.getItem() == wand.getItem();
     }
 
-    private static void setPosition(PlayerEntity player, BlockPos pos, int index) {
-        UUID uuid = player.getUuid();
+    private static void setPosition(Player player, BlockPos pos, int index) {
+        UUID uuid = player.getUUID();
         Object[] positions = playerPositions.getOrDefault(uuid, new Object[3]);
         positions[index] = pos;
         playerPositions.put(uuid, positions);
@@ -73,7 +73,7 @@ public class WandEventHandler {
         	
         	// 1.21.8:
         	try {
-        		positions[0] = (ServerWorld) me.isaiah.multiworld.fabric.ICommonHooks.getWorld(player);
+        		positions[0] = (ServerLevel) me.isaiah.multiworld.fabric.ICommonHooks.getWorld(player);
         	} catch (Exception e) {
         		err.printStackTrace();
         		e.printStackTrace();

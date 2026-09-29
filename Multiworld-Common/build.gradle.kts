@@ -30,7 +30,8 @@ java {
 }
 
 base {
-    archivesBaseName = "Multiworld"
+    // archivesBaseName = "Multiworld"
+    archivesName = "Multiworld"
     version = "-The-API"
     group = "me.isaiah.mods"
 }
@@ -57,7 +58,27 @@ dependencies {
 
 	// 1.20
     minecraft("com.mojang:minecraft:1.20.1") 
-    mappings("net.fabricmc:yarn:1.20.1+build.10")
+  //  mappings(loom.officialMojangMappings())
+	
+	// mappings(file("mappings-identifier.tiny"))
+	
+	mappings(loom.layered {
+        mappings(file("mappings-yay-identifier.jar"))
+
+    })
+	
+	// mappings("net.fabricmc:yarn:1.20.1+build.10")
+	
+	/*
+	mappings(loom.layered {
+        officialMojangMappings {
+			nameSyntheticMembers = false	
+		}
+        mappings(file("mappings_override.tiny"))
+
+    })
+	*/
+	
     modImplementation("net.fabricmc:fabric-loader:0.18.3")
 	
 	modImplementation("xyz.nucleoid:fantasy:0.4.11+1.20-rc1")

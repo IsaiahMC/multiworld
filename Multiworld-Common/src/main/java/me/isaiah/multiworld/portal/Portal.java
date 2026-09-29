@@ -13,15 +13,15 @@ import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.config.FileConfiguration;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.NetherPortalBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.NetherPortalBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Representation of a Multiworld Portal
@@ -298,9 +298,9 @@ public class Portal {
 			
 				BlockPos cen = PortalUtil.findSafeExit(pp.getDestWorld(), pp.getCenterExit(), 2, getMaxY(4));
 				if (axis == Axis.X) {
-					cen = cen.add(0, 0, 2);
+					cen = cen.offset(0, 0, 2);
 				} else {
-					cen = cen.add(3, 0, 0);
+					cen = cen.offset(3, 0, 0);
 				}
 				
 				return cen;
@@ -349,7 +349,7 @@ public class Portal {
 	
 	/**
 	 */
-	public ServerWorld getDestWorld() {
+	public ServerLevel getDestWorld() {
 		
 		String name = this.getDestination();
 		
@@ -367,38 +367,38 @@ public class Portal {
 		
 		if (name.indexOf(':') == -1) name = "multiworld:" + name;
 		
-		HashMap<String,ServerWorld> worlds = new HashMap<>();
-        MultiworldMod.mc.getWorldRegistryKeys().forEach(r -> {
-            ServerWorld world = MultiworldMod.mc.getWorld(r);
-            worlds.put(r.getValue().toString(), world);
+		HashMap<String,ServerLevel> worlds = new HashMap<>();
+        MultiworldMod.mc.levelKeys().forEach(r -> {
+            ServerLevel world = MultiworldMod.mc.getLevel(r);
+            worlds.put(r.identifier().toString(), world);
         });
         
-        ServerWorld w = worlds.get(name);
+        ServerLevel w = worlds.get(name);
         // BlockPos sp = SpawnCommand.getSpawn(w);
 		return w;
 	}
 	
 	/**
 	 */
-	public ServerWorld getOriginWorld() {
+	public ServerLevel getOriginWorld() {
 		String name = this.getOriginWorldId().toString();
-		HashMap<String,ServerWorld> worlds = new HashMap<>();
-        MultiworldMod.mc.getWorldRegistryKeys().forEach(r -> {
-            ServerWorld world = MultiworldMod.mc.getWorld(r);
-            worlds.put(r.getValue().toString(), world);
+		HashMap<String,ServerLevel> worlds = new HashMap<>();
+        MultiworldMod.mc.levelKeys().forEach(r -> {
+            ServerLevel world = MultiworldMod.mc.getLevel(r);
+            worlds.put(r.identifier().toString(), world);
         });
-        ServerWorld w = worlds.get(name);
+        ServerLevel w = worlds.get(name);
 		return w;
 	}
 	
 	@Deprecated
-	public void fillBlocks(BlockPos pos, ServerWorld w) {
+	public void fillBlocks(BlockPos pos, ServerLevel w) {
 		// fill outside frame
 		for (int x = 0; x < 4; x++) {
 			for (int y = 0; y < 5; y++) {
 				if (x == 0 || x == 3 || y == 0 || y == 4) {
-					BlockPos pos2 = pos.add(x, y, 0);
-					w.setBlockState(pos2, Blocks.STONE.getDefaultState());
+					BlockPos pos2 = pos.offset(x, y, 0);
+					w.setBlockAndUpdate(pos2, Blocks.STONE.defaultBlockState());
 				}
 			}
 		}
@@ -406,9 +406,9 @@ public class Portal {
 		// Fill the inner section with portal
 		for (int x = 1; x < 3; x++) {
 			for (int y = 1; y < 4; y++) {
-				BlockPos pos2 = pos.add(x, y, 0);
+				BlockPos pos2 = pos.offset(x, y, 0);
 				//this.blocks.add(pos2);
-				w.setBlockState(pos2, Blocks.NETHER_PORTAL.getDefaultState());
+				w.setBlockAndUpdate(pos2, Blocks.NETHER_PORTAL.defaultBlockState());
 			}
 		}
 
@@ -418,7 +418,7 @@ public class Portal {
 		this.buildPortalArea(this.getMinPos(), this.getMaxPos(), this.getOriginWorld());
 	}
 	
-	public void buildPortalArea(BlockPos pos1, BlockPos pos2, ServerWorld world) {
+	public void buildPortalArea(BlockPos pos1, BlockPos pos2, ServerLevel world) {
 	    int minX = Math.min(pos1.getX(), pos2.getX());
 	    int minY = Math.min(pos1.getY(), pos2.getY());
 	    int minZ = Math.min(pos1.getZ(), pos2.getZ());
@@ -443,8 +443,8 @@ public class Portal {
 
 	                if (isOnEdge) {
 	                    // Frame block
-	                	if (world.isAir(currentPos)) {
-	                		world.setBlockState(currentPos, Blocks.OBSIDIAN.getDefaultState());
+	                	if (world.isEmptyBlock(currentPos)) {
+	                		world.setBlockAndUpdate(currentPos, Blocks.OBSIDIAN.defaultBlockState());
 	                	}
 	                } else {
 	                    // Inner portal
@@ -460,8 +460,8 @@ public class Portal {
 	    
 	    // Set the portal blocks after we have a complete frame
 	    for (BlockPos currentPos : innerBlocks) {
-	    	BlockState portalState = Blocks.NETHER_PORTAL.getDefaultState().with(NetherPortalBlock.AXIS, axis);
-            world.setBlockState(currentPos, portalState);
+	    	BlockState portalState = Blocks.NETHER_PORTAL.defaultBlockState().setValue(NetherPortalBlock.AXIS, axis);
+            world.setBlockAndUpdate(currentPos, portalState);
 	    }
 	}
 

@@ -1,14 +1,13 @@
 package multiworld.mixin;
 
+import net.minecraft.world.level.LevelSettings;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.world.level.LevelInfo;
-
-@Mixin(LevelInfo.class)
+@Mixin(LevelSettings.class)
 public interface MixinLevelInfo {
 
 	@Accessor
-	public void setName(String name);
+	public void setLevelName(String name);
 	
 }

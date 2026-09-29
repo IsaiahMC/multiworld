@@ -6,8 +6,8 @@ package me.isaiah.multiworld;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +24,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import me.isaiah.multiworld.command.CreateCommand;
 import me.isaiah.multiworld.command.DifficultyCommand;
-import me.isaiah.multiworld.command.IGameruleCommand;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.command.SetspawnCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
@@ -33,17 +32,17 @@ import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
 import multiworld.api.WorldFolderMode;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 
 /**
  * Multiworld Mod
@@ -90,13 +89,13 @@ public class MultiworldMod {
     	return world_creator;
     }
 
-    public static ServerWorld createConfigAndWorld(String id, String dimStr, Identifier dimId, ChunkGenerator gen, Difficulty dif, long seed, String cgen, WorldFolderMode dirMode) {
+    public static ServerLevel createConfigAndWorld(String id, String dimStr, Identifier dimId, ChunkGenerator gen, Difficulty dif, long seed, String cgen, WorldFolderMode dirMode) {
     	// CreateCommand.make_config(new_id(id), dimStr, seed, cgen);
     	CreateCommand.makeConfigFile(new_id(id), dimStr, seed, cgen, dirMode);
     	return world_creator.create_world(id, dimId, gen, dif, seed);
     }
     
-    public static ServerWorld create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed) {
+    public static ServerLevel create_world(String id, Identifier dim, ChunkGenerator gen, Difficulty dif, long seed) {
     	return world_creator.create_world(id, dim, gen, dif, seed);
     }
 
@@ -115,10 +114,7 @@ public class MultiworldMod {
 		}
 
     	LOGGER.info("Multiworld Mod Init");
-        
-        // TODO: Testing
-        // PortalCommand.test();
-        
+
         //WandEventHandler.register();
     }
 
@@ -166,31 +162,27 @@ public class MultiworldMod {
 		}
 		
     }
-    
-    public static void getFileConfiguration() {
-    	
-    }
 
-    public static ServerPlayerEntity get_player(ServerCommandSource s) throws CommandSyntaxException {
-    	ServerPlayerEntity plr = s.getPlayer();
+    public static ServerPlayer get_player(CommandSourceStack s) throws CommandSyntaxException {
+    	ServerPlayer plr = s.getPlayer();
     	if (null == plr) {
     		// s.sendMessage(text_plain("Multiworld Mod for Minecraft " + mc.getVersion()));
     		// s.sendMessage(text_plain("These commands currently require a Player."));
     		
-    		throw ServerCommandSource.REQUIRES_PLAYER_EXCEPTION.create();
+    		throw CommandSourceStack.ERROR_NOT_PLAYER.create();
     	}
     	return plr;
     }
-    
-    public static boolean isPlayer(ServerCommandSource s) {
+
+   private static boolean isPlayer(CommandSourceStack s) {
     	try {
-    		ServerPlayerEntity plr = s.getPlayer();
+    		ServerPlayer plr = s.getPlayer();
     		if (null == plr) {
     			return false;
     		}
     	} catch (Exception ex) {
     		if (ex instanceof CommandSyntaxException) {
-    			if (s.getName().equalsIgnoreCase("Server")) return false;
+    			if (s.getTextName().equalsIgnoreCase("Server")) return false;
     		}
     	}
     	return true;
@@ -199,7 +191,7 @@ public class MultiworldMod {
     /**
      * <= >= 1.21.11 Compact.
      */
-    public static boolean permissionLevel(ServerCommandSource source, int level) {
+    public static boolean permissionLevel(CommandSourceStack source, int level) {
     	return Perm.permissionLevel(source, level);
     }
 
@@ -216,7 +208,7 @@ public class MultiworldMod {
     };
     
     // On command register
-    public static void register_commands(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public static void register_commands(CommandDispatcher<CommandSourceStack> dispatcher) {
     	dispatcher.register(literal(CMD)
     			.requires(source -> {
     				// #if mc182
@@ -244,12 +236,12 @@ public class MultiworldMod {
     				}
     			}) 
     			.executes(ctx -> {
-    				return broadcast(ctx.getSource(), Formatting.AQUA, null);
+    				return broadcast(ctx.getSource(), ChatFormatting.AQUA, null);
     			})
     			.then(argument("message", greedyString()).suggests(new InfoSuggest())
     					.executes(ctx -> {
     						try {
-    							return broadcast(ctx.getSource(), Formatting.AQUA, getString(ctx, "message") );
+    							return broadcast(ctx.getSource(), ChatFormatting.AQUA, getString(ctx, "message") );
     						} catch (Exception e) {
     							e.printStackTrace();
     							return 1;
@@ -260,35 +252,28 @@ public class MultiworldMod {
     /**
      * Preprocessed method.
      */
-    public static ServerWorld getWorldFor(PlayerEntity plr) {
+    public static ServerLevel getWorldFor(Player plr) {
     	// #if mc218
     	// return (ServerWorld) plr.getWorld();
     	// #else
-    	ServerWorld w = (ServerWorld) plr.getEntityWorld();
+    	ServerLevel w = (ServerLevel) plr.level();
     	return w;
     	// #endif
     }
 
-    public static int broadcast(ServerCommandSource source, Formatting formatting, String message) throws CommandSyntaxException {
-    	/*
-    	if (!source.isExecutedByPlayer()) {
-    		if (!source.getName().equalsIgnoreCase("Server")) return 1;
-    		return broadcast_console(source, message);
-    	}
-    	*/
-    	
+    public static int broadcast(CommandSourceStack source, ChatFormatting formatting, String message) throws CommandSyntaxException {
     	if (!isPlayer(source)) {
     		ConsoleCommand.broadcast_console(mc, source, message);
     		return 1;
     	}
     	
-    	final ServerPlayerEntity plr = get_player(source); // source.getPlayerOrThrow();
+    	final ServerPlayer plr = get_player(source); // source.getPlayerOrThrow();
 
         if (null == message) {
-            message(plr, "&bMultiworld Mod for Minecraft " + mc.getVersion());
+            message(plr, "&bMultiworld Mod for Minecraft " + mc.getServerVersion());
 
-            World world = getWorldFor(plr);
-            Identifier id = world.getRegistryKey().getValue();
+            Level world = getWorldFor(plr);
+            Identifier id = world.dimension().identifier();
             
             message(plr, "Currently in: " + id.toString());
             
@@ -307,10 +292,10 @@ public class MultiworldMod {
         
         // Debug
         if (args[0].equalsIgnoreCase("debugtick")) {
-        	ServerWorld w = getWorldFor(plr);
-        	Identifier id = w.getRegistryKey().getValue();
+        	ServerLevel w = getWorldFor(plr);
+        	Identifier id = w.dimension().identifier();
         	message(plr, "World ID: " + id.toString());
-        	message(plr, "Players : " + w.getPlayers().size());
+        	message(plr, "Players : " + w.players().size());
         	w.tick(() -> true);
         }
 
@@ -337,11 +322,11 @@ public class MultiworldMod {
         // TP Command
         if (args[0].equalsIgnoreCase("tp") ) {
             if (!(ALL || Perm.has(plr, "multiworld.tp"))) {
-                plr.sendMessage(Text.of("No permission! Missing permission: multiworld.tp"), false);
+                message(plr, "No permission! Missing permission: multiworld.tp");
                 return 1;
             }
             if (args.length == 1) {
-                plr.sendMessage(text_plain("Usage: /" + CMD + " tp <world>"), false);
+                message(plr, "Usage: /" + CMD + " tp <world>");
                 return 0;
             }
             return TpCommand.run(mc, plr, args);
@@ -350,17 +335,17 @@ public class MultiworldMod {
         // List Command
         if (args[0].equalsIgnoreCase("list") ) {
             if (!(ALL || Perm.has(plr, "multiworld.cmd"))) {
-                plr.sendMessage(Text.of("No permission! Missing permission: multiworld.cmd"), false);
+                message(plr, "No permission! Missing permission: multiworld.cmd");
                 return 1;
             }
 
             message(plr, "&bAll Worlds:");
             
-            World pworld = getWorldFor(plr);
-            Identifier pwid = pworld.getRegistryKey().getValue();
+            Level pworld = getWorldFor(plr);
+            Identifier pwid = pworld.dimension().identifier();
             
-            mc.getWorlds().forEach(world -> {
-            	Identifier id = world.getRegistryKey().getValue();
+            mc.getAllLevels().forEach(world -> {
+            	Identifier id = world.dimension().identifier();
                 String name = id.toString();
                 if (name.startsWith("multiworld:")) name = name.replace("multiworld:", "");
 
@@ -409,27 +394,26 @@ public class MultiworldMod {
         return Command.SINGLE_SUCCESS; // Success
     }
 
-	public static Text text(String message) {
+	public static void message(Player player, String message) {
 		try {
-			return Text.of(translate_alternate_color_codes('&', message));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return text_plain(message);
-		}
-	}
-
-	public static void message(PlayerEntity player, String message) {
-		try {
-			player.sendMessage(Text.of(translate_alternate_color_codes('&', message)), false);
+			// #if mc261
+			// player.sendSystemMessage(Component.nullToEmpty(translate_alternate_color_codes('&', message)));
+			// #else
+			player.displayClientMessage(Component.nullToEmpty(translate_alternate_color_codes('&', message)), false);
+			// #endif
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
     }
 	
-	public static void message(ServerCommandSource s, String message) {
+	public static void message(CommandSourceStack s, String message) {
 		try {
-			ServerPlayerEntity player = s.getPlayer();
-			player.sendMessage(Text.of(translate_alternate_color_codes('&', message)), false);
+			ServerPlayer player = s.getPlayer();
+			// #if mc261
+			// player.sendSystemMessage(Component.nullToEmpty(translate_alternate_color_codes('&', message)), false);
+			// #else
+			player.displayClientMessage(Component.nullToEmpty(translate_alternate_color_codes('&', message)), false);
+			// #endif
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -446,9 +430,5 @@ public class MultiworldMod {
         }
         return new String(b);
     }
-
-	public static Text text_plain(String txt) {
-		return Text.of(txt);
-	}
 
 }

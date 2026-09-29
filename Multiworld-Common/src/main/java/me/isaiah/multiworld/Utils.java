@@ -11,17 +11,18 @@ import me.isaiah.multiworld.command.CreateCommand;
 import me.isaiah.multiworld.command.Util;
 import me.isaiah.multiworld.config.FileConfiguration;
 import multiworld.api.WorldFolderMode;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 // import net.minecraft.registry.RegistryKey;
 // import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.level.ServerLevel;
 // import net.minecraft.util.path.SymlinkValidationException;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.level.storage.LevelStorage;
-import net.minecraft.world.level.storage.LevelStorage.Session;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
 
 public class Utils {
@@ -247,15 +248,31 @@ public class Utils {
 		if (id.getNamespace().equalsIgnoreCase("multiworld")) {
 			return id.getPath();
 		}
-		return id.toUnderscoreSeparatedString();
+		return id.toDebugFileName();
 	}
 
  	public static Path getWorldStoragePath() {
  		return getWorldStoragePath(MultiworldMod.mc, WorldFolderMode.VANILLA);
  	}
  	
+ 	public static LevelStorageAccess getServerSession(MinecraftServer server) {
+ 		// #if mc261
+ 		// return ((MinecraftServerAccess) server).getStorageSource();
+ 		// #else
+ 		return ((MinecraftServerAccess) server).getSession();
+ 		// #endif
+ 	}
+ 	
+ 	public static Path getDimensionPath(MinecraftServer server, ResourceKey<Level> level) {
+ 		// #if mc261
+ 		// return ((MinecraftServerAccess) server).getStorageSource().getLevelPath(net.minecraft.world.level.storage.LevelResource.ROOT);
+ 		// #else
+ 		return getServerSession(server).getDimensionPath(level);
+ 		// #endif
+ 	}
+ 	
  	public static Path getWorldStoragePath(MinecraftServer server, WorldFolderMode mode) {
- 		Path overworld = ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD); 
+ 		Path overworld = getDimensionPath(server, Level.OVERWORLD); 
  		
  		// if (mode == WorldFolderMode.VANILLA) {
  			return overworld.resolve("dimensions");
@@ -273,7 +290,7 @@ public class Utils {
  	}
  	
  	public static Path getWorldPath(Identifier id, WorldFolderMode mode) {
- 		Path overworld = ((MinecraftServerAccess) MultiworldMod.mc).getSession().getWorldDirectory(World.OVERWORLD); 
+ 		Path overworld = getDimensionPath(MultiworldMod.mc, Level.OVERWORLD); 
  		
  		// if (mode == WorldFolderMode.VANILLA) {
  			return overworld.resolve("dimensions").resolve(id.getNamespace()).resolve(id.getPath());
@@ -292,10 +309,10 @@ public class Utils {
  	
  	@Deprecated
  	public static Path getWorldStoragePath(MinecraftServer server) {
- 		Path overworld = ((MinecraftServerAccess) server).getSession().getWorldDirectory(World.OVERWORLD); 
+ 		Path overworld = getDimensionPath(server, Level.OVERWORLD); 
  		
  		// Client side
- 		if (!MultiworldMod.mc.isDedicated()) {
+ 		if (!MultiworldMod.mc.isDedicatedServer()) {
  			Path mw = overworld.resolve("multiworlds");
  			return mw;
  		}
@@ -399,7 +416,7 @@ public class Utils {
     	Path path = Utils.getWorldDirectory(MultiworldMod.new_id(id));
 		
 		if (!path.toFile().isDirectory()) {
-			if (MultiworldMod.mc.isDedicated()) {
+			if (MultiworldMod.mc.isDedicatedServer()) {
 				MultiworldMod.LOGGER.info("Error loading World \"" + id + "\" could not find world folder: " + path);
 			}
 			// Singleplayer
@@ -417,7 +434,7 @@ public class Utils {
     	// Path path = Utils.getWorldDirectory(MultiworldMod.new_id(id));
 		
 		if (!path.toFile().isDirectory()) {
-			if (MultiworldMod.mc.isDedicated()) {
+			if (MultiworldMod.mc.isDedicatedServer()) {
 				MultiworldMod.LOGGER.info("Error loading Multiworld world, could not find world folder: " + path);
 			}
 			return false;
@@ -508,7 +525,7 @@ public class Utils {
 				return savedId;
 			});
 
-			ServerWorld world = MultiworldMod.create_world(id, dim, gen, d, seed);
+			ServerLevel world = MultiworldMod.create_world(id, dim, gen, d, seed);
 
 			MultiworldMod.get_world_creator().set_difficulty(id, d);
 

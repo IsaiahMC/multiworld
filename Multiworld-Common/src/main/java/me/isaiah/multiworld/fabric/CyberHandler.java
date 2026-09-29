@@ -1,10 +1,7 @@
 package me.isaiah.multiworld.fabric;
 
-import cyber.permissions.v1.CyberPermissions;
-import cyber.permissions.v1.Permission;
-import cyber.permissions.v1.PermissionDefaults;
 import me.isaiah.multiworld.perm.Perm;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * CyberPermissions API
@@ -14,9 +11,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @Deprecated
 public class CyberHandler {
     
-    public static boolean hasPermission(ServerPlayerEntity plr, String perm) {
-        // Permission p = new Permission(perm, "A permission for Multiworld", PermissionDefaults.OPERATOR);
-        return Perm.permissionLevel(plr, 2); // || CyberPermissions.getPlayerPermissible(plr).hasPermission(p);
+    public static boolean hasPermission(ServerPlayer plr, String perm) {
+        return Perm.permissionLevel(plr, 2);
     }
 
 }

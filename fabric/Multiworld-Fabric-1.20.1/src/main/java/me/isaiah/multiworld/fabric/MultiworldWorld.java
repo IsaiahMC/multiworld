@@ -8,25 +8,24 @@ import com.google.common.collect.ImmutableList;
 import me.isaiah.multiworld.Utils;
 import multiworld.api.IMultiworldWorld;
 import multiworld.mixin.MixinLevelInfo;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.ProgressListener;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.RandomSequencesState;
-import net.minecraft.util.path.SymlinkValidationException;
-import net.minecraft.world.SaveProperties;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProperties;
-import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.world.level.LevelInfo;
-import net.minecraft.world.level.LevelProperties;
-import net.minecraft.world.level.ServerWorldProperties;
-import net.minecraft.world.level.storage.LevelStorage;
-import net.minecraft.world.level.storage.LevelStorage.Session;
-import net.minecraft.world.spawner.Spawner;
+import net.minecraft.world.RandomSequences;
+import net.minecraft.world.level.CustomSpawner;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
+import net.minecraft.world.level.storage.PrimaryLevelData;
+import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraft.world.level.storage.WorldData;
+import net.minecraft.world.level.validation.ContentValidationException;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.fantasy.mixin.MinecraftServerAccess;
 import xyz.nucleoid.fantasy.util.VoidWorldProgressListener;
@@ -42,16 +41,16 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
 	public final Style style;
 	public boolean flat;
 	
-	public final LevelStorage.Session mw$levelStorageAccess;
+	public final LevelStorageSource.LevelStorageAccess mw$levelStorageAccess;
 	
-	protected MultiworldWorld(MinecraftServer server, RegistryKey<World> registryKey, RuntimeWorldConfig config, Style style) {
+	protected MultiworldWorld(MinecraftServer server, ResourceKey<Level> registryKey, RuntimeWorldConfig config, Style style) {
         this(
-                server, Util.getMainWorkerExecutor(), mw$session(server, registryKey.getValue()),
-                new RuntimeWorldProperties(new MySaveProperties((LevelProperties) server.getSaveProperties()).withName(registryKey.getValue().toUnderscoreSeparatedString().replace("multiworld_", "")), config),
+                server, Util.backgroundExecutor(), mw$session(server, registryKey.identifier()),
+                new RuntimeWorldProperties(new MySaveProperties((PrimaryLevelData) server.getWorldData()).withName(registryKey.identifier().toDebugFileName().replace("multiworld_", "")), config),
                 registryKey,
                 config.createDimensionOptions(server),
                 false,
-                BiomeAccess.hashSeed(config.getSeed()),
+                BiomeManager.obfuscateSeed(config.getSeed()),
                 ImmutableList.of(),
                 config.shouldTickTime(),
                 null, style
@@ -66,45 +65,45 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
         this.save(null, true, false); 
     }
 
-    private MultiworldWorld(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, ServerWorldProperties properties, RegistryKey<World> worldKey, DimensionOptions dimensionOptions, boolean debugWorld, long seed, List<Spawner> spawners, boolean shouldTickTime, @Nullable RandomSequencesState randomSequencesState, Style style) {
+    private MultiworldWorld(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> worldKey, LevelStem dimensionOptions, boolean debugWorld, long seed, List<CustomSpawner> spawners, boolean shouldTickTime, @Nullable RandomSequences randomSequencesState, Style style) {
         super(server, workerExecutor, session, properties, worldKey, dimensionOptions, VoidWorldProgressListener.INSTANCE, debugWorld, seed, spawners, shouldTickTime, randomSequencesState, style);
         this.mw$levelStorageAccess = session;
         this.style = style;
     }
 
-    private static Session mw$session(MinecraftServer server, Identifier id) {
+    private static LevelStorageAccess mw$session(MinecraftServer server, Identifier id) {
     	boolean useUs = Utils.shouldUseNewWorldFormat(server, id);
     	if (!useUs) { return ((MinecraftServerAccess) server).getSession(); }
     	
     	return mw$getSession(server, id);
     }
     
-    public static LevelStorage mw$getStorage() {
+    public static LevelStorageSource mw$getStorage() {
     	Path customWorldPath = Utils.getWorldStoragePath();
-    	LevelStorage levelStorage = LevelStorage.create(customWorldPath);
+    	LevelStorageSource levelStorage = LevelStorageSource.createDefault(customWorldPath);
     	return levelStorage;
     }
     
-    public static Session mw$getSession(MinecraftServer server, Identifier id) {
+    public static LevelStorageAccess mw$getSession(MinecraftServer server, Identifier id) {
     	String name = Utils.getWorldName(id);
     	Path customWorldPath = Utils.getWorldStoragePath();
-    	LevelStorage levelStorage = LevelStorage.create(customWorldPath);
-    	try (LevelStorage.Session session = levelStorage.createSession( name )) {
+    	LevelStorageSource levelStorage = LevelStorageSource.createDefault(customWorldPath);
+    	try (LevelStorageSource.LevelStorageAccess session = levelStorage.validateAndCreateAccess( name )) {
 			return session;
-		} catch (IOException | SymlinkValidationException e) {
+		} catch (IOException | ContentValidationException e) {
 			e.printStackTrace();
 			return ((MinecraftServerAccess) server).getSession();
 		}
     }
     
     @Override
-    public Session multiworld$getLevelStorageSession() {
+    public LevelStorageAccess multiworld$getLevelStorageSession() {
     	return this.mw$levelStorageAccess;
     }
     
     @Override
     public Identifier multiworld$getLevelId() {
-    	return this.getRegistryKey().getValue();
+    	return this.dimension().identifier();
     }
     
     @Override
@@ -112,28 +111,28 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
     	return multiworld$getLevelId().getPath();
     }
     
-    public SaveProperties getSaveProperties() {
-    	SaveProperties serverSave = this.getServer().getSaveProperties();
-    	MySaveProperties props = new MySaveProperties((LevelProperties) serverSave).withName(
+    public WorldData getSaveProperties() {
+    	WorldData serverSave = this.getServer().getWorldData();
+    	MySaveProperties props = new MySaveProperties((PrimaryLevelData) serverSave).withName(
     			multiworld$getLevelName()
     			);
 
-        WorldProperties worldProps = (RuntimeWorldProperties) this.getLevelProperties();
+        LevelData worldProps = (RuntimeWorldProperties) this.getLevelData();
 
         props.setDifficulty(worldProps.getDifficulty());
-        props.setSpawnPos(BlockPos.ofFloored(worldProps.getSpawnX(), worldProps.getSpawnY(), worldProps.getSpawnZ()), worldProps.getSpawnAngle());
-        props.setTime(worldProps.getTime());
-        props.setTimeOfDay(worldProps.getTimeOfDay());
+        props.setSpawn(BlockPos.containing(worldProps.getXSpawn(), worldProps.getYSpawn(), worldProps.getZSpawn()), worldProps.getSpawnAngle());
+        props.setGameTime(worldProps.getGameTime());
+        props.setDayTime(worldProps.getDayTime());
         props.setDifficultyLocked(worldProps.isDifficultyLocked());
         props.setRaining(worldProps.isRaining());
         props.setThundering(worldProps.isThundering());
 
-        if (worldProps instanceof ServerWorldProperties swProps) {
-        	props.getGameRules().setAllValues(swProps.getGameRules(), null);
+        if (worldProps instanceof ServerLevelData swProps) {
+        	props.getGameRules().assignFrom(swProps.getGameRules(), null);
             props.setClearWeatherTime(swProps.getClearWeatherTime());
             props.setRainTime(swProps.getRainTime());
             props.setThunderTime(swProps.getThunderTime());
-            props.setGameMode(swProps.getGameMode());
+            props.setGameType(swProps.getGameType());
             props.setInitialized(swProps.isInitialized());
             props.setWanderingTraderId(swProps.getWanderingTraderId());
             props.setWanderingTraderSpawnChance(swProps.getWanderingTraderSpawnChance());
@@ -141,8 +140,8 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
             props.setWorldBorder(swProps.getWorldBorder());
         }
         
-        props.addServerBrand("fabric", true);
-        props.addServerBrand("multiworld", true);
+        props.setModdedInfo("fabric", true);
+        props.setModdedInfo("multiworld", true);
         
         props.mw$setLevelName(this.multiworld$getLevelName());
 
@@ -162,7 +161,7 @@ public class MultiworldWorld extends RuntimeWorld implements IMultiworldWorld {
     
     @Override
     public void multiworld$saveLevelDatFile() {
-        this.mw$levelStorageAccess.backupLevelDataFile(this.getServer().getRegistryManager(), getSaveProperties(), this.getServer().getPlayerManager().getUserData());
+        this.mw$levelStorageAccess.saveDataTag(this.getServer().registryAccess(), getSaveProperties(), this.getServer().getPlayerList().getSingleplayerData());
     }
 
 }

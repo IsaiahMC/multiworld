@@ -1,7 +1,7 @@
 package multiworld.api;
 
-import net.minecraft.util.Identifier;
-import net.minecraft.world.level.storage.LevelStorage.Session;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 
 /**
  * Interface for Multiworld added ServerWorld content.
@@ -30,6 +30,6 @@ public interface IMultiworldWorld {
 
 	/**
 	 */
-	Session multiworld$getLevelStorageSession();
+	LevelStorageAccess multiworld$getLevelStorageSession();
 
 }

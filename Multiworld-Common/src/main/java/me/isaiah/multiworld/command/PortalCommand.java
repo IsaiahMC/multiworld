@@ -11,13 +11,13 @@ import me.isaiah.multiworld.InfoSuggest;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
 import me.isaiah.multiworld.portal.WandEventHandler;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 import static me.isaiah.multiworld.MultiworldMod.message;
 
@@ -59,7 +59,7 @@ public class PortalCommand implements Command {
 	/**
 	 * Execute the Command
 	 */
-	public static int run(MinecraftServer mc, ServerPlayerEntity plr, String[] args) {
+	public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
 
 		// Portal Command Help
 		if (args.length == 1) {
@@ -125,7 +125,7 @@ public class PortalCommand implements Command {
 			}
 			
 			message(plr, "&aGiving wand!");
-			plr.giveItemStack(WandEventHandler.getItemStack().copy());
+			plr.addItem(WandEventHandler.getItemStack().copy());
 
 			return 1;
 		}
@@ -171,15 +171,15 @@ public class PortalCommand implements Command {
 		return null;
 	}
 	
-	private static int createPortal(ServerPlayerEntity plr, String[] args) {
-		Object[] poss = WandEventHandler.getWandPositionsOrNull(plr.getUuid());
+	private static int createPortal(ServerPlayer plr, String[] args) {
+		Object[] poss = WandEventHandler.getWandPositionsOrNull(plr.getUUID());
 		
 		if (null == poss) {
 			message(plr, I18n.CMD_PORTAL_NO_SELECTION);
 			return 0;
 		}
 		
-		ServerWorld world = (ServerWorld) poss[0];
+		ServerLevel world = (ServerLevel) poss[0];
 		BlockPos pos1 = (BlockPos) poss[1];
 		BlockPos pos2 = (BlockPos) poss[2];
 		
@@ -204,7 +204,7 @@ public class PortalCommand implements Command {
 		Portal p = new Portal(
 				name,
 				plr.getName().getString(),
-				world.getRegistryKey().getValue(),
+				world.dimension().identifier(),
 				dest,
 				pos1,
 				pos2 
@@ -238,7 +238,7 @@ public class PortalCommand implements Command {
      * 
      * "/mw portal <arg1> <arg2> <arg3> etc..."
      */
-    public static void getSuggestions_PortalCommand(SuggestionsBuilder builder, String input, String[] cmds, ServerCommandSource plr, boolean ALL) {
+    public static void getSuggestions_PortalCommand(SuggestionsBuilder builder, String input, String[] cmds, CommandSourceStack plr, boolean ALL) {
 
     	// Argument 1:
     	if (cmds.length <= 2 || (cmds.length <= 3 && !input.endsWith(" "))) {
@@ -280,11 +280,11 @@ public class PortalCommand implements Command {
     			}
     			
     			// Suggest Exact Player Pos
-    			Vec3d pos = plr.getPosition();
-    			ServerWorld w = plr.getWorld();
+    			Vec3 pos = plr.getPosition();
+    			ServerLevel w = plr.getLevel();
 
-    			Identifier id = w.getRegistryKey().getValue();
-    			String loc = round(pos.getX()) + "," + round(pos.getY()) + "," + round(pos.getZ());
+    			Identifier id = w.dimension().identifier();
+    			String loc = round(pos.x()) + "," + round(pos.y()) + "," + round(pos.z());
     			builder.suggest("e:" + id + ":" + loc);
     			
     			return;

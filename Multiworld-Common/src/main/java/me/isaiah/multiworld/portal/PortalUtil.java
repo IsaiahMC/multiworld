@@ -4,9 +4,9 @@ import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 import me.isaiah.multiworld.MultiworldMod;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class PortalUtil {
 
@@ -31,22 +31,22 @@ public class PortalUtil {
 	    return joiner.toString();
 	}
 	
-	public static BlockPos findSafeExit(ServerWorld world, BlockPos origin, int radius, int maxY) {
+	public static BlockPos findSafeExit(ServerLevel world, BlockPos origin, int radius, int maxY) {
 	    for (int y = origin.getY(); y < maxY; y++) {
 	        for (int dx = -radius; dx <= radius; dx++) {
 	            for (int dz = -radius; dz <= radius; dz++) {
-	                BlockPos checkPos = origin.add(dx, y - origin.getY(), dz);
+	                BlockPos checkPos = origin.offset(dx, y - origin.getY(), dz);
 
 	                BlockState floor = world.getBlockState(checkPos);
-	                BlockState head = world.getBlockState(checkPos.up());
-	                BlockState aboveHead = world.getBlockState(checkPos.up(2));
+	                BlockState head = world.getBlockState(checkPos.above());
+	                BlockState aboveHead = world.getBlockState(checkPos.above(2));
 
-	                boolean isSafe = floor.isSolidBlock(world, checkPos) &&
+	                boolean isSafe = floor.isRedstoneConductor(world, checkPos) &&
 	                                 head.isAir() &&
 	                                 aboveHead.isAir();
 
 	                if (isSafe) {
-	                    return checkPos.up(); // Return position where player's feet will land
+	                    return checkPos.above(); // Return position where player's feet will land
 	                }
 	            }
 	        }
