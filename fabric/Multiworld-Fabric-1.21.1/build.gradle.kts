@@ -3,7 +3,7 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDepen
 
 
 plugins {
-    id ("fabric-loom") version "1.13-SNAPSHOT"
+    id ("fabric-loom") version "1.15-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -14,7 +14,7 @@ java {
 }
 
 // Preprocess
-extensions.extraProperties["targetVersion"] = "mc211"
+extensions.extraProperties["targetVersion"] = "mc2101"
 extensions.extraProperties["inputSourceDir"] = "${rootProject.projectDir}/Multiworld-Common/src/main/java"
 val createPreprocessor = rootProject.extra["createPreprocessor"] as groovy.lang.Closure<*>
 createPreprocessor.call(project)
@@ -45,7 +45,7 @@ dependencies {
 	// 1.21.1
     minecraft("com.mojang:minecraft:1.21.1") 
     // mappings("net.fabricmc:yarn:1.21.1+build.3:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.18.3")
+    modImplementation("net.fabricmc:fabric-loader:0.19.5")
 
 	mappings(loom.layered {
         mappings(file("mappings-identifier.jar"))

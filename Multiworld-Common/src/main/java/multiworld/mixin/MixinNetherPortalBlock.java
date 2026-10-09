@@ -10,6 +10,7 @@ import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -50,8 +51,19 @@ public class MixinNetherPortalBlock {
 
 				
 				if (isInside) {
+					// Desynced portal: destination world not loaded. Warn instead of crashing (NPE).
+					if (!p.canTeleport()) {
+						// Overlay (action bar) message: avoids chat spam since this runs every tick.
+						((ServerPlayer) entity).sendSystemMessage(
+								Component.literal(MultiworldMod.text("&cPortal \"" + p.getName() + "\" is not synced: destination world not loaded.")),
+								true);
+						ci.cancel();
+						return;
+					}
+
 					I18n.message((ServerPlayer) entity, I18n.TELEPORTING);
-					
+
+
 					BlockPos dest = p.getDestLocation();
 					
 					MultiworldMod.get_world_creator().teleleport(

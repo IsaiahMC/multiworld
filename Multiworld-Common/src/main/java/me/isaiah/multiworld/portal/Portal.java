@@ -2,7 +2,6 @@ package me.isaiah.multiworld.portal;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -391,6 +390,32 @@ public class Portal {
 		return w;
 	}
 	
+	/**
+	 * Returns true if this portal's destination world is currently loaded.
+	 * A desynced portal (destination dimension not registered/loaded) returns false.
+	 */
+	public boolean canTeleport() {
+		return this.getDestWorld() != null;
+	}
+
+	/**
+	 * Logs a console ERROR for every loaded portal whose destination is not synced
+	 * (its destination world is not loaded, so it would not teleport).
+	 *
+	 * @return the number of desynced portals found.
+	 */
+	public static int checkPortalsSync() {
+		int broken = 0;
+		for (Portal p : PortalCommand.KNOWN_PORTALS.values()) {
+			if (!p.canTeleport()) {
+				MultiworldMod.LOGGER.error("Portal \"" + p.getName() + "\" is NOT synced: destination \""
+						+ p.getDestination() + "\" (world not loaded). It will not teleport.");
+				broken++;
+			}
+		}
+		return broken;
+	}
+
 	@Deprecated
 	public void fillBlocks(BlockPos pos, ServerLevel w) {
 		// fill outside frame
@@ -427,13 +452,20 @@ public class Portal {
 	    int maxY = Math.max(pos1.getY(), pos2.getY());
 	    int maxZ = Math.max(pos1.getZ(), pos2.getZ());
 
-	    ArrayList<BlockPos> innerBlocks = new ArrayList<>();
-	    
+	    Direction.Axis axis = (Math.abs(pos1.getX() - pos2.getX()) > Math.abs(pos1.getZ() - pos2.getZ()))
+        	    ? Direction.Axis.X
+        	    : Direction.Axis.Z;
+
+	    BlockState portalState = Blocks.NETHER_PORTAL.defaultBlockState().setValue(NetherPortalBlock.AXIS, axis);
+
+	    // No obsidian frame: only fill air blocks within the selection with portal blocks.
+	    // The player provides their own frame (any material), which is left untouched.
 	    for (int x = minX; x <= maxX; x++) {
 	        for (int y = minY; y <= maxY; y++) {
 	            for (int z = minZ; z <= maxZ; z++) {
 	                BlockPos currentPos = new BlockPos(x, y, z);
-
+// <<<<<<< HEAD
+/*
 	                int edgeCount = 0;
 	                if (x == minX || x == maxX) edgeCount++;
 	                if (y == minY || y == maxY) edgeCount++;
@@ -449,11 +481,18 @@ public class Portal {
 	                } else {
 	                    // Inner portal
 	                	innerBlocks.add(currentPos);
+=======
+*/
+	                if (world.isEmptyBlock(currentPos)) {
+	                    world.setBlockAndUpdate(currentPos, portalState);
+// >>>>>>> 568e155add5e9d5f3e0e08fa1c454e87d6cc2278
 	                }
 	            }
 	        }
 	    }
+// <<<<<<< HEAD
 	    
+	    /*
 	    Direction.Axis axis = (Math.abs(pos1.getX() - pos2.getX()) > Math.abs(pos1.getZ() - pos2.getZ()))
         	    ? Direction.Axis.X
         	    : Direction.Axis.Z;
@@ -463,6 +502,52 @@ public class Portal {
 	    	BlockState portalState = Blocks.NETHER_PORTAL.defaultBlockState().setValue(NetherPortalBlock.AXIS, axis);
             world.setBlockAndUpdate(currentPos, portalState);
 	    }
+=======*/
+	}
+
+	/**
+	 * Clears the portal's blocks from the world.
+	 * Only removes NETHER_PORTAL blocks within the portal's bounds, so the
+	 * player-built frame (and any other blocks) are left untouched.
+	 */
+	public void removePortalArea() {
+		ServerLevel world = this.getOriginWorld();
+		if (null == world) {
+			return;
+		}
+
+		BlockPos min = this.getMinPos();
+		BlockPos max = this.getMaxPos();
+
+		for (int x = min.getX(); x <= max.getX(); x++) {
+			for (int y = min.getY(); y <= max.getY(); y++) {
+				for (int z = min.getZ(); z <= max.getZ(); z++) {
+					BlockPos pos = new BlockPos(x, y, z);
+					var block = world.getBlockState(pos).getBlock();
+					if (block == Blocks.NETHER_PORTAL) {
+						world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Removes this portal's entry from config/multiworld/portals.yml
+	 * so it is not reloaded on the next server start.
+	 */
+	public void delete() throws IOException {
+		File config_dir = new File("config");
+		File cf = new File(config_dir, "multiworld");
+		File wc = new File(cf, "portals.yml");
+
+		if (!wc.exists()) {
+			return;
+		}
+
+		FileConfiguration config = new FileConfiguration(wc);
+		config.removeSection("portals." + this.getName());
+		config.save();
 	}
 
 

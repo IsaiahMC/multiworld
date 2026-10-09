@@ -3,7 +3,7 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDepen
 
 
 plugins {
-    id ("fabric-loom") version "1.13-SNAPSHOT"
+    id ("fabric-loom") version "1.15-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -41,7 +41,7 @@ dependencies {
 
     })
 	
-	modImplementation("net.fabricmc:fabric-loader:0.18.3")
+	modImplementation("net.fabricmc:fabric-loader:0.19.5")
 	
 	
 	

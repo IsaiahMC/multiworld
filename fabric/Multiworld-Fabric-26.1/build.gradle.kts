@@ -48,7 +48,7 @@ dependencies {
 	
 	// Minecraft 26.1
     minecraft("com.mojang:minecraft:26.1.2") 
-    implementation("net.fabricmc:fabric-loader:0.18.3")
+    implementation("net.fabricmc:fabric-loader:0.19.5")
 	
 	// fantasy snapshot: https://pisaiah.com/maven-repo/
 	include("xyz.nucleoid:fantasy:0.8.0-beta.1+26.1.1")

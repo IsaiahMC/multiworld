@@ -80,9 +80,15 @@ public class FileConfiguration extends Configuration {
                 
                 if (sp < lastSpace) {
                 	lastSpace = sp;
-                	section = section.substring(0, section.lastIndexOf('.'));
-                	section = section.substring(0, section.lastIndexOf('.'));
-                	section += "." + key.trim();
+                	if (section.lastIndexOf('.') != -1) {
+                		section = section.substring(0, section.lastIndexOf('.'));
+                	}
+                	if (section.lastIndexOf('.') != -1) {
+                		section = section.substring(0, section.lastIndexOf('.'));
+                		section += "." + key.trim();
+                	} else {
+                		section = key.trim();
+                	}
                 }
                 
                 if (section.startsWith(".")) {

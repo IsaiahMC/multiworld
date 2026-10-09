@@ -4,7 +4,7 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDepen
 
 
 plugins {
-    id ("fabric-loom") version "1.13-SNAPSHOT"
+    id ("fabric-loom") version "1.15-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 	// id ("com.replaymod.preprocess") version "fad42fb94c"
@@ -49,7 +49,7 @@ dependencies {
 
     })
 	
-	modImplementation("net.fabricmc:fabric-loader:0.18.3")
+	modImplementation("net.fabricmc:fabric-loader:0.19.5")
 	
 	include("xyz.nucleoid:fantasy:0.4.11+1.20-rc1")
 	modImplementation("xyz.nucleoid:fantasy:0.4.11+1.20-rc1")

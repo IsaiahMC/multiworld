@@ -57,19 +57,19 @@ public class Configuration {
     /**
      */
     public int getInt(String key) {
-        return (Integer) (Object)contentMap.get(key);
+        return ((Number) contentMap.get(key)).intValue();
     }
 
     /**
      */
     public double getDouble(String key) {
-        return (Double) contentMap.get(key);
+        return ((Number) contentMap.get(key)).doubleValue();
     }
 
     /**
      */
     public long getLong(String key) {
-        return (Long) contentMap.get(key);
+        return ((Number) contentMap.get(key)).longValue();
     }
     
     /**
@@ -94,6 +94,13 @@ public class Configuration {
     public void save() throws IOException {
     }
     
+    /**
+     * Removes every key under the given section prefix (e.g. "portals.myPortal").
+     */
+	public void removeSection(String sect) {
+		contentMap.keySet().removeIf(k -> k.equals(sect) || k.startsWith(sect + "."));
+	}
+
     /**
      */
 	public boolean hasSection(String sect) {

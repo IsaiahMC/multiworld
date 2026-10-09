@@ -46,14 +46,14 @@ public class PortalCommand implements Command {
 			"&a/mw portal select <name>&r - TODO",
 			"&a/mw portal wand&r - Gives a Portal Creation Wand",
 			"&a/mw portal info <name>&r - Displays information about a portal.",
-			"&a/mw portal remove <name>&r - TODO", // Remove the portal whose name is given.",
+			"&a/mw portal remove <name>&r - Removes the portal whose name is given.",
 	};
-	
+
 	/**
 	 * Valid Subcommands
 	 */
 	public static String[] SUBCOMMANDS = {
-			"create", "wand", "info"
+			"create", "wand", "info", "remove"
 	};
 
 	/**
@@ -98,8 +98,13 @@ public class PortalCommand implements Command {
 				for (Portal p : KNOWN_PORTALS.values()) {
 					message(plr, " Portal: \"" + p.getName() + "\": ");
 					String from = p.getOriginWorldId() + " (" + p.getMinPos().toShortString();
-					String to = p.getDestWorldName() + " (" + p.getDestLocation().toShortString();
-					message(plr, " - " + from + ") -> " + to + ")");
+					if (p.canTeleport()) {
+						String to = p.getDestWorldName() + " (" + p.getDestLocation().toShortString();
+						message(plr, " - " + from + ") -> " + to + ")");
+					} else {
+						message(plr, " - " + from + ") -> " + p.getDestWorldName());
+						message(plr, "   &c! Not synced - will not teleport");
+					}
 				}
 				return 1;
 			}
@@ -108,15 +113,58 @@ public class PortalCommand implements Command {
 			Portal p = KNOWN_PORTALS.getOrDefault(name, getPortalIgnoreCase(name));
 			if (null == p) {
 				message(plr, "&4Portal with the name " + name + " not found!");
+				return 0;
 			}
 			message(plr, "&6Multiworld Portals:");
 			message(plr, " Portal: \"" + p.getName() + "\": ");
 			message(plr, "  &6- From:&r " + p.getOriginWorldId() + " @ (" + p.getMinPos().toShortString() + ")");
-			message(plr, "  &6- To:&r " + p.getDestWorldName() + " @ (" + p.getDestLocation().toShortString() + ")");
+			if (p.canTeleport()) {
+				message(plr, "  &6- To:&r " + p.getDestWorldName() + " @ (" + p.getDestLocation().toShortString() + ")");
+			} else {
+				message(plr, "  &6- To:&r " + p.getDestWorldName());
+			}
 			message(plr, "  &6- Destination:&r " + p.getDestination());
+			message(plr, "  &6- Status:&r " + (p.canTeleport()
+					? "&aOK" : "&cNot synced (destination world not loaded)"));
 			message(plr, "  &6- Portal Frame:&r " + p.getLocationConfigString());
 		}
 		
+		// Portal Remove Command
+		if (args[1].equalsIgnoreCase("remove")) {
+			if (!Perm.has(plr, "multiworld.portal.remove")) {
+				message(plr, "Invalid permission! Missing: multiworld.portal.remove");
+				return 0;
+			}
+
+			if (args.length < 3) {
+				message(plr, "Usage: /mw portal remove <name>");
+				return 0;
+			}
+
+			String name = args[2];
+			Portal p = KNOWN_PORTALS.getOrDefault(name.toLowerCase(Locale.ROOT), getPortalIgnoreCase(name));
+			if (null == p) {
+				message(plr, "&4Portal with the name " + name + " not found!");
+				return 0;
+			}
+
+			// Clear the portal blocks from the world
+			p.removePortalArea();
+
+			// Remove from the in-memory map
+			KNOWN_PORTALS.remove(p.getName().toLowerCase(Locale.ROOT));
+
+			// Remove from portals.yml so it does not reappear on restart
+			try {
+				p.delete();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			message(plr, "&aPortal \"" + p.getName() + "\" removed.");
+			return 1;
+		}
+
 		// Portal Wand Command
 		if (args[1].equalsIgnoreCase("wand")) {
 			if (!Perm.has(plr, "multiworld.portal.wand")) {

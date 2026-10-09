@@ -64,6 +64,9 @@ public class FabricWorldCreator implements ICreator {
 				.setSeed(seed)
 				.setShouldTickTime(true)
 				.setWorldConstructor(MultiworldWorld::new)
+				.setSunny(0)   // set clearWeatherTime to 0 for enable weather default minecraft behavior
+				.setMirrorOverworldGameRules(false)   // per-dimension gamerules (don't share the overworld's)
+				.setMirrorOverworldDifficulty(false)  // per-dimension difficulty (don't share the overworld's)
                 ;
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);

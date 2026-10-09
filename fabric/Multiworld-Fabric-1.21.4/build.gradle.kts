@@ -3,7 +3,7 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDepen
 
 
 plugins {
-    id ("fabric-loom") version "1.13-SNAPSHOT"
+    id ("fabric-loom") version "1.15-SNAPSHOT"
     id ("maven-publish")
 	id ("java-library")
 }
@@ -54,7 +54,7 @@ dependencies {
 	// 1.21.4
     minecraft("com.mojang:minecraft:1.21.4") 
     mappings("net.fabricmc:yarn:1.21.4+build.7:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.18.3")
+    modImplementation("net.fabricmc:fabric-loader:0.19.5")
 
 	include("xyz.nucleoid:fantasy:0.6.5+1.21.2")
 	modImplementation("xyz.nucleoid:fantasy:0.6.5+1.21.2")

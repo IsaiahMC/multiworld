@@ -5,7 +5,7 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDepen
 plugins {
     id ("java-library")
     id ("maven-publish")
-	id ("dev.architectury.loom") version "1.13-SNAPSHOT"
+	id ("dev.architectury.loom") version "1.17-SNAPSHOT"
 	id ("architectury-plugin") version "3.4-SNAPSHOT"
 }
 
@@ -79,7 +79,7 @@ dependencies {
     })
 	*/
 	
-    modImplementation("net.fabricmc:fabric-loader:0.18.3")
+    modImplementation("net.fabricmc:fabric-loader:0.19.5")
 	
 	modImplementation("xyz.nucleoid:fantasy:0.4.11+1.20-rc1")
 	modImplementation("curse.maven:cyber-permissions-407695:4640544")

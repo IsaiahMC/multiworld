@@ -290,13 +290,22 @@ public class CreateCommand implements Command {
 				wc.createNewFile();
 			}
             config = new FileConfiguration(wc);
+
+			// Skip empty/incomplete legacy world configs (e.g. a stale, blank yml): nothing to load.
+			if (!config.is_set("environment")) {
+				LOGGER.warn("Skipping incomplete legacy world config: " + wc.getPath());
+				return;
+			}
+
 			String env = config.getString("environment");
+
 			long seed = 0;
-			
-			try {
-				seed = config.getLong("seed");
-			} catch (Exception e) {
-				seed = config.getInt("seed");
+			if (config.is_set("seed")) {
+				try {
+					seed = config.getLong("seed");
+				} catch (Exception e) {
+					try { seed = config.getInt("seed"); } catch (Exception ignore) { /* keep default 0 */ }
+				}
 			}
 
 			ChunkGenerator gen = get_chunk_gen(mc, env);
