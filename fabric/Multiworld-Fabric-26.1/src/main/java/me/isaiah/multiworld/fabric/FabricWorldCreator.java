@@ -170,7 +170,11 @@ public class FabricWorldCreator implements ICreator {
 
 	@Override
 	public boolean is_the_end(ServerLevel world) {
+		// #if mc262 mc263
+		// return ((ServerLevel)(Object)this).dimensionTypeRegistration().is(BuiltinDimensionTypes.END);
+		// #else
 		return world.dimensionTypeRegistration() == BuiltinDimensionTypes.END;
+		// #endif
 	}
 
 	@Override

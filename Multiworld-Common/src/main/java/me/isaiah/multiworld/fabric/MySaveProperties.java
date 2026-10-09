@@ -8,7 +8,7 @@ public class MySaveProperties extends PrimaryLevelData {
 	private PrimaryLevelData original;
 	
 	public MySaveProperties(PrimaryLevelData original) {
-		// #if mc261
+		// #if mc261 mc262 mc263
 		// super(original.getLevelSettings(), getSpecialProperty(original), original.worldGenSettingsLifecycle());
 		// #elif mc192
 		// super(original.getLevelInfo(), original.getGeneratorOptions(), original.getLifecycle());

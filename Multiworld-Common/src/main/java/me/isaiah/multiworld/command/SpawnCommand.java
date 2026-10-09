@@ -21,7 +21,14 @@ public class SpawnCommand implements Command {
 
         // Don't use FabricDimensionInternals here as
         // we are teleporting to the same world.
+        
+        // #if mc263
+        //  plr.randomTeleport(sp.getX(), sp.getY(), sp.getZ(),  true, (state) -> {
+        //    return state.liquid(); // Returns true if the block is "invalid" to teleport into
+        // });
+        // #else
         plr.randomTeleport(sp.getX(), sp.getY(), sp.getZ(), true);
+        // #endif
 
         // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(0, 0, 0), 0f, 0f);
         // ServerPlayerEntity teleported = FabricDimensionInternals.changeDimension(plr, w, target);
@@ -58,7 +65,8 @@ public class SpawnCommand implements Command {
 		
         if (!world.getWorldBorder().isWithinBounds(pos)) {
         	BlockPos pp = MultiworldMod.get_world_creator().get_pos(world.getWorldBorder().getCenterX(), 0.0, world.getWorldBorder().getCenterZ());
-            pos = world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, new BlockPos(pp));
+        	pos = world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pp);
+        	// pos = world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, new BlockPos(pp));
         }
         return pos;
     }

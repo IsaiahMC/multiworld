@@ -90,8 +90,10 @@ public class TimeCommand implements Command {
     
     // Helper Method
     public static long getDayTime(ServerLevel world) {
-    	// #if mc261
+    	// #if mc261 mc262
     	// return world.registryAccess().get(net.minecraft.world.clock.WorldClocks.OVERWORLD).map( holder -> world.clockManager().getTotalTicks( holder ) ).orElse(0L);
+    	// #elif mc263
+    	// return world.registryAccess().get(net.minecraft.world.clock.WorldClocks.OVERWORLD).map(holder -> world.clockManager().getInstance(holder).totalTicks()).orElse(0L);
     	// #else
 		return world.getDayTime();
 		// #endif
@@ -99,7 +101,7 @@ public class TimeCommand implements Command {
     
     // Helper Method
     private static void setDayTime(ServerLevel world, long ticks) {
-    	// #if mc261
+    	// #if mc261 mc262 mc263
     	// world.registryAccess().get(net.minecraft.world.clock.WorldClocks.OVERWORLD).ifPresent( holder -> world.clockManager().setTotalTicks( holder, ticks ) );
 		// #else
     	world.setDayTime(ticks);

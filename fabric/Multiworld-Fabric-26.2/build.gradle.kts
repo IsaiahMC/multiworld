@@ -13,8 +13,11 @@ java {
 }
 
 // Preprocess
-extensions.extraProperties["targetVersion"] = "mc261"
-extensions.extraProperties["inputSourceDir"] = "${rootProject.projectDir}/Multiworld-Common/src/main/java"
+extensions.extraProperties["targetVersion"] = "mc262"
+extensions.extraProperties["inputSourceDir"] = listOf(
+	"${rootProject.projectDir}/Multiworld-Common/src/main/java",
+	"${rootProject.projectDir}/fabric/Multiworld-Fabric-26.1/src/main/java"
+)
 extensions.extraProperties["excludedFiles"] =
     listOf("java/me/isaiah/multiworld/command/GameruleCommand.java")
     //      java/me/isaiah/multiworld/command/GameruleCommand.java
@@ -25,7 +28,7 @@ createPreprocessor.call(project)
 
 base {
     archivesName = "Multiworld-Fabric"
-    version = "26.1"
+    version = "26.2"
     group = "me.isaiah.mods"
 }
 
@@ -46,18 +49,18 @@ dependencies {
 	// annotationProcessor("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	// compileOnly("com.pkware.jabel:jabel-javac-plugin:1.0.1-1")
 	
-	// Minecraft 26.1
-    minecraft("com.mojang:minecraft:26.1.2") 
+	// Minecraft 26.2
+    minecraft("com.mojang:minecraft:26.2") 
     implementation("net.fabricmc:fabric-loader:0.19.5")
 	
 	// fantasy snapshot: https://pisaiah.com/maven-repo/
-	include("xyz.nucleoid:fantasy:0.8.0+26.1.2")
-	implementation("xyz.nucleoid:fantasy:0.8.0+26.1.2")
+	include("xyz.nucleoid:fantasy:0.8.3+26.2")
+	implementation("xyz.nucleoid:fantasy:0.8.3+26.2")
 	implementation("me.lucko:fabric-permissions-api:0.7.0")
 
 	compileOnly("curse.maven:cyber-permissions-407695:7068279")
 
-	implementation("net.fabricmc.fabric-api:fabric-api:0.145.4+26.1.2")
+	implementation("net.fabricmc.fabric-api:fabric-api:0.161.0+26.2")
 
 	
 	val ic = DefaultExternalModuleDependency(

@@ -10,7 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
-// #if mc2111 mc261
+// #if mc2111 mc261 mc262 mc263
 // import net.minecraft.world.level.gamerules.GameRules;
 // #else
 import net.minecraft.world.level.GameRules;
@@ -82,7 +82,7 @@ public class InfoCommand implements Command {
         String state = thundering ? "thunder" : (raining ? "rain" : "clear");
         StringBuilder weather = new StringBuilder("&aWeather&r: " + state);
         if (w.getLevelData() instanceof ServerLevelData props) {
-        	// #if mc261 mc262 
+        	// #if mc261 mc262 mc263 mc262 
         	// net.minecraft.world.level.saveddata.WeatherData wth = w.getWeatherData();
         	// int clear = wth.getClearWeatherTime();
             // int rain = wth.getRainTime();
@@ -102,7 +102,7 @@ public class InfoCommand implements Command {
         GameRules worldRules = w.getGameRules();
         GameRules overworldRules = mc.overworld().getGameRules();
         List<String> diffs = new ArrayList<>();
-        // #if mc2111 mc261
+        // #if mc2111 mc261 mc262 mc263
         // // TODO: Implement gamerule comparison for 1.21.11+
         // #else
         worldRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {

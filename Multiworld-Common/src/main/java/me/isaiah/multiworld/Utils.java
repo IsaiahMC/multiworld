@@ -256,7 +256,7 @@ public class Utils {
  	}
  	
  	public static LevelStorageAccess getServerSession(MinecraftServer server) {
- 		// #if mc261
+ 		// #if mc261 mc262 mc263
  		// return ((MinecraftServerAccess) server).getStorageSource();
  		// #else
  		return ((MinecraftServerAccess) server).getSession();
@@ -264,7 +264,7 @@ public class Utils {
  	}
  	
  	public static Path getDimensionPath(MinecraftServer server, ResourceKey<Level> level) {
- 		// #if mc261
+ 		// #if mc261 mc262 mc263
  		// return ((MinecraftServerAccess) server).getStorageSource().getLevelPath(net.minecraft.world.level.storage.LevelResource.ROOT);
  		// #else
  		return getServerSession(server).getDimensionPath(level);

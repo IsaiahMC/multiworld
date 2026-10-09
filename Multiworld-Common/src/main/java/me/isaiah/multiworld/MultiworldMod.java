@@ -418,7 +418,7 @@ public class MultiworldMod {
 
 	public static void message(Player player, String message) {
 		try {
-			// #if mc261
+			// #if mc261 mc262 mc263
 			// player.sendSystemMessage(Component.nullToEmpty(translate_alternate_color_codes('&', message)));
 			// #else
 			player.displayClientMessage(Component.nullToEmpty(translate_alternate_color_codes('&', message)), false);
@@ -431,7 +431,7 @@ public class MultiworldMod {
 	public static void message(CommandSourceStack s, String message) {
 		try {
 			ServerPlayer player = s.getPlayer();
-			// #if mc261
+			// #if mc261 mc262 mc263
 			// player.sendSystemMessage(Component.nullToEmpty(translate_alternate_color_codes('&', message)), false);
 			// #else
 			player.displayClientMessage(Component.nullToEmpty(translate_alternate_color_codes('&', message)), false);

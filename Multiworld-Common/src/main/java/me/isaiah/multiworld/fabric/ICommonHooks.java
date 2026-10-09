@@ -34,7 +34,7 @@ public class ICommonHooks {
 	
 	public static Level getWorld(Player player) {
 		try {
-			// #if mc261
+			// #if mc261 mc262 mc263
 			// // empty 
 			// #elif mc182
 			// // empty
@@ -68,7 +68,7 @@ public class ICommonHooks {
         MultiworldMod.LOGGER.info("Multiworld: Registered '" + r + "' iCommon events.");
 	}
 	
-	// #if mc261
+	// #if mc261 mc262 mc263
 	// // TODO: 26.1: Update iCommon EntityPortalCollideEvent
 	// #elif mc182
 	// // TODO: 1.18.2 icommon portal enter event

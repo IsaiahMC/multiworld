@@ -20,17 +20,26 @@ ext.createPreprocessor = { Project proj ->
 
     proj.tasks.register("preprocess") {
         // def inputDir = proj.file("src/main/java")
-        def inputDir = proj.file(proj.ext.inputSourceDir ?: "src/main/java")
+        // def inputDir = proj.file(proj.ext.inputSourceDir ?: "src/main/java")
+		
+		 // Fetch the raw value (could be a String or a List)
+        def rawInputDir = proj.ext.has("inputSourceDir") ? proj.ext.inputSourceDir : "src/main/java"
+        
+        // Coerce into a flat list, then convert each path into a Gradle File object
+        def inputDirs = [rawInputDir].flatten().collect { proj.file(it) }
+		
         def excluded = proj.hasProperty("excludedFiles") ? proj.ext.excludedFiles : []
 		def outputDir = preprocessDir.get().asFile
 
-        inputs.dir(inputDir)
+        inputs.files(inputDirs)
         outputs.dir(outputDir)
 
         doLast {
             outputDir.deleteDir()
             outputDir.mkdirs()
 
+			inputDirs.each { inputDir ->
+                if (inputDir.exists()) {
             inputDir.eachFileRecurse { file ->
                 if (file.isFile() && file.name.endsWith(".java")) {
 				
@@ -141,6 +150,8 @@ ext.createPreprocessor = { Project proj ->
                     outFile.text = out.toString()
                 }
             }
+			}
+			}
         }
     }
 	
