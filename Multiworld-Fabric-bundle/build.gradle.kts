@@ -59,9 +59,6 @@ dependencies {
 	
 	// 1.21.x
 	include(project(":Multiworld-Fabric-1.21.1"))
-	// include(project(":Multiworld-Fabric-1.21.4"))
-	// include(project(":Multiworld-Fabric-1.21.8"))
-	// include(project(":Multiworld-Fabric-1.21.10"))
 	include(project(":Multiworld-Fabric-1.21.11"))
 	include(project(":Multiworld-Fabric-26.1"))
 }
